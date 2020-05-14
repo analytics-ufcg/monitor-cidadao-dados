@@ -1,0 +1,163 @@
+---
+title: 2º Experimento utilizando Regressão logística e features de contratos associados
+  a obras
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo=FALSE)
+```
+
+```{r}
+library(here)
+library(tidyverse)
+library(caret)
+library(DT)
+theme_set(theme_bw())
+```
+
+```{r echo=FALSE}
+source(here("lib/tipologias.R"))
+source(here("lib/medidas_avaliacao.R"))
+```
+
+```{r echo=FALSE}
+## Caso a consulta que retorna as tipologias não tiver sido executada ainda
+## dados_contratos <- tipologias_contratos_obras(ano_inicial, ano_final)
+contratos_obras <- read_csv(here("data/tipologias_contratos_obras.csv")) %>% 
+    mutate(cd_UGestora = as.character(cd_UGestora),
+           dt_Inicio = as.character(dt_Inicio))
+```
+
+Para este experimento foi feito um cruzamento dos dados de obras presente no Banco de Obras (TCE-PB) com a base de dados do SAGRES. O objetivo é utilizar os dados de contratos relacionados a obras para o treinamento de um modelo de previsão do status do contrato.
+
+# Modelo Regressão Logística usando dados de Obras e features do SAGRES
+
+A primeira fase deste experimento considera todos os dados de contratos associados a Obras entre os anos de 2014 e 2017. A origem destes anos é obtida nas informações de contrato presentes na base do SAGRES. Um conjunto de features foram geradas considerando informações sobre o contrato mas também informações sobre a empresa até o dia da assinatura do contrato.
+
+Os dados foram divididos em dois subconjuntos: treino (80%) e teste (20%). Existem features que possuem valor NA para algumas observações. Para esta primeira etapa estas observações serão removidas.
+
+```{r}
+dados_contratos <- contratos_obras %>% 
+    mutate(status = as.factor(status)) %>% 
+    na.omit() %>% 
+    mutate(descricao_tipo_logradouro = case_when(
+        descricao_tipo_logradouro == "RUA" ~ "RUA",
+        descricao_tipo_logradouro == "AVENIDA" ~ "AVENIDA",
+        descricao_tipo_logradouro == "SITIO" ~ "RURAL",
+        descricao_tipo_logradouro == "FAZENDA" ~ "RURAL",
+        TRUE ~ "OUTRO"
+    ))
+```
+
+```{r}
+set.seed(175)
+train_ids <- createDataPartition(dados_contratos$status, p=0.8, list = FALSE)
+
+treino <- dados_contratos[train_ids,]
+teste <- dados_contratos[-train_ids,]
+```
+
+Os valores absolutos e relativos das classes de contrato dentro do conjunto de dados estão apresentado a seguir
+```{r}
+table(dados_contratos$status) %>% as_tibble(.name_repair = 'minimal') %>% datatable(options = list(pageLength = 5, dom = 't'), class = 'cell-border stripe', rownames = FALSE, colnames = c("Classe", "Número de observações"))
+
+prop.table(table(dados_contratos$status)) %>% as_tibble(.name_repair = 'minimal') %>% datatable(options = list(pageLength = 5, dom = 't'), class = 'cell-border stripe', rownames = FALSE, colnames = c("Classe", "Porcentagem"))
+```
+
+O modelo foi treinado utilizando apenas os dados de treino, aplicando o método glm e usando cross-validation.
+
+```{r}
+params_preproc <- preProcess(treino, method = c("nzv", "YeoJohnson"))
+treino_transformado <- predict(params_preproc, treino)
+```
+
+```{r results='hide'}
+train_ctrl <- trainControl(method = "repeatedcv", 
+                     number = 5, 
+                     repeats = 10, 
+                     verboseIter = TRUE)
+
+model_glm <- caret::train(status ~ ., 
+                          treino_transformado %>% select(-c(cd_UGestora, nu_Contrato, 
+                                               nu_CPFCNPJ, dt_Inicio)),
+                          method='glm', 
+                          family=binomial(), 
+                          trControl = train_ctrl)
+model_glm
+```
+
+A avaliação do modelo é feita utilizando os dados de teste, que correspondem a 20% dos dados originais e não foram utilizados durante o treinamento do modelo.
+
+```{r}
+teste_transformado <- predict(params_preproc, teste)
+```
+
+
+```{r}
+predicao <- predict(model_glm, teste_transformado %>% select(-c(cd_UGestora, nu_Contrato, 
+                                               nu_CPFCNPJ, dt_Inicio)), type = "raw")
+
+prob_positiva <- predict(model_glm, teste_transformado %>% select(-c(cd_UGestora, nu_Contrato, 
+                                               nu_CPFCNPJ, dt_Inicio)), type = "prob")[[2]]
+
+
+teste_transformado$predicao <- predicao
+teste_transformado$prob <- prob_positiva
+```
+
+```{r}
+teste_predicted <- teste_transformado %>%
+    arrange(desc(prob)) %>% 
+    tibble::rowid_to_column(var = "position")
+```
+
+As métricas utilizadas são F1, AUC (área sob a curva), precision, recall, apresentadas, respectivamente, a seguir
+
+```{r}
+f1_pred <- f1(teste_predicted, "predicao", "status")
+auc_pred <- auc_metric(teste_predicted %>% mutate(predicao = as.numeric(predicao)), "predicao", "status")
+precision_pred <- precision(teste_predicted, "predicao", "status")
+recall_pred <- recall(teste_predicted, "predicao", "status")
+ndcg_pred <- ndcg(teste_predicted, "position", "status")
+```
+
+A matriz de confusão e outras métricas é a seguinte
+```{r}
+confusionMatrix(teste_predicted$predicao, teste_predicted$status, positive = "1")
+```
+
+### Avaliação
+
+A avaliação dos modelos treinados com relação as métricas pode ser observada na tabela a seguir.
+
+```{r}
+avaliacao <- data.frame(modelo = c("Regressão Logística (2014-2017)"), 
+                         f1 = c(f1_pred), 
+                         auc = c(auc_pred),
+                         precision = c(precision_pred),
+                         recall = c(recall_pred),
+                         ndcg = c(ndcg_pred),
+                         stringsAsFactors = FALSE) %>% 
+    mutate(f1 = round(f1, 5),
+           auc = round(auc, 5),
+           ndcg = round(ndcg, 5))
+
+saveRDS(avaliacao, here("data/evaluation_logreg.rds"))
+
+datatable(
+  avaliacao, options = list(pageLength = 5, dom = 't'), class = 'cell-border stripe', rownames = FALSE
+)
+```
+
+### Importância das features
+
+Para a avaliação das features mais relevantes para o modelo foi adotada a função varImp fornecida pelo pacote caret.
+
+```{r}
+features <- varImp(model_glm)
+
+features
+```
