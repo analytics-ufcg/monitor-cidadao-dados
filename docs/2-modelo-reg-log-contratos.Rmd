@@ -1,0 +1,89 @@
+---
+title: "1º Experimento utilizando Regressão logística e features de contratos"
+output: html_document
+---
+
+```{r}
+library(here)
+library(tidyverse)
+library(unbalanced)
+library(caret)
+```
+
+```{r}
+source(here("lib/sagres/load_fornecedores_pagamentos.R"))
+source(here("lib/tipologias.R"))
+source(here("lib/medidas_avaliacao.R"))
+source(here("lib/gabaritos/carrega_gabarito_empresas.R"))
+
+ano_inicial <- 2011
+ano_final <- 2014
+```
+
+# Modelo Regressão Logística usando features do SAGRES
+
+As features usadas neste modelo são: total pago à empresa, total de municípios que a empresa forneceu, tipo de licitação mais comum para a empresa. Essas features foram geradas considerando os anos entre 2011 e 2014 (intervalo fechado).
+
+O gabarito para determinar se uma empresa é suspeita ou não é determinado pela presença desta empresa no CEIS com uma data de início de sanção entre os anos de 2015 e 2016 (intervalo fechado).
+
+### Importando dados
+
+```{r}
+contratos <- carrega_contratos(ano_inicial, ano_final)
+
+cnpjs <- c(as.numeric(contratos$nu_CPFCNPJ) %>% na.omit())
+
+#features <- tipologias_contratos_gerais(ano_inicial, ano_final, cnpjs)
+features <- tipologias_contratos_gerais(ano_inicial, ano_final)
+```
+
+### Cruzando dados com o gabarito
+
+Cada observação nos dados se refere a um contrato, portanto podem existir observações repetidas para um mesmo fornecedor.
+```{r}
+dados <- contratos %>% 
+  select(nu_CPFCNPJ) %>% 
+  left_join(features, by =  c("nu_CPFCNPJ" = "cd_Credor")) %>% 
+  filter(!is.na(n_municipios))
+
+dados <- carrega_gabarito_empresas(dados, "nu_CPFCNPJ")
+```
+
+### Configurações do treinamento
+
+```{r}
+set.seed(175)
+train_ids <- createDataPartition(dados$status, p=0.8, list = FALSE)
+
+treino <- dados[train_ids,]
+teste <- dados[-train_ids,]
+
+balance <- ubBalance(treino, treino$status, type = "ubOver", positive = 1, k = 50, verbose = TRUE)
+
+treino_oversampled <- balance$X
+```
+
+```{r}
+ctrl <- trainControl(method = "repeatedcv", 
+                     number = 5, 
+                     repeats = 10, 
+                     verboseIter = TRUE)
+
+model_glm <- caret::train(status ~ n_municipios + total_ganho + top_tp_Licitacao, 
+                          treino_oversampled, method='glm', trControl = ctrl)
+
+model_glm
+
+```
+
+### Avaliação do modelo
+
+```{r}
+predicao <- predict(model_glm, teste)
+
+teste$predicao <- ifelse(predicao == 0, 0, 1)
+teste$status <- ifelse(teste$status == 0, 0, 1)
+
+f1(teste, "predicao", "status")
+auc_metric(teste, "predicao", "status")
+```

@@ -1,0 +1,58 @@
+---
+title: "Distribuição dos valores de contratos"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  fig.align = 'center',
+  fig.width = 7)
+```
+<style> .html-widget { margin: auto; } </style>
+
+```{r}
+library(tidyverse)
+library(RMySQL)
+library(plotly)
+library(here)
+options(scipen = 999)
+
+theme_set(theme_minimal())
+```
+
+```{r}
+source(here("lib/sagres/load_fornecedores_pagamentos.R"))
+```
+
+## Objetivo
+
+O objetivo desta análise é entender sobre a distribuição de valores dos contratos presentes na base de dados do SAGRES. 
+
+#### Contratos
+A visualização a seguir considera todos os contratos firmados entre fornecedores e Administração Pública ligada aos municípios do Estado da Paraíba.
+
+```{r}
+contratos <- carrega_contratos(ano_inicial = 2011, ano_final = 2014)
+```
+
+```{r}
+contratos %>% 
+    plot_ly(x = ~vl_TotalContrato, type = "histogram") %>% 
+    config(displayModeBar = F) %>% 
+    layout(title = 'Distribuição dos contratos',
+           xaxis = list(title = "Valor total do Contrato"),
+           yaxis = list(title = "Número de contratos"),
+           margin = list(t = 40))
+```
+
+Pela visualização acima é difícil perceber a distribuição uma vez que existem valores muito altos para alguns contratos.
+
+As medidas estatísticas relacionadas ao valor dos contratos são apresentadas a seguir
+```{r}
+summary(contratos$vl_TotalContrato)
+```
+
+
