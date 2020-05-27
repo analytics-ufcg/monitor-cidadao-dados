@@ -1,0 +1,5 @@
+Host host
+HostName hostname
+Port portnumber
+User username
+ServerAliveInterval interval

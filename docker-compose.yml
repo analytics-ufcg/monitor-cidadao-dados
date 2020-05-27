@@ -1,0 +1,22 @@
+version: '3.5'
+
+services:   
+
+  rbase:
+    build: 
+      context: fetcher/
+    container_name: r-container-fetcher
+    restart: always
+    environment:
+      - USER=${USER:-admin}
+      - PASSWORD=${PASSWORD:-secret}  
+    volumes:
+      - ./fetcher:/app/fetcher
+    ports:
+      - 8787:8787
+    networks:
+      - proxynet
+
+networks:
+  proxynet:
+    name: monitor_cidadao_network
