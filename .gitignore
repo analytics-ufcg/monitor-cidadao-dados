@@ -2,4 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
-
+id_rsa
+id_rsa.pub
+known_hosts
+config
