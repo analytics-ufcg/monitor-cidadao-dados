@@ -33,10 +33,10 @@ sudo make build
 Execute os serviços:
 
 ```shell
-make make run
+sudo make run
 ```
 
-### Busca e Processamento
+## Busca e Processamento
 
 O processamento de dados do Monitor Cidadão tem, atualmente, os seguintes passos:
 
@@ -44,7 +44,7 @@ O processamento de dados do Monitor Cidadão tem, atualmente, os seguintes passo
 
 Para realizar estes passos siga o tutorial:
 
-#### 1. Fetcher
+### 1. Fetcher
 
 
 
