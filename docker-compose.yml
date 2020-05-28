@@ -9,7 +9,12 @@ services:
     restart: always
     environment:
       - USER=${USER:-admin}
-      - PASSWORD=${PASSWORD:-secret}  
+      - PASSWORD=${PASSWORD:-secret} 
+      - MYSQL_HOST=${MYSQL_HOST:-host}
+      - MYSQL_DB=${MYSQL_DB:-db}
+      - MYSQL_PORT=${MYSQL_PORT:-3306}
+      - MYSQL_USER=${MYSQL_USER:-user}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-secret}
     volumes:
       - ./fetcher:/app/fetcher
     ports:

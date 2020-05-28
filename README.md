@@ -12,7 +12,17 @@ Obs: todos comandos citados nesse README utilizam o make como facilitador para e
 
 ### Setup
 
+#### Acesso à VM
+
 Para que nossos serviços tenham o devido acesso aos dados (hospedados em uma Máquina Virtual remota e privada), preencha os arquivos em `fetcher/credenciais` com as credenciais e chaves necessárias.
+
+#### Acesso aos Bancos
+
+Crie uma cópia do arquivo .env.sample no diretório raiz desse repositório e renomeie para .env (deve também estar no diretório raiz desse repositório)
+
+Preencha as variáveis contidas no .env.sample também para o .env. Altere os valores conforme sua necessidade. 
+
+#### Serviços
 
 Faça o build das imagens docker com as dependências:
 
