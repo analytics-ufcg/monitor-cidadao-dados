@@ -23,7 +23,7 @@ sudo make build
 Execute os serviços:
 
 ```shell
-make make run
+sudo make run
 ```
 
 ### Busca e Processamento
