@@ -17,9 +17,9 @@ COPY ./credenciais/config ./ \
 RUN chown root ./config && \
     chmod 400 ./id_rsa
 
-WORKDIR ../../app
+WORKDIR ../../app/fetcher
 
 ## Instala dependências
-RUN R -e "install.packages(c('DBI', 'RMySQL'), repos='http://cran.rstudio.com/')"
+RUN R -e "install.packages(c('DBI', 'RMySQL', 'here', 'crayon', 'testthat'), repos='http://cran.rstudio.com/')"
 
 EXPOSE 8787
