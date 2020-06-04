@@ -1,0 +1,27 @@
+version: '3.5'
+
+services:   
+
+  rbase:
+    build: 
+      context: fetcher/
+    container_name: r-container-fetcher
+    restart: always
+    environment:
+      - USER=${USER:-admin}
+      - PASSWORD=${PASSWORD:-secret} 
+      - MYSQL_HOST=${MYSQL_HOST:-host}
+      - MYSQL_DB=${MYSQL_DB:-db}
+      - MYSQL_PORT=${MYSQL_PORT:-3306}
+      - MYSQL_USER=${MYSQL_USER:-user}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-secret}
+    volumes:
+      - ./fetcher:/app/fetcher
+    ports:
+      - 8787:8787
+    networks:
+      - proxynet
+
+networks:
+  proxynet:
+    name: monitor_cidadao_network

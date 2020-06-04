@@ -1,0 +1,5 @@
+MYSQL_HOST <- Sys.getenv("MYSQL_HOST")
+MYSQL_USER <- Sys.getenv("MYSQL_USER")
+MYSQL_DB <- Sys.getenv("MYSQL_DB")
+MYSQL_PORT <- Sys.getenv("MYSQL_PORT")
+MYSQL_PASSWORD <- Sys.getenv("MYSQL_PASSWORD")
