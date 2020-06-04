@@ -4,3 +4,4 @@
 .Ruserdata
 .env
 ./fetcher/credenciais/*
+server/node_modules/
