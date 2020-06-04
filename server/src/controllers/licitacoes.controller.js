@@ -1,14 +1,14 @@
-const { sql, poolPromise } = require("../config/sagres.database");
+const models = require("../models/index.model");
+
+const Licitacao = models.licitacao;
+
+const BAD_REQUEST = 400;
+const SUCCESS = 200;
 
 exports.getLicitacoes = async (req, res) => {
-    var query = 'SELECT TOP 10 cd_UGestora, nu_licitacao, vl_licitacao, de_Obs FROM Licitacao';
-    try {
-        const pool = await poolPromise;
-        const result = await pool.request().query(query);
-        res.send(result.recordset);
-    } catch (e) {
-        console.error(e)
-    }
+    Licitacao.findAll({limit: 10})
+    .then(licitacoes => res.status(SUCCESS).json(licitacoes))
+    .catch(err => res.status(BAD_REQUEST).json({ err }));
 };
 
 
