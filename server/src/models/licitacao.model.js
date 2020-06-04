@@ -1,3 +1,8 @@
+/**
+ * Arquivo: models/index.model.js
+ * Descrição: arquivo com o modelo da licitacao.
+ */
+
 module.exports = (sequelize, type) => {
     Licitacao = sequelize.define(
         "Licitacao",

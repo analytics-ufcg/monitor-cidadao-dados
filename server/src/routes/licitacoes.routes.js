@@ -1,6 +1,6 @@
 /**
  * Arquivo: src/routes/licitacoes.routes.js
- * Descrição: arquivo responsável pelas rotas da api relacionado a classe 'Licitacoes'.
+ * Descrição: arquivo responsável pelas rotas da api relacionadas a classe 'Licitacoes'.
  */
 
 const router = require('express-promise-router')();
