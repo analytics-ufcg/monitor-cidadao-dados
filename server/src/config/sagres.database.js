@@ -1,7 +1,7 @@
 var sql = require("mssql");
 
 const path = require('path')
-const { SAGRES } = require("../config/index");
+const { SAGRES } = require("./db.config");
 
 const poolPromise = new sql.ConnectionPool(SAGRES)
   .connect()
