@@ -38,10 +38,10 @@ A execução do back-end ainda não está sendo feita com o auxílio do docker. 
 
 Adicione as informações do SQLServer no .env (essas informações estão no arquivo '07 - Instruções e Acessos Monitor Cidadão') .
 >SQLSERVER_SAGRES19_HOST
-SQLSERVER_SAGRES19_Database
-SQLSERVER_SAGRES19_USER
-SQLSERVER_SAGRES19_PASS
-SQLSERVER_SAGRES19_PORT
+>SQLSERVER_SAGRES19_Database
+>SQLSERVER_SAGRES19_USER
+>SQLSERVER_SAGRES19_PASS
+>SQLSERVER_SAGRES19_PORT
 
 Agora, para executar, bastar entrar na pasta **server** via terminal e inserir o comando:
  > nodemon
