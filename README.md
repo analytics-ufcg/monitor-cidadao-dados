@@ -36,6 +36,9 @@ sudo make run
 
 A execução do back-end ainda não está sendo feita com o auxílio do docker. Dessa forma, antes de tudo, garanta que você tenha instalado em sua máquina o **nodejs**, **npm** e o **nodemon**.
 
+Instale os pacotes necessários (cd monitor-cidadao/server):
+> npm install 
+
 Adicione as informações do SQLServer no .env (essas informações estão no arquivo '07 - Instruções e Acessos Monitor Cidadão') .
 - SQLSERVER_SAGRES19_HOST
 - SQLSERVER_SAGRES19_Database
