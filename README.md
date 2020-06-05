@@ -7,7 +7,7 @@ Todos os serviços utilizados pelo Monitor Cidadão utilizam docker para configu
 
 Instale o [docker](https://docs.docker.com/install/) e o [docker-compose](https://docs.docker.com/compose/install/). Tenha certeza que você também tem o [Make](https://www.gnu.org/software/make/) instalado.
 
-Obs: todos comandos citados nesse README utilizam o make como facilitador para execução. Caso você queira executar os comandos docker diretamente confira o código correspondende a seu comando no arquivo `Makefile` na raiz desse repositório.
+Obs: todos comandos citados nesse README utilizam o make como facilitador para execução. Caso você queira executar os comandos docker diretamente confira o código correspondente a seu comando no arquivo `Makefile` na raiz desse repositório.
 
 
 ### Setup
@@ -20,7 +20,7 @@ Para que nossos serviços tenham o devido acesso aos dados (hospedados em uma M�
 
 Crie uma cópia do arquivo .env.sample no diretório raiz desse repositório e renomeie para .env (deve também estar no diretório raiz desse repositório)
 
-Preencha as variáveis contidas no .env.sample também para o .env. Altere os valores conforme sua necessidade. 
+Preencha as variáveis contidas no .env. Altere os valores conforme sua necessidade. 
 
 #### Serviços
 
