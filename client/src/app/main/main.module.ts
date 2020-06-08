@@ -1,3 +1,4 @@
+import { LicitacoesModule } from './../licitacoes/licitacoes.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -13,7 +14,8 @@ import { SobreComponent } from './sobre/sobre.component';
   ],
   imports: [
     CommonModule,
-    MainRoutingModule
+    MainRoutingModule,
+    LicitacoesModule
   ]
 })
 export class MainModule { }

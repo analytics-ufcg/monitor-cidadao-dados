@@ -1,0 +1,25 @@
+<ul class="list-group mt-2 col-lg-12" *ngFor="let licitacao of licitacoes; let i = index">
+    <li class="list-group-item">
+
+        <div class="row">
+            <div class="col-9">
+                <p class="text-secondary"><strong>Número:</strong> {{ licitacao.nu_licitacao }}</p>
+            </div>
+            <div class="col-sm align-self-end">
+                <p class="text-secondary"><strong>Valor:</strong> R$ {{ licitacao.vl_licitacao }}</p>
+            </div>
+        </div>
+
+        <p class="text-secondary text-justify mr-4"><strong>Descrição:</strong> {{ licitacao.de_Obs }}</p>
+
+        <div class="container text-right">
+            <span class="badge badge-secondary mr-2 text-light">Obra</span>
+            <span class="badge badge-secondary mr-2 text-light">Prestação de serviços</span>
+            <span class="badge badge-secondary mr-2 text-light">Aquisição de bens</span>
+        </div>
+    </li>
+</ul>
+
+<div class="mt-3" *ngIf="licitacoes.length === 0">
+    <p> <strong> Nenhuma licitação no momento. </strong> </p>
+</div>

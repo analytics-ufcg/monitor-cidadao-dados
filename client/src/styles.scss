@@ -1,1 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* Importing Bootstrap SCSS file. */
+@import "../node_modules/bootstrap/scss/functions";
+@import "assets/bootstrap/variables";
+@import "~bootstrap/scss/bootstrap";
+@import url("https://fonts.googleapis.com/css2?family=Titillium+Web:wght@600;900&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400&display=swap');
+@import "assets/bootstrap/overhide";
+
+body {
+    background-color: #fbfbfb;
+    font-family: 'Rubik', sans-serif;
+}
