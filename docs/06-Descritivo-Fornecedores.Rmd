@@ -1,0 +1,120 @@
+---
+title: "Fornecedores de Licitações Paraibanas"
+author: "Monitor Cidadão - Laboratório Analytics"
+date: "6/12/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  fig.retina = 2,
+  collapse = TRUE,
+  out.width = "100%",
+  fig.asp = 0.618  # 1 / phi
+  # fig.show = "hold"
+)
+
+options(scipen = 999)
+Sys.setlocale(category = "LC_ALL", locale = "pt_PT.UTF-8")
+```
+
+```{r libraries, message=FALSE, warning=FALSE, include=FALSE}
+library(here) 
+library(readr)
+library(plyr)
+library(dplyr)
+library(ggplot2)
+
+library(knitr) # tabelas bonitas
+library(kableExtra)
+
+library(leaflet) # mapas
+library(rgdal)
+
+library(lubridate)
+library(stringi)
+
+theme_set(theme_minimal())
+```
+
+
+```{r, include=FALSE}
+# banco
+```
+
+
+```{r, include=FALSE}
+# Listagem de tabelas existentes
+# dbListTables(sagres)
+```
+
+-----
+<br>
+
+## 1 Fornecedores de Licitações Paraibanas
+
+Neste relatório, analisaremos os fornecedores de licitações paraibanas, que foram analisadas no nosso relatório anterior (incluir link para o relatório da licitações). 
+
+Um fornecedor é aquele que fornece mercadorias ou serviços a um consumidor. Nesta análise em especial, considera-se como fornecedor toda empresa ou pessoa física que está ligada a uma licitação
+
+<br>
+
+## 2 Dados
+
+```{r, include=FALSE}
+#Recupera tabela de fornecedores
+# get_fornecedores <- sql('SELECT l.* FROM Fornecedores l')
+ 
+# fornecedores <- tbl(sagres, get_fornecedores) %>%
+#  collect(n = Inf)
+
+#write.csv(fornecedores, "Fornecedores-Sagres2017.csv")
+
+#Recupera a tabela de fornecedores inabilitados
+# get_fornecedores_inabilitados <- sql('SELECT l.* FROM FornecedoresInabilitados l')
+
+#fornecedores_inabilitados <- tbl(sagres, get_fornecedores_inabilitados) %>%
+#  collect(n = Inf)
+
+#write.csv(fornecedores_inabilitados, "Fornecedores-Inabilitados-Sagres2017.csv")
+
+fornecedores <- read_csv("Fornecedores-Sagres2017.csv")
+
+fornecedores_inabilitados <- read_csv("Fornecedores-Inabilitados-Sagres2017.csv")
+
+```
+
+No Sistema de Acompanhamento da Gestão dos Recursos da Sociedade (SAGRES), estão contidos `r nrow(fornecedores)` fornecedores. Destes, `r nrow(fornecedores_inabilitados)` são inabilitados.
+
+```{r, include=FALSE}
+range_ano <- fornecedores$dt_Ano
+range_ano <- range_ano %>% na.omit()
+```
+
+Temos fornecedores que participaram de licitações de `r min(range_ano)` a `r max(range_ano)`.
+
+```{r, include=FALSE}
+range_ano <- fornecedores$dt_MesAno
+range_ano <- range_ano %>% na.omit()
+
+min(range_ano)
+max(range_ano)
+```
+
+### Número de Propostas por Fornecedor 
+
+```{r}
+#(Plotar gráfico mostrando a quantidade de propostas cada fornedor apresentou - ou de quantas licitações participou)
+
+# fornecedores %>% 
+#  group_by(no_Fornecedor) %>% 
+#  summarise(total_propostas = n()) %>% 
+#  na.omit() %>% 
+#  #filter(nu_Propostas < 50) %>% 
+#  ggplot(aes(x = no_Fornecedor, y = total_propostas)) +
+#  geom_bar(stat = "identity", fill = "dodgerblue4") +
+#  labs(x = "", y = "Contagem", 
+#       title = "Frequência da Quantidade de Propostas por Fornecedor", subtitle = "nas licitações de municípios paraibanos")
+```
