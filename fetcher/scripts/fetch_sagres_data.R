@@ -21,4 +21,8 @@ licitacoes <- fetch_licitacoes(sagres_2017)
 
 readr::write_csv(licitacoes, here::here("./data/licitacoes.csv"))
 
+codigo_subfuncao <- fetch_codigo_subfuncao(sagres_2017)
+
+readr::write_csv(codigo_subfuncao, here::here("./data/codigo_subfuncao.csv"))
+
 DBI::dbDisconnect(sagres_2017)
