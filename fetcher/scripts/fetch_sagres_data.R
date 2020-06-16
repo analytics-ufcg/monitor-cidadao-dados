@@ -18,15 +18,25 @@ tryCatch({sagres_2017 <- DBI::dbConnect(RMySQL::MySQL(),
 DBI::dbGetQuery(sagres_2017, "SET NAMES 'utf8'")
 
 licitacoes <- fetch_licitacoes(sagres_2017)
-
 readr::write_csv(licitacoes, here::here("./data/licitacoes.csv"))
 
-codigo_subfuncao <- fetch_codigo_subfuncao(sagres_2017)
+tipo_objeto_licitacao <- fetch_tipo_objeto_licitacao(sagres_2017)
+readr::write_csv(tipo_objeto_licitacao, here::here("./data/tipo_objeto_licitacao.csv"))
 
+tipo_modalidade_licitacao <- fetch_tipo_modalidade_licitacao(sagres_2017)
+readr::write_csv(tipo_modalidade_licitacao, here::here("./data/tipo_modalidade_licitacao.csv"))
+
+regime_execucao <- fetch_regime_execucao(sagres_2017)
+readr::write_csv(regime_execucao, here::here("./data/regime_execucao.csv"))
+
+contratos <- fetch_contratos(sagres_2017)
+readr::write_csv(contratos, here::here("./data/contratos.csv"))
+
+codigo_subfuncao <- fetch_codigo_subfuncao(sagres_2017)
 readr::write_csv(codigo_subfuncao, here::here("./data/codigo_subfuncao.csv"))
 
 codigo_subelemento <- fetch_codigo_subelemento(sagres_2017)
-
 readr::write_csv(codigo_subelemento, here::here("./data/codigo_subelemento.csv"))
+
 
 DBI::dbDisconnect(sagres_2017)
