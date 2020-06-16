@@ -35,3 +35,20 @@ fetch_codigo_subfuncao <- function(sagres_mysql_con) {
   
   return(codigo_subfuncao)
 }
+
+#' @title Busca os códigos sub-elementos no Banco do Sagres MySQL
+#' @param sagres_mysql_con Conexão com o Banco de Dados
+#' @return Dataframe contendo informações sobre os códigos sub-elementos
+#' @rdname fetch_codigo_subelemento
+#' @examples
+fetch_codigo_subelemento <- function(sagres_mysql_con) {
+  codigo_subfuncao <- tibble::tibble()
+  tryCatch({
+    codigo_subfuncao <- DBI::dbGetQuery(sagres_mysql_con, "SELECT * FROM Codigo_Subelemento;") %>% 
+      assert_dataframe_completo(COLNAMES_CODIGO_SUBELEMENTO)
+  },
+  error = function(e) print(paste0("Erro ao buscar código subelemento no Banco Sagres (MySQL): ", e))
+  )
+  
+  return(codigo_subfuncao)
+}
