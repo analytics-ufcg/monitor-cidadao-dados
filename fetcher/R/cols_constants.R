@@ -28,3 +28,11 @@ COLNAMES_CONTRATOS <- c("cd_UGestora"="character", "dt_Ano"="integer",
                         "foto"="character", "planilha"="character",
                         "ordemServico"="character"
                         )
+
+
+COLNAMES_CODIGO_SUBFUNCAO <-c("cd_SubFuncao"="integer","de_SubFuncao"="character","st_Ativo"="character"
+)
+
+COLNAMES_CODIGO_SUBELEMENTO <-  c("cd_Subelemento"="character","de_Subelemento"="character","de_Conteudo"="character"
+)
+
