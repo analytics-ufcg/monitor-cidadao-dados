@@ -54,3 +54,39 @@ fetch_tipo_modalidade_licitacao <- function(sagres_mysql_con) {
   
   return(tipo_modalidade_licitacao)
 }
+
+#' @title Busca licitações no Banco do Sagres MySQL
+#' @param sagres_mysql_con Conexão com o Banco de Dados
+#' @return Dataframe contendo informações sobre o regime de execução
+#' @rdname fetch_modalidade_objeto_licitacao
+#' @examples
+#' regime_execucao <- fetch_regime_execucao("2018")
+fetch_regime_execucao <- function(sagres_mysql_con) {
+  regime_execucao <- tibble::tibble()
+  tryCatch({
+    regime_execucao <- DBI::dbGetQuery(sagres_mysql_con, "SELECT * FROM RegimeExecucao;") %>% 
+      assert_dataframe_completo(COLNAMES_REGIME_EXECUCAO)
+  },
+  error = function(e) print(paste0("Erro ao buscar regime_execucao no Banco Sagres (MySQL): ", e))
+  )
+  
+  return(regime_execucao)
+}
+
+#' @title Busca licitações no Banco do Sagres MySQL
+#' @param sagres_mysql_con Conexão com o Banco de Dados
+#' @return Dataframe contendo informações sobre os contratos
+#' @rdname fetch_contratos
+#' @examples
+#' contratos <- fetch_contratos("2018")
+fetch_contratos <- function(sagres_mysql_con) {
+  contratos <- tibble::tibble()
+  tryCatch({
+    contratos <- DBI::dbGetQuery(sagres_mysql_con, "SELECT * FROM Contratos;") %>% 
+      assert_dataframe_completo(COLNAMES_CONTRATOS)
+  },
+  error = function(e) print(paste0("Erro ao buscar contratos no Banco Sagres (MySQL): ", e))
+  )
+  
+  return(contratos)
+}

@@ -12,18 +12,18 @@ sagres_2017 <- DBI::dbConnect(RMySQL::MySQL(),
                               password = MYSQL_PASSWORD)
 DBI::dbGetQuery(sagres_2017, "SET NAMES 'utf8'")
 
-tipo_modalidade_licitacao <- fetch_tipo_modalidade_licitacao(sagres_2017)
+contratos <- fetch_contratos(sagres_2017)
 
 DBI::dbDisconnect(sagres_2017)
 
 test_that("Is dataframe", {
-  expect_true(is.data.frame(tipo_modalidade_licitacao))
+  expect_true(is.data.frame(contratos))
 })
 
 test_that("Not Empty", {
-  expect_true(nrow(tipo_modalidade_licitacao) != 0)
+  expect_true(nrow(contratos) != 0)
 })
 
-test_that("fetch_tipo_modalidade_licitacao()", {
-  expect_true(all(sapply(tipo_modalidade_licitacao, class) %in% COLNAMES_TIPO_MODALIDADE_LICITACAO))
+test_that("fetch_contratos()", {
+  expect_true(all(sapply(contratos, class) %in% COLNAMES_CONTRATOS))
 })

@@ -29,4 +29,12 @@ tipo_modalidade_licitacao <- fetch_tipo_modalidade_licitacao(sagres_2017)
 
 readr::write_csv(tipo_modalidade_licitacao, here::here("./data/tipo_modalidade_licitacao.csv"))
 
+regime_execucao <- fetch_regime_execucao(sagres_2017)
+
+readr::write_csv(regime_execucao, here::here("./data/regime_execucao.csv"))
+
+contratos <- fetch_contratos(sagres_2017)
+
+readr::write_csv(contratos, here::here("./data/contratos.csv"))
+
 DBI::dbDisconnect(sagres_2017)

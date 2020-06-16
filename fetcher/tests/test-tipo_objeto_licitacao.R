@@ -24,6 +24,6 @@ test_that("Not Empty", {
   expect_true(nrow(tipo_objeto_licitacao) != 0)
 })
 
-test_that("fetch_licitacoes()", {
-  expect_true(all(sapply(tipo_objeto_licitacao, class) %in% COLNAMES_LICITACOES))
+test_that("fetch_tipo_objeto_licitacao()", {
+  expect_true(all(sapply(tipo_objeto_licitacao, class) %in% COLNAMES_TIPO_OBJETO_LICITACAO))
 })
