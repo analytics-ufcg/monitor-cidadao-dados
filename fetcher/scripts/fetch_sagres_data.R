@@ -21,4 +21,12 @@ licitacoes <- fetch_licitacoes(sagres_2017)
 
 readr::write_csv(licitacoes, here::here("./data/licitacoes.csv"))
 
+tipo_objeto_licitacao <- fetch_tipo_objeto_licitacao(sagres_2017)
+
+readr::write_csv(tipo_objeto_licitacao, here::here("./data/tipo_objeto_licitacao.csv"))
+
+tipo_modalidade_licitacao <- fetch_tipo_modalidade_licitacao(sagres_2017)
+
+readr::write_csv(tipo_modalidade_licitacao, here::here("./data/tipo_modalidade_licitacao.csv"))
+
 DBI::dbDisconnect(sagres_2017)
