@@ -90,6 +90,7 @@ fetch_contratos <- function(sagres_mysql_con) {
   )
   
   return(contratos)
+}
 
 #' @title Busca os códigos subfunção no Banco do Sagres MySQL
 #' @param sagres_mysql_con Conexão com o Banco de Dados
