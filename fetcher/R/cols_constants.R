@@ -6,3 +6,6 @@ COLNAMES_LICITACOES <- c("cd_UGestora"="integer","dt_Ano"="integer","nu_Licitaca
 
 COLNAMES_CODIGO_FUNCAO <- c("cd_Funcao"="integer","de_Funcao"="character","st_Ativo"="character"
 )
+
+COLNAMES_CODIGO_ELEMENTO_DESPESA <- c("cd_Elemento"="character","de_Elemento"="character","de_Abreviacao"="character"
+)

@@ -25,4 +25,8 @@ codigo_funcao <- fetch_codigo_funcao(sagres_2017)
 
 readr::write_csv(codigo_funcao, here::here("./data/codigo_funcao.csv"))
 
+codigo_elemento_despesa <- fetch_codigo_elemento_despesa(sagres_2017)
+
+readr::write_csv(codigo_elemento_despesa, here::here("./data/codigo_elemento_despesa.csv"))
+
 DBI::dbDisconnect(sagres_2017)
