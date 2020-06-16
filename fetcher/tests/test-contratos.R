@@ -24,6 +24,3 @@ test_that("Not Empty", {
   expect_true(nrow(contratos) != 0)
 })
 
-test_that("fetch_contratos()", {
-  expect_true(all(sapply(contratos, class) %in% COLNAMES_CONTRATOS))
-})
