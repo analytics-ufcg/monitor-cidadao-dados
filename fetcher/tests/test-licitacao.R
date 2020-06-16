@@ -4,7 +4,7 @@ source(here::here("R/sagres.R"))
 source(here::here("R/setup/constants.R"))
 source(here::here("R/cols_constants.R"))
 
-tryCatch({sagres_2017 <- DBI::dbConnect(odbc::odbc(),
+tryCatch({sagres <- DBI::dbConnect(odbc::odbc(),
                                    Driver = "ODBC Driver 17 for SQL Server",
                                    Database = SQLSERVER_SAGRES19_Database,
                                    Server = paste0(SQLSERVER_SAGRES19_HOST,",", SQLSERVER_SAGRES19_PORT),
@@ -13,9 +13,9 @@ tryCatch({sagres_2017 <- DBI::dbConnect(odbc::odbc(),
 }, error = function(e) print(paste0("Erro ao tentar se conectar ao Banco Sagres (SQLServer): ", e)))
 
 
-licitacoes <- fetch_licitacoes(sagres_2017)
+licitacoes <- fetch_licitacoes(sagres)
 
-DBI::dbDisconnect(sagres_2017)
+DBI::dbDisconnect(sagres)
 
 test_that("Is dataframe", {
   expect_true(is.data.frame(licitacoes))
