@@ -13,8 +13,6 @@ tryCatch({sagres <- DBI::dbConnect(odbc::odbc(),
 }, error = function(e) print(paste0("Erro ao tentar se conectar ao Banco Sagres (SQLServer): ", e)))
 
 codigo_unidade_gestora <- fetch_codigo_unidade_gestora(sagres)
-print(COLNAMES_CODIGO_UNIDADE_GESTORA)
-print(sapply(codigo_unidade_gestora, class))
 
 DBI::dbDisconnect(sagres)
 
