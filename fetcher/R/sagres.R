@@ -160,3 +160,20 @@ fetch_codigo_subelemento <- function(sagres_con) {
   
   return(codigo_subfuncao)
 }
+
+#' @title Busca os códigos das unidades gestoras no Banco do Sagres SQLServer
+#' @param sagres_con Conexão com o Banco de Dados
+#' @return Dataframe contendo informações sobre os códigos das unidades gestoras
+#' @rdname fetch_codigo_unidade_gestora
+#' @examples
+fetch_codigo_unidade_gestora <- function(sagres_con) {
+  codigo_unidade_gestora <- tibble::tibble()
+  tryCatch({
+    codigo_unidade_gestora <- DBI::dbGetQuery(sagres_con, "SELECT * FROM Codigo_Unidade_Gestora;") %>% 
+      assert_dataframe_completo(COLNAMES_CODIGO_UNIDADE_GESTORA)
+  },
+  error = function(e) print(paste0("Erro ao buscar código da unidade gestora no Banco Sagres (SQLServer): ", e))
+  )
+  
+  return(codigo_unidade_gestora)
+}

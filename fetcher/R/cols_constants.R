@@ -36,6 +36,10 @@ COLNAMES_CONTRATOS <- c("cd_UGestora"="character", "dt_Ano"="integer",
                         "ordemServico"="character"
                         )
 
+COLNAMES_CODIGO_UNIDADE_GESTORA <- c("cd_Ibge"="integer", "cd_Municipio"="character",
+                                    "no_Municipio"="character", "cd_Ugestora"="character", 
+                                    "de_Ugestora"="character", "previdencia"="character" 
+                                    )
 
 COLNAMES_CODIGO_SUBFUNCAO <-c("cd_SubFuncao"="integer","de_SubFuncao"="character","st_Ativo"="character"
 )
