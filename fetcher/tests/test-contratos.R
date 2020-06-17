@@ -4,17 +4,17 @@ source(here::here("R/sagres.R"))
 source(here::here("R/setup/constants.R"))
 source(here::here("R/cols_constants.R"))
 
-sagres_2017 <- DBI::dbConnect(RMySQL::MySQL(),
-                              dbname = MYSQL_DB,
-                              host = MYSQL_HOST,
-                              port = as.numeric(MYSQL_PORT),
-                              user = MYSQL_USER,
-                              password = MYSQL_PASSWORD)
-DBI::dbGetQuery(sagres_2017, "SET NAMES 'utf8'")
+tryCatch({sagres <- DBI::dbConnect(odbc::odbc(),
+                                   Driver = "ODBC Driver 17 for SQL Server",
+                                   Database = SQLSERVER_SAGRES19_Database,
+                                   Server = paste0(SQLSERVER_SAGRES19_HOST,",", SQLSERVER_SAGRES19_PORT),
+                                   UID = SQLSERVER_SAGRES19_USER,
+                                   PWD = SQLSERVER_SAGRES19_PASS)
+}, error = function(e) print(paste0("Erro ao tentar se conectar ao Banco Sagres (SQLServer): ", e)))
 
-contratos <- fetch_contratos(sagres_2017)
+contratos <- fetch_contratos(sagres)
 
-DBI::dbDisconnect(sagres_2017)
+DBI::dbDisconnect(sagres)
 
 test_that("Is dataframe", {
   expect_true(is.data.frame(contratos))
@@ -24,6 +24,3 @@ test_that("Not Empty", {
   expect_true(nrow(contratos) != 0)
 })
 
-test_that("fetch_contratos()", {
-  expect_true(all(sapply(contratos, class) %in% COLNAMES_CONTRATOS))
-})

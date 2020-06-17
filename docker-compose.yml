@@ -10,11 +10,11 @@ services:
     environment:
       - USER=${USER:-admin}
       - PASSWORD=${PASSWORD:-secret} 
-      - MYSQL_HOST=${MYSQL_HOST:-host}
-      - MYSQL_DB=${MYSQL_DB:-db}
-      - MYSQL_PORT=${MYSQL_PORT:-3306}
-      - MYSQL_USER=${MYSQL_USER:-user}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-secret}
+      - SQLSERVER_SAGRES19_HOST=${SQLSERVER_SAGRES19_HOST:-host}
+      - SQLSERVER_SAGRES19_Database=${SQLSERVER_SAGRES19_Database:-db}
+      - SQLSERVER_SAGRES19_PORT=${SQLSERVER_SAGRES19_PORT:-1401}
+      - SQLSERVER_SAGRES19_USER=${SQLSERVER_SAGRES19_USER:-user}
+      - SQLSERVER_SAGRES19_PASS=${SQLSERVER_SAGRES19_PASS:-secret}
     volumes:
       - ./fetcher:/app/fetcher
     ports:
