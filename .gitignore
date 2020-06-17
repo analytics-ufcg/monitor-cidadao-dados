@@ -5,6 +5,7 @@
 .env
 server/node_modules/
 
+
 fetcher/credenciais/config
 fetcher/credenciais/id_rsa
 fetcher/credenciais/id_rsa.pub
