@@ -44,4 +44,7 @@ readr::write_csv(codigo_subfuncao, here::here("./data/codigo_subfuncao.csv"))
 codigo_subelemento <- fetch_codigo_subelemento(sagres)
 readr::write_csv(codigo_subelemento, here::here("./data/codigo_subelemento.csv"))
 
+codigo_unidade_gestora <- fetch_codigo_unidade_gestora(sagres)
+readr::write_csv(codigo_unidade_gestora, here::here("./data/codigo_unidade_gestora.csv"))
+
 DBI::dbDisconnect(sagres)
