@@ -14,4 +14,3 @@ generate_licitacao_id <- function(licitacoes_df) {
                                       "id_licitacao") %>%
     dplyr::select(id_licitacao, dplyr::everything())
 }
-

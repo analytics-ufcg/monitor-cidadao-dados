@@ -22,3 +22,13 @@ get_tipo_objeto_licitacao <- function() {
   tipo_objeto_licitacao_dt <- read_tipo_objeto_licitacao() %>%
     translate_tipo_objeto_licitacao()
 }
+
+#' @title Obtem dados dos códigos de funções
+#' @return Dataframe contendo informações sobre os códigos de funções
+#' @rdname get_codigo_funcao
+#' @examples
+#' codigo_funcao_dt <- get_codigo_funcao()
+get_codigo_funcao <- function() {
+  codigo_funcao_dt <- read_codigo_funcao() %>%
+    translate_codigo_funcao()
+}
