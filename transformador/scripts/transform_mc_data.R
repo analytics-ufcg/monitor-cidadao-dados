@@ -11,3 +11,7 @@ licitacoes_df <- get_licitacoes()
 licitacoes_transformadas <- licitacoes_df %>% mcTransformador::generate_licitacao_id()
 
 readr::write_csv(licitacoes_transformadas, here::here("data/licitacoes.csv"))
+
+codigo_funcao_df <- get_codigo_funcao()
+
+readr::write_csv(codigo_funcao_df, here::here("data/codigo_funcao.csv"))

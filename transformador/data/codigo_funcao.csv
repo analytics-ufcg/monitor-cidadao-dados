@@ -1,0 +1,30 @@
+cd_funcao,de_funcao,st_ativo
+1,Legislativa,NA
+2,Judiciária,NA
+3,Essencial à Justica,NA
+4,Administração,NA
+5,Defesa Nacional,NA
+6,Segurança Pública,NA
+7,Relações Exteriores,NA
+8,Assistêncial Social,NA
+9,Previdência Social,NA
+10,Saúde,NA
+11,Trabalho,NA
+12,Educação,NA
+13,Cultura,NA
+14,Direitos de Cidadania,NA
+15,Urbanismo,NA
+16,Habitação,NA
+17,Saneamento,NA
+18,Gestão Ambiental,NA
+19,Ciência e Tecnologia,NA
+20,Agricultura,NA
+21,Organização Agrária,NA
+22,Indústria,NA
+23,Comércio e Serviços,NA
+24,Comunicações,NA
+25,Energia,NA
+26,Transporte,NA
+27,Desporto e Lazer,NA
+28,Encargos Especias,NA
+99,Reserva de Contingência,NA

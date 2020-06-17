@@ -15,3 +15,17 @@ read_licitacoes <- function() {
                                    ))
 }
 
+#' @title Lê dataframe contendo informações dos códigos de funções
+#' @return Dataframe contendo informações sobre os códigos de funções
+#' @rdname read_codigo_funcao
+#' @examples
+#' codigo_funcao_dt <- read_codigo_funcao()
+read_codigo_funcao <- function() {
+  codigo_funcao_df <- readr::read_csv(here::here("../fetcher/data/codigo_funcao.csv"),
+                                   col_types = list(
+                                     .default = readr::col_number(),
+                                     cd_Funcao = readr::col_integer(),
+                                     de_Funcao = readr::col_character(),
+                                     st_Ativo = readr::col_character()
+                                   ))
+}
