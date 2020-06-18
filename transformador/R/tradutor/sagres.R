@@ -12,7 +12,7 @@ translate_licitacoes <- function(licitacoes_raw) {
 }
 
 #' @title Traduz dado recebido para dataset
-#' @param tipo_objeto_licitacao_raw Dados brutos do tipo dos objetos das licitações 
+#' @param tipo_objeto_licitacao_raw Dados brutos do tipo dos objetos das licitações
 #' @return Dataframe contendo informações sobre o tipo dos objetos das licitações
 #' @rdname translate_tipo_objeto_licitacao
 #' @examples
@@ -28,4 +28,13 @@ translate_tipo_objeto_licitacao <- function(tipo_objeto_licitacao_raw) {
 #' codigo_funcao_dt <- translate_codigo_funcao(codigo_funcao_raw)
 translate_codigo_funcao <- function(codigo_funcao_raw) {
   codigo_funcao_raw %<>% janitor::clean_names()
+}
+
+#' @param codigo_subfuncao_raw Dados brutos dos códigos de subfunções
+#' @return Dataframe contendo informações sobre os códigos de subfunções
+#' @rdname translate_codigo_subfuncao
+#' @examples
+#' codigo_subfuncao_dt <- translate_codigo_subfuncao(codigo_subfuncao_raw)
+translate_codigo_subfuncao <- function(codigo_subfuncao_raw) {
+  codigo_subfuncao_raw %<>% janitor::clean_names()
 }

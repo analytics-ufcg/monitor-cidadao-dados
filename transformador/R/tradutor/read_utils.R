@@ -43,3 +43,18 @@ read_codigo_funcao <- function() {
                                      st_Ativo = readr::col_character()
                                    ))
 }
+
+#' @title Lê dataframe contendo informações dos códigos de subfunções
+#' @return Dataframe contendo informações sobre os códigos de subfunções
+#' @rdname read_codigo_subfuncao
+#' @examples
+#' codigo_subfuncao_dt <- read_codigo_subfuncao()
+read_codigo_subfuncao <- function() {
+  codigo_subfuncao_df <- readr::read_csv(here::here("../fetcher/data/codigo_subfuncao.csv"),
+                                   col_types = list(
+                                     .default = readr::col_number(),
+                                     cd_SubFuncao = readr::col_integer(),
+                                     de_SubFuncao = readr::col_character(),
+                                     st_Ativo = readr::col_character()
+                                   ))
+}

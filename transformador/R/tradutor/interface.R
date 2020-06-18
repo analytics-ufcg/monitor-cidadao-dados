@@ -32,3 +32,13 @@ get_codigo_funcao <- function() {
   codigo_funcao_dt <- read_codigo_funcao() %>%
     translate_codigo_funcao()
 }
+
+#' @title Obtem dados dos códigos de subfunções
+#' @return Dataframe contendo informações sobre os códigos de subfunções
+#' @rdname get_codigo_subfuncao
+#' @examples
+#' codigo_subfuncao_dt <- get_codigo_subfuncao()
+get_codigo_subfuncao <- function() {
+  codigo_subfuncao_dt <- read_codigo_subfuncao() %>%
+    translate_codigo_subfuncao()
+}

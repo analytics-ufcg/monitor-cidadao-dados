@@ -17,3 +17,5 @@ readr::write_csv(tipo_objeto_licitacao_df, here::here("data/tipo_objeto_licitaca
 codigo_funcao_df <- get_codigo_funcao()
 readr::write_csv(codigo_funcao_df, here::here("data/codigo_funcao.csv"))
 
+codigo_subfuncao_df <- get_codigo_subfuncao()
+readr::write_csv(codigo_subfuncao_df, here::here("data/codigo_subfuncao.csv"))
