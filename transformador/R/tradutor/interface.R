@@ -17,10 +17,40 @@ get_licitacoes <- function() {
 #' @return Dataframe contendo informações sobre o tipo do objeto das licitações
 #' @rdname get_tipo_objeto_licitacao
 #' @examples
-#' get_tipo_objeto_licitacao_dt <- get_tipo_objeto_licitacao()
+#' tipo_objeto_licitacao_dt <- get_tipo_objeto_licitacao()
 get_tipo_objeto_licitacao <- function() {
   tipo_objeto_licitacao_dt <- read_tipo_objeto_licitacao() %>%
     translate_tipo_objeto_licitacao()
+}
+
+#' @title Obtem dados do tipo da modalidade das licitações
+#' @return Dataframe contendo informações sobre o tipo da modalidade das licitações
+#' @rdname get_tipo_modalidade_licitacao
+#' @examples
+#' tipo_modalidade_licitacao_dt <- get_tipo_modalidade_licitacao()
+get_tipo_modalidade_licitacao <- function() {
+  tipo_modalidade_licitacao_dt <- read_tipo_modalidade_licitacao() %>%
+    translate_tipo_modalidade_licitacao()
+}
+
+#' @title Obtem dados do regime de execução
+#' @return Dataframe contendo informações sobre o tipo do regime de execução
+#' @rdname get_regime_execucao
+#' @examples
+#' regime_execucao_dt <- get_tipo_modalidade_licitacao()
+get_regime_execucao <- function() {
+  regime_execucao_dt <- read_regime_execucao() %>%
+    translate_regime_execucao()
+}
+
+#' @title Obtem dados do código da unidade gestora
+#' @return Dataframe contendo informações sobre o código da unidade gestora
+#' @rdname get_codigo_unidade_gestora
+#' @examples
+#' codigo_unidade_gestora_dt <- get_codigo_unidade_gestora()
+get_codigo_unidade_gestora <- function() {
+  codigo_unidade_gestora_dt <- read_codigo_unidade_gestora() %>%
+    translate_codigo_unidade_gestora()
 }
 
 #' @title Obtem dados dos códigos de funções

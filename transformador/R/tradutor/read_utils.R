@@ -15,7 +15,6 @@ read_licitacoes <- function() {
                                    ))
 }
 
-
 #' @title Lê dataframe contendo informações do tipo do objeto das licitações
 #' @return Dataframe contendo informações sobre o tipo do objeto das licitações
 #' @rdname read_licitacoes
@@ -26,6 +25,46 @@ read_tipo_objeto_licitacao <- function() {
                                    col_types = list(
                                      .default = readr::col_number(),
                                      de_TipoObjeto = readr::col_character()
+                                   ))
+}
+
+#' @title Lê dataframe contendo informações do tipo da modalidade das licitações
+#' @return Dataframe contendo informações sobre o tipo da modalidade das licitações
+#' @rdname read_tipo_modalidade_licitacao
+#' @examples
+#' tipo_modalidade_licitacao_dt <- read_tipo_modalidade_licitacao()
+read_tipo_modalidade_licitacao <- function() {
+  tipo_modalidade_licitacao_dt <- readr::read_csv(here::here("../fetcher/data/tipo_modalidade_licitacao.csv"),
+                                   col_types = list(
+                                     .default = readr::col_number(),
+                                     de_TipoLicitacao = readr::col_character()
+                                   ))
+}
+
+#' @title Lê dataframe contendo informações do tipo do regime de execução
+#' @return Dataframe contendo informações sobre o tipo do regime de execução
+#' @rdname read_regime_execucao
+#' @examples
+#' regime_execucao_dt <- read_regime_execucao()
+read_regime_execucao <- function() {
+  regime_execucao_dt <- readr::read_csv(here::here("../fetcher/data/regime_execucao.csv"),
+                                   col_types = list(
+                                     .default = readr::col_number(),
+                                     de_regimeExecucao = readr::col_character()
+                                   ))
+}
+
+#' @title Lê dataframe contendo informações dos códigos das unidades gestoras
+#' @return Dataframe contendo informações sobre os códigos das unidades gestoras
+#' @rdname read_codigo_unidade_gestora
+#' @examples
+#' codigo_unidade_gestora_dt <- read_codigo_unidade_gestora()
+read_codigo_unidade_gestora <- function() {
+  codigo_unidade_gestora_dt <- readr::read_csv(here::here("../fetcher/data/codigo_unidade_gestora.csv"),
+                                   col_types = list(
+                                     .default = readr::col_character(),
+                                     cd_Ibge = readr::col_number(),
+                                     cd_Ugestora = readr::col_number()
                                    ))
 }
 
