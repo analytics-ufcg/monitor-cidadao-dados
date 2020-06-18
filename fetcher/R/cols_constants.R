@@ -13,11 +13,11 @@ COLNAMES_LICITACOES <- c("cd_UGestora"="integer","dt_Ano"="integer",
                          "registroCGE"="character","tp_regimeExecucao"="integer"
                         )
 
-COLNAMES_TIPO_OBJETO_LICITACAO <- c("tp_Objeto"="integer", 
+COLNAMES_TIPO_OBJETO_LICITACAO <- c("tp_Objeto"="integer",
                                     "de_TipoObjeto"="character"
                                     )
 
-COLNAMES_TIPO_MODALIDADE_LICITACAO <- c("tp_Licitacao"="integer", 
+COLNAMES_TIPO_MODALIDADE_LICITACAO <- c("tp_Licitacao"="integer",
                                         "de_TipoLicitacao"="character"
                                         )
 
@@ -37,8 +37,8 @@ COLNAMES_CONTRATOS <- c("cd_UGestora"="character", "dt_Ano"="integer",
                         )
 
 COLNAMES_CODIGO_UNIDADE_GESTORA <- c("cd_Ibge"="integer", "cd_Municipio"="character",
-                                    "no_Municipio"="character", "cd_Ugestora"="character", 
-                                    "de_Ugestora"="character", "previdencia"="character" 
+                                    "no_Municipio"="character", "cd_Ugestora"="character",
+                                    "de_Ugestora"="character", "previdencia"="character"
                                     )
 
 COLNAMES_CODIGO_SUBFUNCAO <-c("cd_SubFuncao"="integer","de_SubFuncao"="character","st_Ativo"="character"

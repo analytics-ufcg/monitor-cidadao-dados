@@ -43,3 +43,23 @@ read_codigo_funcao <- function() {
                                      st_Ativo = readr::col_character()
                                    ))
 }
+
+#' @title Lê dataframe contendo informações do objeto dos contratos
+#' @return Dataframe contendo informações sobre os contratos
+#' @rdname read_contratos
+#' @examples
+#' contratos_dt <- read_contratos()
+read_contratos <- function() {
+  contratos_df <- readr::read_csv(here::here("../fetcher/data/contratos.csv"),
+                                   col_types = list(
+                                     .default = readr::col_character(),
+                                     cd_UGestora = readr::col_integer(),
+                                     dt_Ano = readr::col_integer(),
+                                     tp_Licitacao = readr::col_integer(),
+                                     vl_TotalContrato = readr::col_number(),
+                                     dt_Assinatura = readr::col_datetime(format = ""),
+                                     dt_Recebimento = readr::col_datetime(format = "")
+                                   ))
+}
+
+

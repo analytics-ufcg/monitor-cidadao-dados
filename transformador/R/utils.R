@@ -15,3 +15,24 @@
 
   return(df)
 }
+
+#' Extrai o código do município do código da unidade gestora. 
+#' Essa estração é feita através da coleta dos últimos 3 digitos da unidade gestora.
+#' @param df Dataframe sem o código do município
+#' @param cd_u_gestora código da unidade gestora
+#' @return Dataframe com o código do município
+.extract_cd_municipio  <- function (df, cd_u_gestora) {
+  df <- df %>%
+    dplyr::mutate(cd_municipio = .substrRight(cd_u_gestora, 3))
+  
+  return(df)
+}
+
+#' Extrai os últimos n caracteres de uma string.
+#' @param x string com todos os caracteres
+#' @param n numero de caracteres que serão extraídos
+#' @return os últimos n caracteres
+.substrRight <- function(x, n) {
+  substr(x, nchar(x)-n+1, nchar(x))
+}
+
