@@ -25,7 +25,7 @@ COLNAMES_REGIME_EXECUCAO <- c("tp_regimeExecucao"="integer",
                               "de_regimeExecucao"="character"
                               )
 
-COLNAMES_CONTRATOS <- c("cd_UGestora"="character", "dt_Ano"="integer",
+COLNAMES_CONTRATOS <- c("cd_UGestora"="integer", "dt_Ano"="integer",
                         "nu_Contrato"="character", "dt_Assinatura"="character",
                         "pr_Vigencia"="character", "nu_CPFCNPJ"="character",
                         "nu_Licitacao"="character", "tp_Licitacao"="integer",
@@ -37,7 +37,7 @@ COLNAMES_CONTRATOS <- c("cd_UGestora"="character", "dt_Ano"="integer",
                         )
 
 COLNAMES_CODIGO_UNIDADE_GESTORA <- c("cd_Ibge"="integer", "cd_Municipio"="character",
-                                    "no_Municipio"="character", "cd_Ugestora"="character", 
+                                    "no_Municipio"="character", "cd_Ugestora"="integer", 
                                     "de_Ugestora"="character", "previdencia"="character" 
                                     )
 
@@ -46,5 +46,4 @@ COLNAMES_CODIGO_SUBFUNCAO <-c("cd_SubFuncao"="integer","de_SubFuncao"="character
 
 COLNAMES_CODIGO_SUBELEMENTO <-  c("cd_Subelemento"="character","de_Subelemento"="character","de_Conteudo"="character"
 )
-
 

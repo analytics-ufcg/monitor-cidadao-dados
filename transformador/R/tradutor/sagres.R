@@ -21,6 +21,36 @@ translate_tipo_objeto_licitacao <- function(tipo_objeto_licitacao_raw) {
   tipo_objeto_licitacao_raw %<>% janitor::clean_names()
 }
 
+#' @title Traduz dado recebido para dataset
+#' @param tipo_modalidade_licitacao_raw Dados brutos do tipo das modalidades das licitações 
+#' @return Dataframe contendo informações sobre o tipo das modalidades das licitações
+#' @rdname translate_tipo_modalidade_licitacao
+#' @examples
+#' tipo_modalidade_licitacao_dt <- translate_tipo_modalidade_licitacao(tipo_modalidade_licitacao_raw)
+translate_tipo_modalidade_licitacao <- function(tipo_modalidade_licitacao_raw) {
+  tipo_modalidade_licitacao_raw %<>% janitor::clean_names()
+}
+
+#' @title Traduz dado recebido para dataset
+#' @param regime_execucao_raw Dados brutos do regime de execução
+#' @return Dataframe contendo informações sobre o regime de execução
+#' @rdname translate_regime_execucao
+#' @examples
+#' regime_execucao_dt <- translate_regime_execucao(regime_execucao_raw)
+translate_regime_execucao <- function(regime_execucao_raw) {
+  regime_execucao_raw %<>% janitor::clean_names()
+}
+
+#' @title Traduz dado recebido para dataset
+#' @param codigo_unidade_gestora_raw Dados brutos do codigo da unidade gestora
+#' @return Dataframe contendo informações sobre o codigo da unidade gestora
+#' @rdname translate_codigo_unidade_gestora
+#' @examples
+#' codigo_unidade_gestora_dt <- translate_codigo_unidade_gestora(codigo_unidade_gestora_raw)
+translate_codigo_unidade_gestora <- function(codigo_unidade_gestora_raw) {
+  codigo_unidade_gestora_raw %<>% janitor::clean_names()
+}
+
 #' @param codigo_funcao_raw Dados brutos dos códigos de funções
 #' @return Dataframe contendo informações sobre os códigos de funções
 #' @rdname translate_codigo_funcao
