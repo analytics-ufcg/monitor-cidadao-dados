@@ -12,9 +12,6 @@ output:
 
 
 ```{r setup, include=FALSE}
-    # toc: true
-    # toc_float: true
-
 knitr::opts_chunk$set(
   echo = FALSE,
   warning = FALSE,
@@ -52,7 +49,8 @@ theme_set(theme_minimal())
 
 
 ```{r, include=FALSE}
-contratos <- read_csv("Contratos-Sagres2017.csv", 
+# - Dados de Contratos
+contratos <- read_csv(here::here("fetcher/data/contratos.csv"), 
     col_types = cols(cd_UGestora = col_character(), 
         nu_Contrato = col_character(), tp_Licitacao = col_character()))
 
@@ -72,42 +70,24 @@ range_ano_contratos <- range_ano_contratos %>% na.omit()
 
 
 ```{r, include=FALSE}
-# Codigo_Funcao
+# - filtrar os contratos associados a alguma licitação
 
-# Recupera tabela de Codigo Funcao
-# codigo_funcao = tbl(sagres, 'Codigo_Funcao') %>%
-#   collect(n = Inf)
-# 
-# write.csv(codigo_funcao, file = "CodigoFuncao-Sagres2017.csv", row.names = FALSE)
+# - Dados de Licitações
+licitacoes <- read_csv(here::here("fetcher/data/licitacoes.csv"), 
+    col_types = cols(cd_UGestora = col_character(), 
+        nu_Licitacao = col_character(), tp_Licitacao = col_character(),
+        tp_Licitacao = col_character()))
+
+licitacoes <- licitacoes %>% 
+  mutate(ano_Homologacao = as.numeric(format(dt_Homologacao, "%Y")))
+
+# Filtra apeanas os contratos que estão associados a alguma licitação
+contratos_ass_licitacoes <- contratos %>% 
+  semi_join(licitacoes, by = c('cd_UGestora', 'nu_Licitacao', 'tp_Licitacao'))
+
+contratos_ass_licitacoes <- contratos_ass_licitacoes %>% 
+  mutate(ano_Assinatura = as.numeric(format(dt_Assinatura, "%Y")))
 ```
-
-```{r, include=FALSE}
-# Codigo_Subfuncao
-
-# Recupera tabela de Codigo Funcao
-# codigo_subfuncao = tbl(sagres, 'Codigo_Subfuncao') %>%
-#   collect(n = Inf)
-# 
-# write.csv(codigo_subfuncao, file = "CodigoSubFuncao-Sagres2017.csv", row.names = FALSE)
-```
-
-```{r, include=FALSE}
-# Codigo_ElementoDespesa
-# Recupera tabela de Codigo Funcao
-# codigo_elemento = tbl(sagres, 'Codigo_ElementoDespesa') %>%
-#   collect(n = Inf)
-# 
-# write.csv(codigo_elemento, file = "CodigoElemento-Sagres2017.csv", row.names = FALSE)
-
-# Codigo_Subelemento
-# Recupera tabela de Codigo Funcao
-# codigo_subelemento = tbl(sagres, 'Codigo_Subelemento') %>%
-  # collect(n = Inf)
-# 
-# write.csv(codigo_subelemento, file = "CodigoSubElemento-Sagres2017.csv", row.names = FALSE)
-```
-
-
 
 -------
 
@@ -130,44 +110,10 @@ A partir disso, é interessante conhecer mais sobre os contratos em andamento (a
 Neste relatório buscamos entender um pouco mais sobre a relação Licitação, Contrato, Empenho e suas características, através do subconjunto de contratos em andamento.
 
 
-
 <br>
 
 
 ## Contratos vigentes e valores
-
-
-```{r, include=FALSE}
-# - filtrar os contratos associados a alguma licitação
-
-# Dados de Licitações
-licitacoes <- read_csv("Licitacoes-Sagres2017.csv", 
-    col_types = cols(cd_UGestora = col_character(), 
-        nu_Licitacao = col_character(), tp_Licitacao = col_character(),
-        tp_Licitacao = col_character()))
-
-licitacoes <- licitacoes %>% 
-  mutate(ano_Homologacao = as.numeric(format(dt_Homologacao, "%Y")))
-
-# Dados de Contratos
-contratos <- read_csv("Contratos-Sagres2017.csv", 
-    col_types = cols(cd_UGestora = col_character(), 
-        nu_Contrato = col_character(), tp_Licitacao = col_character()))
-
-contratos$registroCGE <- NULL
-contratos$dt_Recebimento <- NULL
-contratos$foto <- NULL
-contratos$planilha <- NULL
-contratos$ordemServico <- NULL
-contratos$cd_SIAFI <- NULL
-
-# Filtra apeanas os contratos que estão associados a alguma licitação
-contratos_ass_licitacoes <- contratos %>% 
-  semi_join(licitacoes, by = c('cd_UGestora', 'nu_Licitacao', 'tp_Licitacao'))
-
-contratos_ass_licitacoes <- contratos_ass_licitacoes %>% 
-  mutate(ano_Assinatura = as.numeric(format(dt_Assinatura, "%Y")))
-```
 
 
 ```{r, include=FALSE}
@@ -193,25 +139,25 @@ contratos_ass_licitacoes <- contratos_ass_licitacoes %>%
 
 # write.csv(empenhos_ass_contratos, file = "EmpenhosAssoContratos-Sagres2017.csv", row.names = FALSE)
 
-empenhos_ass_contratos <- read_csv("EmpenhosAssoContratos-Sagres2017.csv", 
-    col_types = cols(cd_Acao = col_character(), 
-        cd_CatEconomica = col_character(), 
-        cd_Funcao = col_character(), 
-        cd_Modalidade = col_character(), 
-        cd_NatDespesa = col_character(), 
-        cd_Programa = col_character(), 
-        cd_Subfuncao = col_character(), 
-        cd_UGestora = col_character(), 
-        cd_UnidOrcamentaria = col_character(), 
-        cd_classificacao = col_character(), 
-        tp_Meta = col_character(),
-        nu_Licitacao = col_character(),
-        tp_Licitacao = col_character()))
+# empenhos_ass_contratos <- read_csv(here::here("fetcher/data/EmpenhosAssoContratos-Sagres2017.csv"), 
+#     col_types = cols(cd_Acao = col_character(), 
+#         cd_CatEconomica = col_character(), 
+#         cd_Funcao = col_character(), 
+#         cd_Modalidade = col_character(), 
+#         cd_NatDespesa = col_character(), 
+#         cd_Programa = col_character(), 
+#         cd_Subfuncao = col_character(), 
+#         cd_UGestora = col_character(), 
+#         cd_UnidOrcamentaria = col_character(), 
+#         cd_classificacao = col_character(), 
+#         tp_Meta = col_character(),
+#         nu_Licitacao = col_character(),
+#         tp_Licitacao = col_character()))
 ```
 
 ```{r, include=FALSE}
 contratos_vigentes <- contratos_ass_licitacoes %>% 
-  filter(pr_Vigencia >= "2017-01-01")
+  filter(pr_Vigencia >= "2019-01-01")
 
 contratos_estranhos <- contratos_vigentes %>% 
   filter(pr_Vigencia >= "2047-01-01")
@@ -227,21 +173,22 @@ contratos_vigentes_f <- contratos_vigentes %>%
 
 Primeiramente, foram filtrados os contratos que possuem associação com alguma licitação realizada. Dessa maneira, garantimos que os contratos desta análise passaram pela primeira fase do Processo de Despesa Pública.
 
-O valor total do contrato e sua data de encerramento são dados disponíveis no SAGRES. Para que estejamos todos na mesma página, vamos definir um *contrato vigente* como um contrato ainda em seu prazo de validade. Dada a versão do SAGRES utilizada aqui, nesta análise iremos considerar como um contrato vigente como **o contrato cuja data de expiração é supeior a 01 de janeiro de 2017**.
+O valor total do contrato e sua data de encerramento são dados disponíveis no SAGRES. Para que estejamos todos na mesma página, vamos definir um *contrato vigente* como um contrato ainda em seu prazo de validade. Dada a versão do SAGRES utilizada aqui, nesta análise iremos considerar como um contrato vigente como **o contrato cuja data de expiração é supeior a 01 de janeiro de 2019**.
 
 <br>
 
 ```{r}
 contratos_vigentes_f %>% 
-ggplot(aes(x = pr_Vigencia, y = vl_TotalContrato)) + 
+  filter(vl_TotalContrato < 150000000) %>% 
+  ggplot(aes(x = pr_Vigencia, y = vl_TotalContrato/1000000)) + 
   geom_line(color = "coral2") + 
   geom_point(color = "firebrick3", alpha = 0.3) +
-  labs(x = "Ano do encerramento do contrato", y = "Valor da licitação", subtitle = "Valor e ano de finalização de contratos")
+  labs(x = "Ano do encerramento do contrato", y = "Valor da licitação (em milhões)", subtitle = "Valor e ano de finalização de contratos")
 ```
 
 <br>
 
-Acima, estão expostos os valores totais dos contratos em relação a sua data de término. Vemos que a grande maioria dos contratos possui validade até 2020, mas também existem contratos com datas de término que podem chegar ao ano de 2030. Compreender a prática administrativa de gerar contratos tão "largos" pode servir de insumo para nortear outras análises ou percepções.
+Acima, estão expostos os valores totais dos contratos em relação a sua data de término. Vemos que a grande maioria dos contratos possui validade até 2020, mas também existem contratos com datas de término que podem chegar ao ano de 2030 ou mais. Compreender a prática administrativa de gerar contratos tão "largos" pode servir de insumo para nortear outras análises ou percepções.
 
 Entretanto esta visualização nos limita em relação ao intervalo de ocorrência do contrato, ou seja, quanto tempo este contrato esteve ativo. Com base nisso, a visualização abaixo traz o "tempo de vida" de cada contrato em aberto. 
 
@@ -255,10 +202,11 @@ Nota: Foram removidos contratos cujo tempo de vida é inferior a zero. Comportam
 
 ```{r}
 contratos_vigentes_f %>% 
-ggplot(aes(x = tempo_Vida, y = vl_TotalContrato)) + 
+  filter(vl_TotalContrato < 150000000) %>% 
+  ggplot(aes(x = tempo_Vida, y = vl_TotalContrato/1000000)) + 
   geom_line(color = "coral2") + 
   geom_point(color = "firebrick3", alpha = 0.3) +
-  labs(x = "Dias", y = "Valor Total", subtitle = "Período de Vigência dos Contratos")
+  labs(x = "Dias", y = "Valor Total (em milhões)", subtitle = "Período de Vigência dos Contratos")
 ```
 
 <br>
@@ -300,7 +248,7 @@ Dessa maneira, é preciso encontrar outras estratégias para entender melhor o q
 
 # write.csv(empenhos_ass_contratos_vigentes, file = "EmpenhosAssoContratosVigentes-Sagres2017.csv", row.names = FALSE)
 
-empenhos_ass_contratos_vigentes <- read_csv("EmpenhosAssoContratosVigentes-Sagres2017.csv", 
+empenhos_ass_contratos_vigentes <- read_csv(here::here("fetcher/data/EmpenhosAssoContratosVigentes-Sagres2017.csv"), 
     col_types = cols(cd_CatEconomica = col_character(), 
         cd_Funcao = col_character(), cd_Programa = col_character(), 
         cd_SubElemento = col_character(), 
@@ -310,17 +258,18 @@ empenhos_ass_contratos_vigentes <- read_csv("EmpenhosAssoContratosVigentes-Sagre
 ```
 
 ```{r, include=FALSE}
+# - Carregamento de tabelas auxiliares
 
-funcao <- read_csv("CodigoFuncao-Sagres2017.csv", 
+funcao <- read_csv(here::here("fetcher/data/codigo_funcao.csv"), 
     col_types = cols(cd_Funcao = col_character()))
   
-subfuncao <- read_csv("CodigoSubFuncao-Sagres2017.csv", 
+subfuncao <- read_csv(here::here("fetcher/data/codigo_subfuncao.csv"), 
     col_types = cols(cd_SubFuncao = col_character()))
   
-elemento <- read_csv("CodigoElemento-Sagres2017.csv", 
+elemento <- read_csv(here::here("fetcher/data/codigo_elemento_despesa.csv"), 
     col_types = cols(cd_Elemento = col_character()))
 
-subelemento <- read_csv("CodigoSubElemento-Sagres2017.csv", 
+subelemento <- read_csv(here::here("fetcher/data/codigo_subelemento.csv"), 
     col_types = cols(cd_Subelemento = col_character(), 
         de_Conteudo = col_character(), de_Subelemento = col_character()))
 ```
@@ -356,7 +305,7 @@ Para os contratos vigentes nos municípios paraibanos, temos em seus empenhos re
 ```{r}
 empenhos_ass_contratos_vigentes %>% 
   group_by(de_Funcao) %>% 
-  summarise(volume_Funcao = n()) %>% 
+  dplyr::summarise(volume_Funcao = n()) %>% 
   ggplot(aes(x = reorder(de_Funcao, volume_Funcao), y = volume_Funcao)) +
   geom_bar(stat = "identity", fill = "violetred3") +
   coord_flip() +
@@ -372,13 +321,13 @@ A função orçamentária nos conta em quais grandes áreas os municípios empen
 ```{r, include=FALSE}
 empenhos_top <- empenhos_ass_contratos_vigentes %>% 
   group_by(de_SubFuncao) %>% 
-  summarise(volume_SubFuncao = n()) %>% 
+  dplyr::summarise(volume_SubFuncao = n()) %>% 
   arrange(desc(volume_SubFuncao)) %>% 
   slice(1:20)
 
 empenhos_tail <- empenhos_ass_contratos_vigentes %>% 
   group_by(de_SubFuncao) %>% 
-  summarise(volume_SubFuncao = n()) %>% 
+  dplyr::summarise(volume_SubFuncao = n()) %>% 
   arrange(volume_SubFuncao) %>% 
   slice(1:20)
 ```
@@ -420,7 +369,7 @@ A partir do subelemento, é possível ter uma visão ainda mais específica:
 ```{r}
 empenhos_ass_contratos_vigentes %>% 
   group_by(de_Subelemento) %>% 
-  summarise(volume_Subelemento = n()) %>% 
+  dplyr::summarise(volume_Subelemento = n()) %>% 
   arrange(desc(volume_Subelemento)) %>% 
   slice(1:20) %>% 
   ggplot(aes(x = reorder(de_Subelemento, volume_Subelemento), y = volume_Subelemento)) +
@@ -435,7 +384,7 @@ empenhos_ass_contratos_vigentes %>%
  
 A partir disso, voltando aos contratos de longa duração, é possível compreender quais os objetos contratados a partir das categorias descritas acima.
 
-Temos `r nrow(contratos_vigentes_f)` contratos vigentes e `r nrow(empenhos_ass_contratos_vigentes)`, o que nos diz: é possível que um contrato tenha diversos empenhos associado a ele. Por exemplo: uma prefeitura que contrata uma padaria para fornecimento de coffe break ao longo do ano. A cada evento ou a cada mês, é realizado um empenho para o pagamento dos serviços prestados.
+Temos `r nrow(contratos_vigentes_f)` contratos vigentes e `r nrow(empenhos_ass_contratos_vigentes)` empenhos associados a estes contratos, o que nos diz: é possível que um contrato tenha diversos empenhos associado a ele. Por exemplo: uma prefeitura que contrata uma padaria para fornecimento de coffe break ao longo do ano. A cada evento ou a cada mês, é realizado um empenho para o pagamento dos serviços prestados.
 
 <br>
 
@@ -462,7 +411,7 @@ contratos_empenhos_longos$dt_MesAno <- NULL
 ```{r}
 contratos_empenhos_longos %>% 
   group_by(de_Funcao) %>% 
-  summarise(montanteEmpenho = sum(vl_Empenho)) %>%
+  dplyr::summarise(montanteEmpenho = sum(vl_Empenho)) %>%
   na.omit() %>% 
   ggplot(aes(x = reorder(de_Funcao, montanteEmpenho), y = montanteEmpenho/1000)) +
   geom_bar(stat = "identity", fill = "coral2") +
@@ -475,7 +424,7 @@ contratos_empenhos_longos %>%
 ```{r}
 contratos_empenhos_longos %>% 
   group_by(de_SubFuncao) %>% 
-  summarise(montanteEmpenho = sum(vl_Empenho)) %>%
+  dplyr::summarise(montanteEmpenho = sum(vl_Empenho)) %>%
   na.omit() %>% 
   ggplot(aes(x = reorder(de_SubFuncao, montanteEmpenho), y = montanteEmpenho/1000)) +
   geom_bar(stat = "identity", fill = "coral2") +
@@ -488,7 +437,7 @@ contratos_empenhos_longos %>%
 ```{r}
 contratos_empenhos_longos %>% 
   group_by(no_Credor) %>% 
-  summarise(montanteEmpenho = sum(vl_Empenho)) %>%
+  dplyr::summarise(montanteEmpenho = sum(vl_Empenho)) %>%
   na.omit() %>% 
   ggplot(aes(x = reorder(no_Credor, montanteEmpenho), y = montanteEmpenho/1000)) +
   geom_bar(stat = "identity", fill = "coral2") +
