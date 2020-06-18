@@ -43,3 +43,48 @@ read_codigo_funcao <- function() {
                                      st_Ativo = readr::col_character()
                                    ))
 }
+
+#' @title Lê dataframe contendo informações dos códigos de subfunções
+#' @return Dataframe contendo informações sobre os códigos de subfunções
+#' @rdname read_codigo_subfuncao
+#' @examples
+#' codigo_subfuncao_dt <- read_codigo_subfuncao()
+read_codigo_subfuncao <- function() {
+  codigo_subfuncao_df <- readr::read_csv(here::here("../fetcher/data/codigo_subfuncao.csv"),
+                                   col_types = list(
+                                     .default = readr::col_number(),
+                                     cd_SubFuncao = readr::col_integer(),
+                                     de_SubFuncao = readr::col_character(),
+                                     st_Ativo = readr::col_character()
+                                   ))
+}
+
+#' @title Lê dataframe contendo informações dos códigos de elementos de despesas
+#' @return Dataframe contendo informações sobre os códigos de elementos de despesas
+#' @rdname read_codigo_elemento_despesa
+#' @examples
+#' codigo_elemento_despesa_dt <- read_codigo_elemento_despesa()
+read_codigo_elemento_despesa <- function() {
+  codigo_elemento_despesa_df <- readr::read_csv(here::here("../fetcher/data/codigo_elemento_despesa.csv"),
+                                   col_types = list(
+                                     .default = readr::col_number(),
+                                     cd_Elemento = readr::col_character(),
+                                     de_Elemento = readr::col_character(),
+                                     de_Abreviacao = readr::col_character()
+                                   ))
+}
+
+#' @title Lê dataframe contendo informações dos códigos de subelementos
+#' @return Dataframe contendo informações sobre os códigos de subelementos
+#' @rdname read_codigo_subelemento
+#' @examples
+#' codigo_subelemento_dt <- read_codigo_subelemento()
+read_codigo_subelemento <- function() {
+  codigo_subelemento_df <- readr::read_csv(here::here("../fetcher/data/codigo_subelemento.csv"),
+                                   col_types = list(
+                                     .default = readr::col_number(),
+                                     cd_Subelemento = readr::col_character(),
+                                     de_Subelemento = readr::col_character(),
+                                     de_Conteudo = readr::col_character()
+                                   ))
+}
