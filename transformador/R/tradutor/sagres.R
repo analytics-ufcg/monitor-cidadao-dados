@@ -8,7 +8,8 @@
 #' @examples
 #' licitacoes_dt <- translate_licitacoes(licitacoes_raw)
 translate_licitacoes <- function(licitacoes_raw) {
-  licitacoes_raw %<>% janitor::clean_names()
+  licitacoes_raw %<>% janitor::clean_names() %>%
+    dplyr::mutate(de_obs = stringr::str_replace(de_obs, "\uFFFD", ""))
 }
 
 #' @title Traduz dado recebido para dataset
@@ -29,3 +30,4 @@ translate_tipo_objeto_licitacao <- function(tipo_objeto_licitacao_raw) {
 translate_codigo_funcao <- function(codigo_funcao_raw) {
   codigo_funcao_raw %<>% janitor::clean_names()
 }
+

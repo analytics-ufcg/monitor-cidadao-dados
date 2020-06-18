@@ -36,6 +36,42 @@ services:
     networks:
       - proxynet
 
+  feed-al:
+    build:
+      context: feed-al/
+    container_name: feed-al
+    env_file:
+      - .env
+    volumes:
+      - ./transformador/data:/data
+      - ./feed-al:/feed-al
+    ports:
+      - 7643:7643
+    depends_on:
+      - postgres
+    networks:
+      - proxynet
+
+  postgres:
+    image: postgres:11.1-alpine
+    container_name: postgres-analytics
+    restart: always
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-al_db}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-secret}
+      - TZ=GMT
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/    
+    ports:
+      - 7655:5432
+    networks:
+      - proxynet
+
 networks:
   proxynet:
     name: monitor_cidadao_network
+
+volumes:
+  postgres_data:
+      
