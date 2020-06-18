@@ -12,16 +12,18 @@ tryCatch({sagres <- DBI::dbConnect(odbc::odbc(),
                                    PWD = SQLSERVER_SAGRES19_PASS)
 }, error = function(e) print(paste0("Erro ao tentar se conectar ao Banco Sagres (SQLServer): ", e)))
 
-
-licitacoes <- fetch_licitacoes(sagres)
+regime_execucao <- fetch_regime_execucao(sagres)
 
 DBI::dbDisconnect(sagres)
 
 test_that("Is dataframe", {
-  expect_true(is.data.frame(licitacoes))
+  expect_true(is.data.frame(regime_execucao))
 })
 
 test_that("Not Empty", {
-  expect_true(nrow(licitacoes) != 0)
+  expect_true(nrow(regime_execucao) != 0)
 })
 
+test_that("fetch_regime_execucao()", {
+  expect_true(all(sapply(regime_execucao, class) %in% COLNAMES_REGIME_EXECUCAO))
+})

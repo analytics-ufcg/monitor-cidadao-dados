@@ -12,16 +12,18 @@ tryCatch({sagres <- DBI::dbConnect(odbc::odbc(),
                                    PWD = SQLSERVER_SAGRES19_PASS)
 }, error = function(e) print(paste0("Erro ao tentar se conectar ao Banco Sagres (SQLServer): ", e)))
 
-
-licitacoes <- fetch_licitacoes(sagres)
+tipo_objeto_licitacao <- fetch_tipo_objeto_licitacao(sagres)
 
 DBI::dbDisconnect(sagres)
 
 test_that("Is dataframe", {
-  expect_true(is.data.frame(licitacoes))
+  expect_true(is.data.frame(tipo_objeto_licitacao))
 })
 
 test_that("Not Empty", {
-  expect_true(nrow(licitacoes) != 0)
+  expect_true(nrow(tipo_objeto_licitacao) != 0)
 })
 
+test_that("fetch_tipo_objeto_licitacao()", {
+  expect_true(all(sapply(tipo_objeto_licitacao, class) %in% COLNAMES_TIPO_OBJETO_LICITACAO))
+})
