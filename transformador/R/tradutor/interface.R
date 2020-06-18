@@ -52,3 +52,13 @@ get_codigo_elemento_despesa <- function() {
   codigo_elemento_despesa_dt <- read_codigo_elemento_despesa() %>%
     translate_codigo_elemento_despesa()
 }
+
+#' @title Obtem dados dos códigos de subelementos
+#' @return Dataframe contendo informações sobre os códigos de subelementos
+#' @rdname get_codigo_subelemento
+#' @examples
+#' codigo_subelemento_dt <- get_codigo_subelemento()
+get_codigo_subelemento <- function() {
+  codigo_subelemento_dt <- read_codigo_subelemento() %>%
+    translate_codigo_subelemento()
+}

@@ -22,3 +22,6 @@ readr::write_csv(codigo_subfuncao_df, here::here("data/codigo_subfuncao.csv"))
 
 codigo_elemento_despesa_df <- get_codigo_elemento_despesa()
 readr::write_csv(codigo_elemento_despesa_df, here::here("data/codigo_elemento_despesa.csv"))
+
+codigo_subelemento_df <- get_codigo_subelemento()
+readr::write_csv(codigo_subelemento_df, here::here("data/codigo_subelemento.csv"))

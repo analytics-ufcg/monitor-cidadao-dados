@@ -47,3 +47,12 @@ translate_codigo_subfuncao <- function(codigo_subfuncao_raw) {
 translate_codigo_elemento_despesa <- function(codigo_elemento_despesa_raw) {
   codigo_elemento_despesa_raw %<>% janitor::clean_names()
 }
+
+#' @param codigo_subelemento_raw Dados brutos dos códigos de subelementos
+#' @return Dataframe contendo informações sobre os códigos de subelementos
+#' @rdname translate_codigo_subelemento
+#' @examples
+#' codigo_subelemento_dt <- translate_codigo_subelemento(codigo_subelemento_raw)
+translate_codigo_subelemento <- function(codigo_subelemento_raw) {
+  codigo_subelemento_raw %<>% janitor::clean_names()
+}
