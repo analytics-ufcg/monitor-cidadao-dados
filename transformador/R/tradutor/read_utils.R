@@ -58,3 +58,18 @@ read_codigo_subfuncao <- function() {
                                      st_Ativo = readr::col_character()
                                    ))
 }
+
+#' @title Lê dataframe contendo informações dos códigos de elementos de despesas
+#' @return Dataframe contendo informações sobre os códigos de elementos de despesas
+#' @rdname read_codigo_elemento_despesa
+#' @examples
+#' codigo_elemento_despesa_dt <- read_codigo_elemento_despesa()
+read_codigo_elemento_despesa <- function() {
+  codigo_elemento_despesa_df <- readr::read_csv(here::here("../fetcher/data/codigo_elemento_despesa.csv"),
+                                   col_types = list(
+                                     .default = readr::col_number(),
+                                     cd_Elemento = readr::col_character(),
+                                     de_Elemento = readr::col_character(),
+                                     de_Abreviacao = readr::col_character()
+                                   ))
+}
