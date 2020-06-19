@@ -22,6 +22,7 @@ Crie uma cópia do arquivo .env.sample no diretório raiz desse repositório e r
 
 Preencha as variáveis contidas no .env.sample também para o .env. Altere os valores conforme sua necessidade.
 
+
 #### Serviços
 
 Faça o build das imagens docker com as dependências:

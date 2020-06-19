@@ -17,10 +17,40 @@ get_licitacoes <- function() {
 #' @return Dataframe contendo informações sobre o tipo do objeto das licitações
 #' @rdname get_tipo_objeto_licitacao
 #' @examples
-#' get_tipo_objeto_licitacao_dt <- get_tipo_objeto_licitacao()
+#' tipo_objeto_licitacao_dt <- get_tipo_objeto_licitacao()
 get_tipo_objeto_licitacao <- function() {
   tipo_objeto_licitacao_dt <- read_tipo_objeto_licitacao() %>%
     translate_tipo_objeto_licitacao()
+}
+
+#' @title Obtem dados do tipo da modalidade das licitações
+#' @return Dataframe contendo informações sobre o tipo da modalidade das licitações
+#' @rdname get_tipo_modalidade_licitacao
+#' @examples
+#' tipo_modalidade_licitacao_dt <- get_tipo_modalidade_licitacao()
+get_tipo_modalidade_licitacao <- function() {
+  tipo_modalidade_licitacao_dt <- read_tipo_modalidade_licitacao() %>%
+    translate_tipo_modalidade_licitacao()
+}
+
+#' @title Obtem dados do regime de execução
+#' @return Dataframe contendo informações sobre o tipo do regime de execução
+#' @rdname get_regime_execucao
+#' @examples
+#' regime_execucao_dt <- get_tipo_modalidade_licitacao()
+get_regime_execucao <- function() {
+  regime_execucao_dt <- read_regime_execucao() %>%
+    translate_regime_execucao()
+}
+
+#' @title Obtem dados do código da unidade gestora
+#' @return Dataframe contendo informações sobre o código da unidade gestora
+#' @rdname get_codigo_unidade_gestora
+#' @examples
+#' codigo_unidade_gestora_dt <- get_codigo_unidade_gestora()
+get_codigo_unidade_gestora <- function() {
+  codigo_unidade_gestora_dt <- read_codigo_unidade_gestora() %>%
+    translate_codigo_unidade_gestora()
 }
 
 #' @title Obtem dados dos códigos de funções
@@ -43,3 +73,32 @@ get_contratos <- function() {
     translate_contratos()
 }
 
+#' @title Obtem dados dos códigos de subfunções
+#' @return Dataframe contendo informações sobre os códigos de subfunções
+#' @rdname get_codigo_subfuncao
+#' @examples
+#' codigo_subfuncao_dt <- get_codigo_subfuncao()
+get_codigo_subfuncao <- function() {
+  codigo_subfuncao_dt <- read_codigo_subfuncao() %>%
+    translate_codigo_subfuncao()
+}
+
+#' @title Obtem dados dos códigos de elementos de despesas
+#' @return Dataframe contendo informações sobre os códigos de elementos de despesas
+#' @rdname get_codigo_elemento_despesa
+#' @examples
+#' codigo_elemento_despesa_dt <- get_codigo_elemento_despesa()
+get_codigo_elemento_despesa <- function() {
+  codigo_elemento_despesa_dt <- read_codigo_elemento_despesa() %>%
+    translate_codigo_elemento_despesa()
+}
+
+#' @title Obtem dados dos códigos de subelementos
+#' @return Dataframe contendo informações sobre os códigos de subelementos
+#' @rdname get_codigo_subelemento
+#' @examples
+#' codigo_subelemento_dt <- get_codigo_subelemento()
+get_codigo_subelemento <- function() {
+  codigo_subelemento_dt <- read_codigo_subelemento() %>%
+    translate_codigo_subelemento()
+}
