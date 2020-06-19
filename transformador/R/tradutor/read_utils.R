@@ -156,7 +156,7 @@ read_codigo_municipio <- function() {
   codigo_municipio_dt <- readr::read_csv(here::here("../fetcher/data/codigo_municipio.csv"),
                                            col_types = list(
                                              .default = readr::col_character(),
-                                             cd_Ibge = col_number()
+                                             cd_Ibge = readr::col_number()
                                            ))
 }
 
