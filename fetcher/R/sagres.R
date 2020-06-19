@@ -177,3 +177,20 @@ fetch_codigo_unidade_gestora <- function(sagres_con) {
   
   return(codigo_unidade_gestora)
 }
+
+#' @title Busca os códigos códigos dos municípios no Banco do Sagres SQLServer
+#' @param sagres_con Conexão com o Banco de Dados
+#' @return Dataframe contendo informações sobre os códigos dos municípios
+#' @rdname fetch_codigo_municipio
+#' @examples
+fetch_codigo_municipio <- function(sagres_con) {
+  codigo_munipio <- tibble::tibble()
+  tryCatch({
+    codigo_munipio <- DBI::dbGetQuery(sagres_con, "SELECT * FROM Codigo_Municipios;") %>% 
+      assert_dataframe_completo(COLNAMES_CODIGO_MUNICIPIO)
+  },
+  error = function(e) print(paste0("Erro ao buscar código do município no Banco Sagres (SQLServer): ", e))
+  )
+  
+  return(codigo_munipio)
+}
