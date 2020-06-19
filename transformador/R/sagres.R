@@ -45,3 +45,11 @@ process_licitacao <- function(licitacoes_df) {
   licitacoes_df %<>% .extract_cd_municipio("cd_u_gestora") %>%
     generate_licitacao_id()
 }
+
+#' @title Processa datagrame de municipios
+#' @description Manipula tabela pra forma que será utilizada no banco
+#' @param municipios_df Dataframe contendo informações dos municipios
+#' @return Dataframe contendo informações dos municipios processados
+process_municipio <- function(municipios_df) {
+  municipios_df %<>% dplyr::select(cd_municipio, dplyr::everything())
+}
