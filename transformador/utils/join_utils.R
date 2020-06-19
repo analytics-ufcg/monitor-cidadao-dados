@@ -12,5 +12,5 @@ join_contratos_licitacao <- function(df_contratos, df_licitacoes) {
                                      tp_licitacao, id_licitacao)
 
   df_contratos %<>% dplyr::left_join(df_licitacoes) %>%
-    dplyr::select(id_contrato, id_licitacao, dplyr::everything())
+    dplyr::select(id_contrato, id_licitacao, cd_municipio, dplyr::everything())
 }

@@ -70,7 +70,9 @@ translate_codigo_funcao <- function(codigo_funcao_raw) {
 #' @examples
 #' contratos_dt <- translate_contratos(contratos_raw)
 translate_contratos <- function(contratos_raw) {
-  contratos_raw %<>% janitor::clean_names()
+  contratos_raw %<>% janitor::clean_names() %>%
+    dplyr::mutate(de_obs = stringr::str_replace(de_obs, "\uFFFD", "")) %>%
+    dplyr::mutate(nu_contrato = stringr::str_replace(nu_contrato, "\uFFFD", ""))
 }
 
 #' @title Traduz dado recebido para dataset

@@ -34,6 +34,7 @@ generate_contrato_id <- function(contratos_df) {
 #' @return Dataframe contendo informações dos contratos processados
 process_contrato <- function(contratos_df) {
   contratos_df %<>% .extract_cd_municipio("cd_u_gestora") %>%
+    dplyr::filter(cd_municipio != "612") %>%  #registro preenchido errado
     generate_contrato_id()
 }
 

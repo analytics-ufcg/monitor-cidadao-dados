@@ -1,2 +1,3 @@
+DROP TABLE IF EXISTS "contrato";
 DROP TABLE IF EXISTS "licitacao";
 DROP TABLE IF EXISTS "municipio";
