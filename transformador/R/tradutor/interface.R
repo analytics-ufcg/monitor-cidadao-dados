@@ -102,3 +102,14 @@ get_codigo_subelemento <- function() {
   codigo_subelemento_dt <- read_codigo_subelemento() %>%
     translate_codigo_subelemento()
 }
+
+#' @title Obtem dados dos municípios
+#' @return Dataframe contendo informações sobre os municípios
+#' @rdname get_codigo_municipio
+#' @examples
+#' codigo_municipio_dt <- get_codigo_municipio()
+get_codigo_municipio <- function() {
+  codigo_municipio_dt <- read_codigo_municipio() %>%
+    translate_codigo_municipio()
+}
+
