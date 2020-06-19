@@ -23,7 +23,7 @@ translate_tipo_objeto_licitacao <- function(tipo_objeto_licitacao_raw) {
 }
 
 #' @title Traduz dado recebido para dataset
-#' @param tipo_modalidade_licitacao_raw Dados brutos do tipo das modalidades das licitações 
+#' @param tipo_modalidade_licitacao_raw Dados brutos do tipo das modalidades das licitações
 #' @return Dataframe contendo informações sobre o tipo das modalidades das licitações
 #' @rdname translate_tipo_modalidade_licitacao
 #' @examples
@@ -52,6 +52,7 @@ translate_codigo_unidade_gestora <- function(codigo_unidade_gestora_raw) {
   codigo_unidade_gestora_raw %<>% janitor::clean_names()
 }
 
+#' @title Traduz dado recebido para dataset
 #' @param codigo_funcao_raw Dados brutos dos códigos de funções
 #' @return Dataframe contendo informações sobre os códigos de funções
 #' @rdname translate_codigo_funcao
@@ -61,6 +62,7 @@ translate_codigo_funcao <- function(codigo_funcao_raw) {
   codigo_funcao_raw %<>% janitor::clean_names()
 }
 
+
 #' @title Traduz dado recebido para dataset
 #' @param contratos_raw Dados brutos dos contratos
 #' @return Dataframe contendo informações sobre os contratos
@@ -68,9 +70,12 @@ translate_codigo_funcao <- function(codigo_funcao_raw) {
 #' @examples
 #' contratos_dt <- translate_contratos(contratos_raw)
 translate_contratos <- function(contratos_raw) {
-  contratos_raw %<>% janitor::clean_names()
+  contratos_raw %<>% janitor::clean_names() %>%
+    dplyr::mutate(de_obs = stringr::str_replace(de_obs, "\uFFFD", "")) %>%
+    dplyr::mutate(nu_contrato = stringr::str_replace(nu_contrato, "\uFFFD", ""))
 }
 
+#' @title Traduz dado recebido para dataset
 #' @param codigo_subfuncao_raw Dados brutos dos códigos de subfunções
 #' @return Dataframe contendo informações sobre os códigos de subfunções
 #' @rdname translate_codigo_subfuncao
@@ -80,6 +85,7 @@ translate_codigo_subfuncao <- function(codigo_subfuncao_raw) {
   codigo_subfuncao_raw %<>% janitor::clean_names()
 }
 
+#' @title Traduz dado recebido para dataset
 #' @param codigo_elemento_despesa_raw Dados brutos dos códigos de elementos de despesas
 #' @return Dataframe contendo informações sobre os códigos de elementos de despesas
 #' @rdname translate_codigo_elemento_despesa
@@ -89,6 +95,7 @@ translate_codigo_elemento_despesa <- function(codigo_elemento_despesa_raw) {
   codigo_elemento_despesa_raw %<>% janitor::clean_names()
 }
 
+#' @title Traduz dado recebido para dataset
 #' @param codigo_subelemento_raw Dados brutos dos códigos de subelementos
 #' @return Dataframe contendo informações sobre os códigos de subelementos
 #' @rdname translate_codigo_subelemento
@@ -97,3 +104,14 @@ translate_codigo_elemento_despesa <- function(codigo_elemento_despesa_raw) {
 translate_codigo_subelemento <- function(codigo_subelemento_raw) {
   codigo_subelemento_raw %<>% janitor::clean_names()
 }
+
+#' @title Traduz dado recebido para dataset
+#' @param codigo_municipio_raw Dados brutos dos municípios
+#' @return Dataframe contendo informações sobre os municípios
+#' @rdname translate_codigo_municipio
+#' @examples
+#' codigo_municipio_dt <- translate_codigo_municipio(codigo_municipio_raw)
+translate_codigo_municipio <- function(codigo_municipio_raw) {
+  codigo_municipio_raw %<>% janitor::clean_names()
+}
+

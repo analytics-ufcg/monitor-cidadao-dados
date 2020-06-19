@@ -9,6 +9,7 @@ read_licitacoes <- function() {
                                      .default = readr::col_number(),
                                      nu_Licitacao = readr::col_character(),
                                      dt_Homologacao = readr::col_datetime(format = ""),
+                                     nu_Licitacao = readr::col_double(),
                                      de_Obs = readr::col_character(),
                                      dt_MesAno = readr::col_character(),
                                      registroCGE= readr::col_character()
@@ -96,7 +97,7 @@ read_contratos <- function() {
                                      cd_UGestora = readr::col_integer(),
                                      dt_Ano = readr::col_integer(),
                                      tp_Licitacao = readr::col_integer(),
-                                     vl_TotalContrato = readr::col_number(),
+                                     vl_TotalContrato = readr::col_double(),
                                      dt_Assinatura = readr::col_datetime(format = ""),
                                      dt_Recebimento = readr::col_datetime(format = "")
                                    ))
@@ -146,3 +147,17 @@ read_codigo_subelemento <- function() {
                                      de_Conteudo = readr::col_character()
                                    ))
 }
+
+#' @title Lê dataframe contendo informações dos municípios
+#' @return Dataframe contendo informações sobre os municípios
+#' @rdname read_codigo_municipio
+#' @examples
+#' codigo_municipio_dt <- read_codigo_municipio()
+read_codigo_municipio <- function() {
+  codigo_municipio_dt <- readr::read_csv(here::here("../fetcher/data/codigo_municipio.csv"),
+                                           col_types = list(
+                                             .default = readr::col_character(),
+                                             cd_Ibge = readr::col_number()
+                                           ))
+}
+

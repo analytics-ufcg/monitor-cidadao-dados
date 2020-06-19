@@ -47,3 +47,7 @@ COLNAMES_CODIGO_SUBFUNCAO <-c("cd_SubFuncao"="integer","de_SubFuncao"="character
 COLNAMES_CODIGO_SUBELEMENTO <-  c("cd_Subelemento"="character","de_Subelemento"="character","de_Conteudo"="character"
 )
 
+COLNAMES_CODIGO_MUNICIPIO <-  c("cd_Ibge"="integer","cd_Municipio"="character","no_Municipio"="character", 
+                                "dt_AnoCriacao"="character","cd_RegiaoAdministrativa"="character", "cd_MicroRegiao"="character",
+                                "cd_MesoRegiao"="character"
+)
