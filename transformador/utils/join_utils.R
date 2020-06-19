@@ -2,7 +2,7 @@
 #' @title Realiza o join dos contratos com o dataframe das licitações
 #' @param df_contratos dataframe com os contratos
 #' @param df_licitacoes dataframe com as licitações
-#' @return Dataframe contendo informações sobre os códigos de funções
+#' @return Dataframe contendo informações dos contratos com os ids das licitações
 #' @rdname join_contratos_licitacao
 #' @examples
 #' join_contrato_licitacao_dt <- join_contratos_licitacao(df_contratos, df_licitacoes)
