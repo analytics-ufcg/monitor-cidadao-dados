@@ -31,6 +31,7 @@ get_args <- function() {
 
 #' @title Cria as tabelas do Banco de dados
 create <- function() {
+  system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_municipio.sql"))
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_licitacao.sql"))
 }
 
