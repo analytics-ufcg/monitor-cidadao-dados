@@ -177,3 +177,24 @@ fetch_codigo_unidade_gestora <- function(sagres_con) {
   
   return(codigo_unidade_gestora)
 }
+
+
+#' @title Busca os empenhos realizados no Banco do Sagres SQLServer
+#' @param sagres_con Conexão com o Banco de Dados
+#' @return Dataframe contendo informações sobre os empenhos
+#' @rdname fetch_empenhos
+#' @examples
+fetch_empenhos <- function(sagres_con) {
+  empenhos <- tibble::tibble()
+  tryCatch({
+    empenhos <- DBI::dbGetQuery(sagres_con, "SELECT TOP 10 * FROM Empenhos;") %>% 
+      assert_dataframe_completo(COLNAMES_EMPENHOS)
+  },
+  error = function(e) print(paste0("Erro ao buscar empenhos no Banco Sagres (SQLServer): ", e))
+  )
+  
+  return(empenhos)
+}
+
+
+

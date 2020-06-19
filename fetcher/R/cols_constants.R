@@ -47,3 +47,21 @@ COLNAMES_CODIGO_SUBFUNCAO <-c("cd_SubFuncao"="integer","de_SubFuncao"="character
 COLNAMES_CODIGO_SUBELEMENTO <-  c("cd_Subelemento"="character","de_Subelemento"="character","de_Conteudo"="character"
 )
 
+COLNAMES_EMPENHOS <- c("cd_UGestora"="character", "dt_Ano"="integer", "cd_UnidOrcamentaria"="character", 
+				"cd_Funcao"="character", "cd_Subfuncao"="character", "cd_Programa"="character",
+				"cd_Acao"="character", "cd_classificacao"="character", "cd_CatEconomica"="character", 
+				"cd_NatDespesa"="character", "cd_Modalidade"="character", "cd_Elemento"="character", 
+				"cd_SubElemento"="character", "tp_Licitacao"="character", "nu_Licitacao"="character", 
+				"nu_Empenho"="character", "tp_Empenho"="character", "dt_Empenho"="character", 
+				"vl_Empenho"="numeric", "cd_Credor"="character", "no_Credor"="character", 
+				"tp_Credor"="character", "de_Historico1"="character", "de_Historico2"="character", 
+				"de_Historico"="character", "tp_Meta"="character", "nu_Obra"="character", 
+				"dt_MesAno"="character", "dt_MesAnoReferencia"="character", "tp_FonteRecursos"="character", 
+				"nu_CPF"="character"
+)
+
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
