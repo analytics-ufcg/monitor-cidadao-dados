@@ -1,6 +1,7 @@
 library(magrittr)
 
 source(here::here("R/tradutor/interface.R"))
+source(here::here("utils/join_utils.R"))
 
 .HELP <- "Rscript transform_mc_data.R"
 
@@ -24,6 +25,11 @@ readr::write_csv(codigo_unidade_gestora_df, here::here("data/codigo_unidade_gest
 
 codigo_funcao_df <- get_codigo_funcao()
 readr::write_csv(codigo_funcao_df, here::here("data/codigo_funcao.csv"))
+
+contratos_df <- get_contratos()
+contratos_transformados <- contratos_df %>% mcTransformador::process_contrato() %>%
+  join_contratos_licitacao(licitacoes_transformadas)
+readr::write_csv(contratos_transformados, here::here("data/contratos.csv"))
 
 codigo_subfuncao_df <- get_codigo_subfuncao()
 readr::write_csv(codigo_subfuncao_df, here::here("data/codigo_subfuncao.csv"))

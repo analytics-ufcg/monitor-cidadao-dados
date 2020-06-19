@@ -63,6 +63,16 @@ get_codigo_funcao <- function() {
     translate_codigo_funcao()
 }
 
+#' @title Obtem dados dos contratos
+#' @return Dataframe contendo informações sobre os contratos
+#' @rdname get_contratos
+#' @examples
+#' get_contratos_dt <- get_contratos()
+get_contratos <- function() {
+  contratos_dt <- read_contratos() %>%
+    translate_contratos()
+}
+
 #' @title Obtem dados dos códigos de subfunções
 #' @return Dataframe contendo informações sobre os códigos de subfunções
 #' @rdname get_codigo_subfuncao

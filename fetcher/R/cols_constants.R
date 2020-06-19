@@ -13,11 +13,11 @@ COLNAMES_LICITACOES <- c("cd_UGestora"="integer","dt_Ano"="integer",
                          "registroCGE"="character","tp_regimeExecucao"="integer"
                         )
 
-COLNAMES_TIPO_OBJETO_LICITACAO <- c("tp_Objeto"="integer", 
+COLNAMES_TIPO_OBJETO_LICITACAO <- c("tp_Objeto"="integer",
                                     "de_TipoObjeto"="character"
                                     )
 
-COLNAMES_TIPO_MODALIDADE_LICITACAO <- c("tp_Licitacao"="integer", 
+COLNAMES_TIPO_MODALIDADE_LICITACAO <- c("tp_Licitacao"="integer",
                                         "de_TipoLicitacao"="character"
                                         )
 

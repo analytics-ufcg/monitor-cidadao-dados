@@ -61,6 +61,16 @@ translate_codigo_funcao <- function(codigo_funcao_raw) {
   codigo_funcao_raw %<>% janitor::clean_names()
 }
 
+#' @title Traduz dado recebido para dataset
+#' @param contratos_raw Dados brutos dos contratos
+#' @return Dataframe contendo informações sobre os contratos
+#' @rdname translate_contratos
+#' @examples
+#' contratos_dt <- translate_contratos(contratos_raw)
+translate_contratos <- function(contratos_raw) {
+  contratos_raw %<>% janitor::clean_names()
+}
+
 #' @param codigo_subfuncao_raw Dados brutos dos códigos de subfunções
 #' @return Dataframe contendo informações sobre os códigos de subfunções
 #' @rdname translate_codigo_subfuncao
