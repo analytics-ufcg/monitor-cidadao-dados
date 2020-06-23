@@ -61,4 +61,8 @@ readr::write_csv(pagamentos, here::here("./data/pagamentos.csv"))
 convenios <- fetch_convenios(sagres)
 readr::write_csv(convenios, here::here("./data/convenios.csv"))
 
+codigo_municipio<- fetch_codigo_municipio(sagres)
+readr::write_csv(codigo_municipio, here::here("./data/codigo_municipio.csv"))
+
+
 DBI::dbDisconnect(sagres)

@@ -7,14 +7,19 @@ COLNAMES_ADITIVOS <-  c("cd_UGestora"="character","dt_Ano"="character","nu_Contr
                         "vl_Aditivo"="numeric","dt_MesAno"="character","dt_Aditado"="character"
 )
 
-
 COLNAMES_CODIGO_ELEMENTO_DESPESA <- c("cd_Elemento"="character","de_Elemento"="character","de_Abreviacao"="character"
 )
-
 
 COLNAMES_CODIGO_FUNCAO <- c("cd_Funcao"="integer","de_Funcao"="character","st_Ativo"="character"
 )
 
+COLNAMES_TIPO_OBJETO_LICITACAO <- c("tp_Objeto"="integer",
+                                    "de_TipoObjeto"="character"
+                                    )
+
+COLNAMES_TIPO_MODALIDADE_LICITACAO <- c("tp_Licitacao"="integer",
+                                        "de_TipoLicitacao"="character"
+                                        )
 
 COLNAMES_CODIGO_SUBELEMENTO <-  c("cd_Subelemento"="character","de_Subelemento"="character","de_Conteudo"="character"
 )
@@ -96,5 +101,7 @@ COLNAMES_TIPO_OBJETO_LICITACAO <- c("tp_Objeto"="integer",
                                     "de_TipoObjeto"="character"
 )
 
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+COLNAMES_CODIGO_MUNICIPIO <-  c("cd_Ibge"="integer","cd_Municipio"="character","no_Municipio"="character", 
+                                "dt_AnoCriacao"="character","cd_RegiaoAdministrativa"="character", "cd_MicroRegiao"="character",
+                                "cd_MesoRegiao"="character"
+)
