@@ -127,3 +127,123 @@ read_codigo_subelemento <- function() {
                                      de_Conteudo = readr::col_character()
                                    ))
 }
+
+
+#' @title Lê dataframe contendo informações dos empenhos
+#' @return Dataframe contendo informações sobre empenhos
+#' @rdname read_empenhos
+#' @examples
+#' empenhos_dt <- read_empenhos()
+read_empenhos <- function() {
+  empenhos_df <- readr::read_csv(here::here("../fetcher/data/empenhos.csv"),
+                                 col_types = list(
+                                   .default = readr::col_number(),
+                                   cd_UGestora = readr::col_character(),
+                                   dt_Ano = readr::col_character(),
+                                   cd_UnidOrcamentaria = readr::col_character(),
+                                   cd_Funcao = readr::col_character(),
+                                   cd_Subfuncao = readr::col_character(),
+                                   cd_Programa = readr::col_character(),
+                                   cd_Acao = readr::col_character(),
+                                   cd_classificacao = readr::col_character(),
+                                   cd_CatEconomica = readr::col_character(),
+                                   cd_NatDespesa = readr::col_character(),
+                                   cd_Modalidade = readr::col_character(),
+                                   cd_Elemento = readr::col_character(),
+                                   cd_SubElemento = readr::col_character(),
+                                   tp_Licitacao = readr::col_character(),
+                                   nu_Licitacao = readr::col_character(),
+                                   nu_Empenho = readr::col_character(),
+                                   tp_Empenho = readr::col_character(),
+                                   dt_Empenho = readr::col_character(),
+                                   cd_Credor = readr::col_character(),
+                                   no_Credor = readr::col_character(),
+                                   tp_Credor = readr::col_character(),
+                                   de_Historico1 = readr::col_character(),
+                                   de_Historico2 = readr::col_character(),
+                                   de_Historico = readr::col_character(),
+                                   tp_Meta = readr::col_character(),
+                                   nu_Obra = readr::col_character(),
+                                   dt_MesAno = readr::col_character(),
+                                   dt_MesAnoReferencia = readr::col_character(),
+                                   tp_FonteRecursos = readr::col_character(),
+                                   nu_CPF = readr::col_character()
+                                 ))
+}
+
+
+#' @title Lê dataframe contendo informações dos aditivos de licitações/contratos
+#' @return Dataframe contendo informações sobre os aditivos
+#' @rdname read_aditivos
+#' @examples
+#' aditivos_dt <- read_aditivos()
+read_aditivos <- function() {
+  aditivos_df <- readr::read_csv(here::here("../fetcher/data/aditivos.csv"),
+                                           col_types = list(
+                                             .default = readr::col_number(),
+                                             cd_UGestora = readr::col_character(),
+                                             dt_Ano = readr::col_character(),
+                                             nu_Contrato = readr::col_character(),
+                                             nu_Aditivo = readr::col_character(),
+                                             dt_Assinatura = readr::col_character(),
+                                             de_Motivo = readr::col_character(),
+                                             dt_MesAno = readr::col_character(),
+                                             dt_Aditado = readr::col_character()
+                                           ))
+}
+
+
+#' @title Lê dataframe contendo informações de pagamentos
+#' @return Dataframe contendo informações sobre pagamentos
+#' @rdname read_pagamentos
+#' @examples
+#' pagamentos_dt <- read_pagamentos()
+read_pagamentos <- function() {
+  pagamentos_df <- readr::read_csv(here::here("../fetcher/data/pagamentos.csv"),
+                                           col_types = list(
+                                             .default = readr::col_number(),
+                                             cd_UGestora = readr::col_character(),
+                                             dt_Ano = readr::col_character(),
+                                             cd_UnidOrcamentaria = readr::col_character(),
+                                             nu_Empenho = readr::col_character(),
+                                             nu_Parcela = readr::col_character(),
+                                             tp_Lancamento = readr::col_character(),
+                                             dt_Pagamento = readr::col_character(),
+                                             cd_Conta = readr::col_character(),
+                                             nu_ChequePag = readr::col_character(),
+                                             nu_DebAut = readr::col_character(),
+                                             cd_BancoRec = readr::col_character(),
+                                             cd_AgenciaRec = readr::col_character(),
+                                             nu_ContaRec = readr::col_character(),
+                                             tp_FonteRecursos = readr::col_character(),
+                                             dt_MesAno = readr::col_character(),
+                                             cd_Banco = readr::col_character(),
+                                             cd_Agencia = readr::col_character(),
+                                             tp_ContaBancaria = readr::col_character()
+                                           ))
+}
+
+
+#' @title Lê dataframe contendo informações de convênios
+#' @return Dataframe contendo informações sobre convênios
+#' @rdname read_convenios
+#' @examples
+#' convenios_dt <- read_convenios()
+read_convenios <- function() {
+  convenios_df <- readr::read_csv(here::here("../fetcher/data/convenios.csv"),
+                                   col_types = list(
+                                     .default = readr::col_number(),
+                                     cd_UGestora = readr::col_character(),
+                                     dt_Ano = readr::col_character(),
+                                     nu_Convenio = readr::col_character(),
+                                     dt_AnoCelebracao = readr::col_character(),
+                                     no_Convenio = readr::col_character(),
+                                     cd_Concedente = readr::col_character(),
+                                     no_Concedente = readr::col_character(),
+                                     de_Objeto = readr::col_character(),
+                                     tp_OrigemRecursoConvenio = readr::col_character(),
+                                     dt_MesAno = readr::col_character()
+                                   ))
+}
+
+

@@ -33,3 +33,15 @@ readr::write_csv(codigo_elemento_despesa_df, here::here("data/codigo_elemento_de
 
 codigo_subelemento_df <- get_codigo_subelemento()
 readr::write_csv(codigo_subelemento_df, here::here("data/codigo_subelemento.csv"))
+
+empenhos_df <- get_empenhos()
+readr::write_csv(empenhos_df, here::here("data/empenhos.csv"))
+
+aditivos_df <- get_aditivos()
+readr::write_csv(aditivos_df, here::here("data/aditivos.csv"))
+
+pagamentos_df <- get_pagamentos()
+readr::write_csv(pagamentos_df, here::here("data/pagamentos.csv"))
+
+convenios_df <- get_convenios()
+readr::write_csv(convenios_df, here::here("data/convenios.csv"))

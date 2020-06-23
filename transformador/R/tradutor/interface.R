@@ -92,3 +92,44 @@ get_codigo_subelemento <- function() {
   codigo_subelemento_dt <- read_codigo_subelemento() %>%
     translate_codigo_subelemento()
 }
+
+#' @title Obtem dados dos empenhos
+#' @return Dataframe contendo informações sobre empenhos
+#' @rdname get_empenhos
+#' @examples
+#' empenhos_dt <- get_empenhos()
+get_empenhos <- function() {
+  empenhos_dt <- read_empenhos() %>%
+    translate_empenhos()
+}
+
+#' @title Obtem dados dos aditivos de licitação/contrato
+#' @return Dataframe contendo informações sobre os aditivos
+#' @rdname get_aditivos
+#' @examples
+#' aditivos_dt <- get_aditivos()
+get_aditivos <- function() {
+  aditivos_dt <- read_aditivos() %>%
+    translate_aditivos()
+}
+
+#' @title Obtem dados dos aditivos de pagamentos
+#' @return Dataframe contendo informações sobre pagamentos
+#' @rdname get_pagamentos
+#' @examples
+#' pagamentos_dt <- get_pagamentos()
+get_pagamentos <- function() {
+  pagamentos_dt <- read_pagamentos() %>%
+    translate_pagamentos()
+}
+
+#' @title Obtem dados dos aditivos de convênios
+#' @return Dataframe contendo informações sobre convênios
+#' @rdname get_convenios
+#' @examples
+#' convenios_dt <- get_convenios()
+get_convenios <- function() {
+  convenios_dt <- read_convenios() %>%
+    translate_convenios()
+}
+

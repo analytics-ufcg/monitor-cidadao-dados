@@ -87,3 +87,39 @@ translate_codigo_elemento_despesa <- function(codigo_elemento_despesa_raw) {
 translate_codigo_subelemento <- function(codigo_subelemento_raw) {
   codigo_subelemento_raw %<>% janitor::clean_names()
 }
+
+#' @param empenhos_raw Dados brutos dos empenhos
+#' @return Dataframe contendo informações sobre empenhos
+#' @rdname translate_empenhos
+#' @examples
+#' empenhos_dt <- translate_empenhos(translate_empenhos_raw)
+translate_empenhos <- function(empenhos_raw) {
+  empenhos_raw %<>% janitor::clean_names()
+}
+
+#' @param aditivos_raw Dados brutos dos aditivos
+#' @return Dataframe contendo informações sobre aditivos
+#' @rdname translate_aditivos
+#' @examples
+#' aditivos_dt <- translate_aditivos(translate_aditivos_raw)
+translate_aditivos <- function(aditivos_raw) {
+  aditivos_raw %<>% janitor::clean_names()
+}
+
+#' @param pagamentos_raw Dados brutos dos pagamentos
+#' @return Dataframe contendo informações sobre pagamentos
+#' @rdname translate_pagamentos
+#' @examples
+#' pagamentos_dt <- translate_pagamentos(translate_pagamentos_raw)
+translate_pagamentos <- function(pagamentos_raw) {
+  pagamentos_raw %<>% janitor::clean_names()
+}
+
+#' @param convenios_raw Dados brutos dos Convênios
+#' @return Dataframe contendo informações sobre Convênios
+#' @rdname translate_convenios
+#' @examples
+#' convenios_dt <- translate_convenios(translate_convenios_raw)
+translate_convenios <- function(convenios_raw) {
+  convenios_raw %<>% janitor::clean_names()
+}
