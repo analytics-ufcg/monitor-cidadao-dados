@@ -6,8 +6,6 @@ output:
   html_document:
     df_print: paged
     code_folding: hide
-    toc: true
-    toc_float: true
 ---
 
 
@@ -463,7 +461,7 @@ contratos_empenhos_longos %>%
 
 --------
 
-          Dados Extraídos do Sagres 2017.
+          Dados Extraídos do Sagres 2019.
           Tabelas: Empenhos, Contratos, Tipo da Modalidade da Licitação.
           Dados Externos: Mapa da Paraíba, Código dos Municípios Paraibanos (IBGE).<br>
           O SAGRES é um sistema alimentado pela administração de cada município paraibano. É possível que hajam inconsistências em alguns registros. 
