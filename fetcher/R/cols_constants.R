@@ -47,7 +47,23 @@ COLNAMES_CODIGO_SUBFUNCAO <-c("cd_SubFuncao"="integer","de_SubFuncao"="character
 COLNAMES_CODIGO_SUBELEMENTO <-  c("cd_Subelemento"="character","de_Subelemento"="character","de_Conteudo"="character"
 )
 
-COLNAMES_CODIGO_MUNICIPIO <-  c("cd_Ibge"="integer","cd_Municipio"="character","no_Municipio"="character", 
-                                "dt_AnoCriacao"="character","cd_RegiaoAdministrativa"="character", "cd_MicroRegiao"="character",
-                                "cd_MesoRegiao"="character"
+COLNAMES_CODIGO_MUNICIPIO <-  c("cd_Ibge"="integer","cd_Municipio"="character",
+		"no_Municipio"="character","dt_AnoCriacao"="character",
+		"cd_RegiaoAdministrativa"="character",
+		"cd_MicroRegiao"="character","cd_MesoRegiao"="character"
+)
+
+COLNAMES_FORNECEDORES <-c("cd_UGestora"="integer","dt_Ano"="integer",
+                      			"nu_CPFCNPJ"="character","tp_Credor"="integer",
+                      			"no_Fornecedor"="character","nu_IncEstadual"="character",
+                      			"de_Endereco"="character","de_Bairro"="character",
+                      			"de_Complemento"="character","nu_CEP"="character",
+                      			"de_Municipio"="character","cd_UF"="character",
+                      			"nu_ddd"="character","nu_Fone"="character",
+                      			"dt_MesAno"="character","dt_MesAnoReferencia"="character"
+)
+
+COLNAMES_PARTICIPANTES <- c("cd_UGestora"="integer","dt_Ano"="integer",
+                        			"nu_Licitacao"="character","tp_Licitacao"="integer",
+                        			"nu_CPFCNPJ"="character","dt_MesAno"="character"
 )
