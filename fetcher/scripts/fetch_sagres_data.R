@@ -50,4 +50,10 @@ readr::write_csv(codigo_unidade_gestora, here::here("./data/codigo_unidade_gesto
 codigo_municipio<- fetch_codigo_municipio(sagres)
 readr::write_csv(codigo_municipio, here::here("./data/codigo_municipio.csv"))
 
+participantes<- fetch_participantes(sagres)
+readr::write_csv(participantes, here::here("./data/participantes.csv"))
+
+fornecedores<- fetch_fornecedores(sagres)
+readr::write_csv(fornecedores, here::here("./data/fornecedores.csv"))
+
 DBI::dbDisconnect(sagres)
