@@ -23,7 +23,3 @@ test_that("Is dataframe", {
 test_that("Not Empty", {
   expect_true(nrow(pagamentos) != 0)
 })
-
-test_that("fetch_pagamentos()", {
-  expect_true(all(sapply(pagamentos, class) %in% COLNAMES_PAGAMENTOS))
-})
