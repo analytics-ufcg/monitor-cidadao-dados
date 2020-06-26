@@ -10,7 +10,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
-  echo = TRUE,
+  echo = FALSE,
   warning = FALSE,
   fig.retina = 2,
   collapse = TRUE,
@@ -71,7 +71,7 @@ contratos_rescindidos_2018 <- read_delim(here::here("dados/contratos_rescindidos
 
 Fornecedor é toda e qualquer pessoa física ou jurídica que preste serviços ou proveja bens. No contexto da Administração Pública, é necessário que os fornecedores interessados cadastrem-se previamente e habilitem-se a fornecer. Dessa maneira, poderão participar em certames licitatórios.
 
-No relatório anterior conhecemos mais sobre (características das licitações paraibanas)[http://]. Nesta análise, aprenderemos mais sobre os fornecedores da Paraíba.
+No relatório anterior conhecemos mais sobre características das licitações paraibanas. Nesta análise, aprenderemos mais sobre os fornecedores da Paraíba.
 
 <br>
 <br>
