@@ -177,3 +177,93 @@ fetch_codigo_unidade_gestora <- function(sagres_con) {
   
   return(codigo_unidade_gestora)
 }
+
+#' @title Busca os empenhos realizados no Banco do Sagres SQLServer
+#' @param sagres_con Conexão com o Banco de Dados
+#' @return Dataframe contendo informações sobre os empenhos
+#' @rdname fetch_empenhos
+#' @examples
+fetch_empenhos <- function(sagres_con) {
+  empenhos <- tibble::tibble()
+  tryCatch({
+    empenhos <- DBI::dbGetQuery(sagres_con, "SELECT TOP 10 * FROM Empenhos;") %>% 
+      assert_dataframe_completo(COLNAMES_EMPENHOS)
+  },
+  error = function(e) print(paste0("Erro ao buscar empenhos no Banco Sagres (SQLServer): ", e))
+  )
+  
+  return(empenhos)
+}
+
+
+#' @title Busca os Aditivos realizados no Banco do Sagres SQLServer
+#' @param sagres_con Conexão com o Banco de Dados
+#' @return Dataframe contendo informações sobre os aditivos de licitação/contrato
+#' @rdname fetch_aditivos
+#' @examples
+fetch_aditivos <- function(sagres_con) {
+  aditivos <- tibble::tibble()
+  tryCatch({
+    aditivos <- DBI::dbGetQuery(sagres_con, "SELECT TOP 10 * FROM Aditivos;") %>% 
+      assert_dataframe_completo(COLNAMES_ADITIVOS)
+  },
+  error = function(e) print(paste0("Erro ao buscar aditivos no Banco Sagres (SQLServer): ", e))
+  )
+  
+  return(aditivos)
+}
+
+#' @title Busca os Pagamentos realizados no Banco do Sagres SQLServer
+#' @param sagres_con Conexão com o Banco de Dados
+#' @return Dataframe contendo informações sobre pagamentos
+#' @rdname fetch_pagamentos
+#' @examples
+fetch_pagamentos <- function(sagres_con) {
+  pagamentos <- tibble::tibble()
+  tryCatch({
+    pagamentos <- DBI::dbGetQuery(sagres_con, "SELECT TOP 10 * FROM Pagamentos;") %>% 
+      assert_dataframe_completo(COLNAMES_PAGAMENTOS)
+  },
+  error = function(e) print(paste0("Erro ao buscar pagamentos no Banco Sagres (SQLServer): ", e))
+  )
+  
+  return(pagamentos)
+}
+
+
+
+#' @title Busca os Convenios realizados no Banco do Sagres SQLServer
+#' @param sagres_con Conexão com o Banco de Dados
+#' @return Dataframe contendo informações sobre convênios
+#' @rdname fetch_convenios
+#' @examples
+fetch_convenios <- function(sagres_con) {
+  convenios <- tibble::tibble()
+  tryCatch({
+    convenios <- DBI::dbGetQuery(sagres_con, "SELECT TOP 10 * FROM Convenios;") %>% 
+      assert_dataframe_completo(COLNAMES_CONVENIOS)
+  },
+  error = function(e) print(paste0("Erro ao buscar convênios no Banco Sagres (SQLServer): ", e))
+  )
+  
+  return(convenios)
+}
+
+
+#' @title Busca os códigos códigos dos municípios no Banco do Sagres SQLServer
+#' @param sagres_con Conexão com o Banco de Dados
+#' @return Dataframe contendo informações sobre os códigos dos municípios
+#' @rdname fetch_codigo_municipio
+#' @examples
+fetch_codigo_municipio <- function(sagres_con) {
+  codigo_munipio <- tibble::tibble()
+  tryCatch({
+    codigo_munipio <- DBI::dbGetQuery(sagres_con, "SELECT * FROM Codigo_Municipios;") %>% 
+      assert_dataframe_completo(COLNAMES_CODIGO_MUNICIPIO)
+  },
+  error = function(e) print(paste0("Erro ao buscar código do município no Banco Sagres (SQLServer): ", e))
+  )
+  
+  return(codigo_munipio)
+}
+

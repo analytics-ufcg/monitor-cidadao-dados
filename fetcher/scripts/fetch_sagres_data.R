@@ -17,6 +17,8 @@ tryCatch({sagres <- DBI::dbConnect(odbc::odbc(),
 
 #DBI::dbGetQuery(sagres, "SET NAMES 'utf8'")
 
+
+
 licitacoes <- fetch_licitacoes(sagres)
 readr::write_csv(licitacoes, here::here("./data/licitacoes.csv"))
 
@@ -46,5 +48,21 @@ readr::write_csv(codigo_subelemento, here::here("./data/codigo_subelemento.csv")
 
 codigo_unidade_gestora <- fetch_codigo_unidade_gestora(sagres)
 readr::write_csv(codigo_unidade_gestora, here::here("./data/codigo_unidade_gestora.csv"))
+
+empenhos <- fetch_empenhos(sagres)
+readr::write_csv(empenhos, here::here("./data/empenhos.csv"))
+
+aditivos <- fetch_aditivos(sagres)
+readr::write_csv(aditivos, here::here("./data/aditivos.csv"))
+
+pagamentos <- fetch_pagamentos(sagres)
+readr::write_csv(pagamentos, here::here("./data/pagamentos.csv"))
+
+convenios <- fetch_convenios(sagres)
+readr::write_csv(convenios, here::here("./data/convenios.csv"))
+
+codigo_municipio<- fetch_codigo_municipio(sagres)
+readr::write_csv(codigo_municipio, here::here("./data/codigo_municipio.csv"))
+
 
 DBI::dbDisconnect(sagres)
