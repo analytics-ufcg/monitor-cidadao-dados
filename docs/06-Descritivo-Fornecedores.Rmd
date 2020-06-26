@@ -1,0 +1,601 @@
+---
+title: "Fornecedores em Licitações Paraibanas"
+subtitle: "Fonte de dados: Sagres"
+author: "Monitor Cidadão - Laboratório Analytics"
+output:
+  html_document:
+    df_print: paged
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  fig.retina = 2,
+  collapse = TRUE,
+  out.width = "100%",
+  fig.asp = 0.618  # 1 / phi
+  # fig.show = "hold"
+)
+
+options(scipen = 999)
+Sys.setlocale(category = "LC_ALL", locale = "pt_PT.UTF-8")
+```
+
+```{r libraries, message=FALSE, warning=FALSE, include=FALSE}
+library(here)
+library(readr)
+library(plyr)
+library(dplyr)
+library(ggplot2)
+
+library(lubridate)
+library(tidyr)
+
+library(stringi)
+library(kableExtra)
+# library(knitr) # tabelas bonitas
+
+library(rgdal)
+library(leaflet)
+library(plotly)
+
+
+theme_set(theme_minimal())
+```
+
+```{r, include=FALSE}
+source(here::here("lib/utils-sagres.R"))
+source(here::here("lib/get-dados.R"))
+```
+
+```{r, include=FALSE}
+contratos_rescindidos_2018 <- read_delim(here::here("dados/contratos_rescindidos_2018/contratos_mutacoes_tramita_08_11_2018_corrigido.csv"), ";", escape_double = FALSE, col_types = cols(cnpj_fornecedor = col_character(),
+        cpf_fornecedor = col_character(),
+        data_ato_mutacao = col_character(),
+        data_mutacao = col_character(), numero_contrato = col_character()),
+    trim_ws = TRUE)
+```
+
+
+**Atualizado em 23 de junho de 2020.**
+
+-----
+
+
+<br>
+
+## Visão geral
+
+
+Fornecedor é toda e qualquer pessoa física ou jurídica que preste serviços ou proveja bens. No contexto da Administração Pública, é necessário que os fornecedores interessados cadastrem-se previamente e habilitem-se a fornecer. Dessa maneira, poderão participar em certames licitatórios.
+
+No relatório anterior conhecemos mais sobre características das licitações paraibanas. Nesta análise, aprenderemos mais sobre os fornecedores da Paraíba.
+
+<br>
+<br>
+
+## O que há no SAGRES?
+
+
+```{r, include=FALSE, message=FALSE}
+# Descritores dos tipos de modalidade
+tipos_modalidade <- get_tipo_modalidade()
+
+# Tabela auxiliar dos municípios paraibanos
+municipios <- get_municipios_list()
+municipios$de_Municipio[municipios$de_Municipio == "Quixaba"] <- "Quixabá"
+
+# Dados de licitações dos municípios da Paraíba
+licitacoes <- get_licitacoes()
+
+# Dados de contratos dos municípios da Paraíba
+contratos <- get_contratos()
+
+# Dados de participantes na concorrência em Licitações
+participantes <- get_participantes()
+
+# Dados de fornecedores eleitos em Licitações
+fornecedores <- get_fornecedores()
+```
+
+```{r, include=FALSE}
+licitacoes <- licitacoes %>%
+  filter(nu_Licitacao != "000000000")
+
+fornecedores <- fornecedores %>%
+  mutate(de_Municipio = get_municipio(cd_UGestora))
+
+fornecedores$nu_IncEstadual <- NULL
+fornecedores$de_Complemento <- NULL
+fornecedores$cd_UF <- NULL
+fornecedores$nu_ddd <- NULL
+fornecedores$nu_Fone <- NULL
+
+fornecedores <- fornecedores %>%
+  filter(nu_CPFCNPJ != "00000000000000")
+
+participantes <- participantes %>%
+  filter(nu_CPFCNPJ != "00000000000000")
+
+contratos <- contratos %>%
+  mutate(de_Municipio = get_municipio(cd_UGestora))
+```
+
+```{r, include=FALSE}
+# Filtra licitações a partir  de 2012 e também adiciona o nome do município a qual pertence
+licitacoes <- licitacoes %>%
+  mutate(dt_Homologacao = ymd(dt_Homologacao)) %>%
+  filter(year(dt_Homologacao) >= 2014) %>%
+  mutate(cd_UGestora_copy = cd_UGestora) %>%
+  separate(cd_UGestora_copy, c('cd_UnGestora', 'cd_Municipio'), -3) %>%
+  left_join(municipios %>% select(cd_Municipio, de_Municipio), 'cd_Municipio') %>%
+  select(-cd_UnGestora)
+
+# Filtra contratos que são provenientes de licitação
+contratos <- contratos %>%
+  semi_join(licitacoes, by = c('cd_UGestora', 'nu_Licitacao', 'tp_Licitacao'))
+
+# Filtra participantes que estiveram em licitações
+participantes <- participantes %>%
+  semi_join(licitacoes, by = c('cd_UGestora', 'nu_Licitacao', 'tp_Licitacao'))
+
+# Filtra fornecedores que estiveram em licitações
+fornecedores <- fornecedores %>%
+  semi_join(participantes, by = c('cd_UGestora', 'nu_CPFCNPJ'))
+```
+
+<br>
+
+
+
+Relativo ao cadastro de empresas interessadas em fornecer bens ou serviços ao Estado e municípios, no SAGRES, temos as entidades: Fornecedores, Participantes.
+
+Os **Fornecedores** podem ser caracterizados como qualquer pessoa física ou jurídica que possua alguma relação de ordem econômica com uma Unidade Gestora. Já na entidade **Participantes** estão listados os CPFs ou CNPJs que concorreram em certames licitatórios.
+
+De maneira a incluir neste relatório os casos comuns, que percorrem o processo de compra pública, consideraremos dados de Participantes/Fornecedores que tenham, necessariamente, concorrido em licitações.
+
+<br>
+
+
+Como mencionado em relatórios anteriores, o SAGRES começou a ser utilizado mais ferrenhamente pelos municípios para cadastro de dados a partir de 2012. Neste relatório, iremos considerar dados (licitações homologadas) a partir de 2014. Isso nos deixa com `r nrow(licitacoes)` licitações e `r nrow(contratos)`.
+
+
+<br>
+<br>
+
+## Número de fornecedores por município
+
+```{r, include=FALSE}
+fornecedores_Municipios <- fornecedores %>%
+  distinct(cd_UGestora, nu_CPFCNPJ, de_Municipio) %>%
+  group_by(de_Municipio) %>%
+  summarise(montante_Fornecedores = n())
+```
+
+```{r, include=FALSE}
+# Mapa Paraíba
+mapa_pb <- readOGR(here::here("dados/mapa_paraiba_ibge/Municipios.shp"))
+
+# Corrigindo nomes de municípios que mudaram ao longo dos anos
+levels_mapa = levels(mapa_pb@data$Nome_Munic)
+levels_mapa[51] = "Tacima" # Era Campo de Santana -> Virou Tacima
+levels_mapa[175] = "Joca Claudino" # Era Santarém -> Virou Joca Claudino
+levels_mapa[200] = "São Vicente do Seridó" # Era Seridó -> Virou São Vicente do Seridó
+
+levels(mapa_pb@data$Nome_Munic) = levels_mapa
+
+# Criação de níveis através dos ranges de valor
+fornecedores_Municipios$forn_levels <- cut(fornecedores_Municipios$montante_Fornecedores,
+                                    breaks = c(0, 100, 300, 400, 1000, 5000),
+                                    labels = c('1 a 99', '100 a 299', '300 a 399', '409 a 999', '1000 ou mais'),
+                                    include.lowest = TRUE, ordered_result = TRUE)
+
+# Inclui o montante de fornecedores por município na camada de dados do mapa
+mapa_pb@data <- mapa_pb@data %>%
+  left_join(fornecedores_Municipios, by = c('Nome_Munic' = 'de_Municipio'))
+
+colors <- colorFactor('OrRd', mapa_pb@data$forn_levels)
+
+# Para cada município cria uma string contendo <Nome, Volume de Licitações>
+labs_num_fornecedores <- lapply(seq(nrow(mapa_pb@data)), function(i) {
+                                  paste0('Município: ', mapa_pb@data[i, "Nome_Munic"], '</br>',
+                                      'Qnt. de Fornecedores: ', mapa_pb@data[i, "montante_Fornecedores"])
+                              })
+```
+
+
+A partir dos critérios acima, observemos a distribuição do número de fornecedores por município paraibano:
+
+<br>
+
+```{r}
+leaflet(data = mapa_pb) %>%
+              addProviderTiles(providers$Esri.WorldGrayCanvas) %>%
+              addPolygons(opacity = 0.5,
+                          weight = 1,
+                          fillColor = colors(mapa_pb@data$forn_levels),
+                          color = 'black',
+                          label = lapply(labs_num_fornecedores, htmltools::HTML),
+                          fillOpacity = 1) %>%
+              addLegend(position = "bottomright",
+                        pal = colors, values = mapa_pb@data$forn_levels,
+                        title = "Nº de fornecedores por município",
+                        opacity = 1)
+```
+
+<br>
+
+Em média, cada cidade possui aproximadamente 300 fornecedores. 75% das cidades possuem até 360 fornecedores.
+A capital, João Pessoa, e Campina Grande se destacam pelo elevado número - o que é compreensível dado que são pólos de referência para cidades de menor porte.
+
+Ao oeste, no Sertão Paraibano - próximo ao Ceará, salvo cidades notoriamente mais desenvolvidas como Patos (896), Sousa (824) e Pombal (791), há um baixo número de fornecedores que já tenham concorrido em alguma licitação desde 2014.
+Mato Grosso e Carrapateira destacam-se como as cidades com menor número de fornecedores, 89 e 97, respectivamente.
+
+Já na Mata Paraibana, próximo ao litoral, é possível notar uma acentuação nos tons legenda do mapa. A quantidade de fornecedores cresce expressivamente. João Pessoa (4106), Cabedelo (1296), Santa Rita (937) e Conde (897) lideram o ranking. Do lado oposto estão São Miguel de Taipu (115), Cruz do Espírito Santo (117) e Lucena (181), com o menor número de fornecedores.
+
+<br>
+
+
+## Muita gente participa do concurso?
+
+```{r, include=FALSE}
+glimpse(participantes)
+
+# Há um caso onde a dt_Ano do participante está incorreto. A licitação foi homologada em 2014
+participantes$dt_Ano[participantes$dt_Ano == "2013"] <- "2014"
+```
+
+```{r, include=FALSE}
+num_participantes_licitacoes <- participantes %>%
+  group_by(cd_UGestora, dt_Ano, nu_Licitacao, tp_Licitacao) %>%
+  summarise(numConcorrentes = n())
+
+num_participantes_licitacoes <- num_participantes_licitacoes %>%
+  left_join(tipos_modalidade, by = "tp_Licitacao")
+```
+
+
+De 2014 até 2019 tivemos um total de `r nrow(licitacoes)`, e participaram destas um total de `r nrow(participantes)` concorrentes nas mais diversas modalidades.
+
+A seguir podemos observar como a concorrência nos certames se mantém ao longo do tempo e também em relação a suas modalidades.
+
+<br>
+
+```{r}
+num_participantes_licitacoes %>%
+  na.omit() %>%
+  ggplot(aes(numConcorrentes, dt_Ano)) +
+  geom_jitter(alpha = 0.5, color = "mediumpurple4") +
+  labs(x = "Nº de Concorrentes", y = "Ano de Homologação",
+       title = "Distribuição de Participantes", subtitle = "por licitação")
+```
+<br>
+
+```{r}
+num_participantes_licitacoes %>%
+  na.omit() %>%
+  ggplot(aes(numConcorrentes, de_TipoLicitacao)) +
+  geom_jitter(alpha = 0.5, color = "coral3") +
+  labs(x = "", y = "Modalidade",
+       title = "Distribuição do nº Participantes", subtitle = "por modalidade de licitação")
+```
+
+<br>
+
+Vemos que, em geral, são poucas as licitações onde temos mais de 20 concorrentes, e raras as que possuem mais de 40 ou 50. O número mediano de concorrentes em uma licitação é de **duas** pessoas físicas ou jurídicas, já a média de concorrentes é ~2.86 - isso nos conta que existem algumas licitações com muitíssimos concorrentes, o que finda por enviesar o resultado da média.
+
+A licitação com maior número de concorrentes, **83**, foi a licitação de número **000012013**, ocorrida em *2015* no município de *João Pessoa*. Ocorreu na modalidade *4 - Concurso*, movimentou *R$ 1.500.000* e se referia à **Realização de Proposta de Incentivos Culturais**.
+
+<br>
+
+```{r, include=FALSE}
+num_participantes_licitacoes_1 <- num_participantes_licitacoes %>%
+    filter(numConcorrentes == "1")
+```
+
+Temos também que houveram `r nrow(num_participantes_licitacoes_1)` cujo total de participantes foi igual a UM, ou seja, não houve concorrência nestes casos. <explicar aqui porque nao é bom que isso aconteça >
+
+<br>
+
+```{r}
+num_participantes_licitacoes_1 %>%
+  na.omit() %>%
+  ggplot(aes(dt_Ano, de_TipoLicitacao)) +
+  geom_jitter(alpha = 0.5, color = "coral3") +
+  labs(x = "", y = "Modalidade",
+       title = "Licitações sem concorrência", subtitle = "Participantes = 1")
+```
+<br>
+<br>
+
+
+## Grandes concorrentes e grandes vencedores
+
+```{r, include=FALSE, message=FALSE}
+# Dado que o número do CPF ou CNPJ é um identificador único, o agrupamento será realizado por ele
+grandes_aplicadores <- participantes %>%
+  group_by(nu_CPFCNPJ) %>%
+  dplyr::summarise(TotalAplicacoes = n())
+
+nome_fornecedores <- get_fornecedor(grandes_aplicadores$nu_CPFCNPJ) %>%
+  group_by(nu_CPFCNPJ) %>%
+  dplyr::summarise(fornecedor = gsub("[[:space:]][[:space:]]", "", first(no_Fornecedor)))
+
+grandes_aplicadores <- grandes_aplicadores %>%
+  left_join(nome_fornecedores, by = "nu_CPFCNPJ")
+```
+
+```{r}
+summary(grandes_aplicadores$TotalAplicacoes)
+```
+
+<br>
+
+Em média, cada fornecedor concorreu, aproximadamente, em 4 licitações. Enquanto isso há um fornecedor que chegou a concorrer em 849 licitações. Desse modo, iremos verificar para quantas licitações cada fornecedor enviou proposta, no intuito de encontrar algum insight interessante. Filtraremos os top 200 fornecedores mais ativos na concorrência.
+
+
+```{r}
+grandes_aplicadores %>%
+  arrange(-TotalAplicacoes) %>%
+  slice(1:200) %>%
+  ggplot(aes(x = reorder(nu_CPFCNPJ, -TotalAplicacoes), y = TotalAplicacoes)) +
+  geom_bar(stat = "identity", fill = "dodgerblue4") +
+  labs(x = "", y = "Participações",
+       title = "Frequência de participação", subtitle = "dos licitantes paraibanos") +
+  theme(axis.text.x = element_blank())
+```
+<br>
+
+É possível perceber um salto, aproximadamente em 300 participações. Vejamos isso com mais detalhes:
+
+<br>
+
+```{r, include=FALSE}
+# grandes_aplicadores %>%
+#   filter(TotalAplicacoes > 300) %>%
+#   ggplot(aes(x = reorder(nu_CPFCNPJ, -TotalAplicacoes), y = TotalAplicacoes)) +
+#   geom_bar(stat = "identity", fill = "dodgerblue3") +
+#   labs(x = "", y = "Participações",
+#        title = "Frequência de participação", subtitle = "dos licitantes paraibanos") +
+#   theme(axis.text.x = element_blank())
+```
+
+```{r}
+grandes_aplicadores$nu_CPFCNPJ <- factor(grandes_aplicadores$nu_CPFCNPJ,
+                       levels = unique(grandes_aplicadores$nu_CPFCNPJ)[order(grandes_aplicadores$TotalAplicacoes,
+                                                                             decreasing = TRUE)])
+
+grandes_aplicadores %>%
+  filter(TotalAplicacoes > 300) %>%
+  arrange(-TotalAplicacoes) %>%
+  plot_ly(x = ~nu_CPFCNPJ, y = ~TotalAplicacoes, type = "bar",
+          text = ~paste("Fornecedor: ", fornecedor, "\nFrequência: ", TotalAplicacoes), hoverinfo = "text") %>%
+  layout(title = "Top Participantes",
+         xaxis = list(title = "Fornecedores", showticklabels = FALSE),
+         yaxis = list(title = "Participações"),
+         showlegend = FALSE)
+```
+<br>
+
+Vemos que LARMED DISTRIBUIDORA DE MEDICAMENTOS E MATERIAL HOSPITALAR LTDA, JOSE NERGINO SOBREIRA e FARMAGUEDES COMERCIO DE PRODUTOS FARMACEUTICOS LTDA são as empresas que possuem mais passagens por licitações, ou seja, que mais aplicaram propostas a licitações em aberto.
+
+De maneira a verificar se as empresas que mais aplicaram são também as que mais firmaram contratos, é interessante também observar quais empresas mais firmaram contratos com a Administração Pública.
+
+<br>
+
+```{r, include=FALSE}
+# Dado que o número do CPF ou CNPJ é um identificador único, o agrupamento será realizado por ele
+grandes_contratados <- contratos %>%
+  group_by(nu_CPFCNPJ) %>%
+  dplyr::summarise(TotalContratacoes = n()) %>%
+  na.omit()
+
+grandes_contratados <- grandes_contratados %>%
+  left_join(nome_fornecedores, by = "nu_CPFCNPJ")
+```
+
+```{r}
+grandes_contratados$nu_CPFCNPJ <- factor(grandes_contratados$nu_CPFCNPJ,
+                       levels = unique(grandes_contratados$nu_CPFCNPJ)[order(grandes_contratados$TotalContratacoes,
+                                                                             decreasing = TRUE)])
+
+grandes_contratados %>%
+  filter(TotalContratacoes > 300) %>%
+  arrange(-TotalContratacoes) %>%
+  plot_ly(x = ~nu_CPFCNPJ, y = ~TotalContratacoes, type = "bar",
+          text = ~paste("Fornecedor: ", fornecedor, "\nContratações: ", TotalContratacoes), hoverinfo = "text") %>%
+  layout(title = "Top Contratados",
+         xaxis = list(title = "Fornecedores", showticklabels = FALSE),
+         yaxis = list(title = "Contratações"),
+         showlegend = FALSE)
+```
+
+<br>
+
+Tem-se que: os dois primeiros fornecedores com maior número de contratações são, de fato, os dois maiores aplicadores de propostas em licitações. A FARMAGUEDES COMERCIO DE PRODUTOS FARMACEUTICOS LTDA, apesar de terceira maior aplicadora de propostas, é a apenas a quinta mais contratada.
+
+<br>
+
+```{r, include=FALSE, message=FALSE}
+larmed_dominio <- participantes %>%
+  filter(nu_CPFCNPJ == "10831701000126")
+
+larmed_dominio <- larmed_dominio %>%
+  mutate(de_Municipio = get_municipio(cd_UGestora))
+
+sumario_larmed <- larmed_dominio %>%
+  group_by(de_Municipio) %>%
+  dplyr::summarise(AplicacoesLarmed = n())
+```
+
+
+Com foco na empresa que lidera ambos os rankings que calculamos acima, vejamos qual extensão do domínio da LARMED DISTRIBUIDORA DE MEDICAMENTOS E MATERIAL HOSPITALAR LTDA no território da Paraíba, que atua como fornecedor deste **2014**. Abaixo, podemos visualizar o número de participações da LARMED por município:
+
+<br>
+
+```{r, include=FALSE}
+# Criação de níveis através dos ranges de valor
+sumario_larmed$levels <- cut(sumario_larmed$AplicacoesLarmed,
+                                    breaks = c(0, 10, 50, 200),
+                                    labels = c('1 a 10', '11 a 50', 'Acima de 50'),
+                                    include.lowest = TRUE, ordered_result = TRUE)
+
+mapa_pb@data <- mapa_pb@data %>%
+  left_join(sumario_larmed, by = c('Nome_Munic' = 'de_Municipio'))
+
+colors <- colorFactor('OrRd', mapa_pb@data$levels)
+
+# Para cada município cria uma string contendo <Nome, Volume de Licitações>
+labs_larmed <- lapply(seq(nrow(mapa_pb@data)), function(i) {
+                                  paste0('Município: ', mapa_pb@data[i, "Nome_Munic"], '</br>',
+                                      'Aplicações: ', mapa_pb@data[i, "AplicacoesLarmed"])
+                              })
+```
+
+```{r}
+leaflet(data = mapa_pb) %>%
+              addProviderTiles(providers$Esri.WorldGrayCanvas) %>%
+              addPolygons(opacity = 0.5,
+                          weight = 1,
+                          fillColor = colors(mapa_pb@data$levels),
+                          color = 'black',
+                          label = lapply(labs_larmed, htmltools::HTML),
+                          fillOpacity = 1) %>%
+              addLegend(position = "bottomright",
+                        pal = colors, values = mapa_pb@data$levels,
+                        title = "LARMED - Nº de propostas por município",
+                        opacity = 1)
+```
+<br>
+
+Dos 223 municípios da Paraíba, apenas `r 223-nrow(sumario_larmed)` não são foram interesse da empresa em licitações abertas. Campina Grande é a cidade com maior número de intentos da empresa.
+
+Outra analise interessante que pode-se fazer futuramente é: quanto dos contratos de determinada área, uma empresa detém? Assim, podemos verificar a concentração de responsabilidade e também repasses a uma empresa específica.
+
+<br>
+<br>
+
+
+
+## Existem fornecedores que aplicam bastante mas não firmam contratos?
+
+Na Administração Pública é sabido que existem alguns fornecedores que participam do certame com a prévia intenção de não vencê-lo. Abaixo, podemos observar se há algum fornecedor que destoe em relação ao número de proposições em licitações e número de contratos celebrados (vitórias).
+
+<br>
+
+```{r, include=FALSE}
+aplicado_ganho <- grandes_contratados %>%
+  left_join(grandes_aplicadores, by = "nu_CPFCNPJ") %>%
+  mutate(fornecedor = fornecedor.x) %>%
+  select(-fornecedor.x, -fornecedor.y) %>%
+  na.omit()
+```
+
+```{r, include=FALSE}
+# plot_ly(data = aplicado_ganho, x = ~TotalAplicacoes, y = ~TotalContratacoes,
+#         text = ~paste("Fornecedor: ", fornecedor, "\nAplicações: ", TotalAplicacoes, "\nContratações: ", TotalContratacoes),
+#         hoverinfo = "text") %>%
+#         layout(xaxis = list(title = "Aplicações", showticklabels = FALSE),
+#              yaxis = list(title = "Contratações"),
+#              showlegend = FALSE)
+```
+
+
+```{r, message=FALSE}
+aplicado_ganho %>%
+  ggplot(aes(x = TotalAplicacoes, y = TotalContratacoes)) +
+  geom_point(alpha = 0.4, color = "goldenrod4") + coord_fixed() +
+  geom_abline(slope=1, intercept=0, color='grey') +
+  labs(x = "Total de Aplicações", y = "Total de Contratações")
+```
+
+<br>
+
+Pontos abaixo da linha cinza significam empresas que aplicaram mais do que venceram. Quanto mais próximo a linha, mais o número de aplicações e vitórias esteve próximo.
+
+Pontos acima da linha designam fornecedores que foram contratados mais vezes do que passaram pelo processo de concorrência. Neste caso, a grande maioria dos fornecedores listados aparenta ser pessoas físicas contratadas pelo poder público - porém não todos. Abaixo, estão listados alguns:
+
+<br>
+
+```{r}
+kable(aplicado_ganho %>%
+        arrange(-TotalContratacoes) %>%  
+        filter(TotalAplicacoes < TotalContratacoes) %>%  
+        slice(1:20),
+        col.names = c("CPF/CNPJ", "Contratações", "Aplicações", "Nome do Fornecedor / Nome Fantasia")) %>%
+  kable_styling()
+```
+
+<br>
+<br>
+
+
+## Fornecedores com contratos interrompidos
+
+```{r, include=FALSE}
+contratos_rescindidos_2018$data_mutacao <- as.Date(contratos_rescindidos_2018$data_mutacao)
+contratos_rescindidos_2018$ano_rescisao <- as.numeric(format(contratos_rescindidos_2018$data_mutacao, "%Y"))
+
+contratos_interrompidos <- contratos_rescindidos_2018 %>%
+  filter(tipo_mutacao == "IMPEDIMENTO" | tipo_mutacao == "PARALISACAO" |
+           tipo_mutacao == "RESCISAO" | tipo_mutacao == "SUSPENSAO" | tipo_mutacao == "SUSTACAO") %>%
+  select(-protocolo_contrato_tce, -justificativa_mutacao)
+```
+
+
+Entre 2014 e 2018, segundo o [TRAMITA](https://tramita.tce.pb.gov.br/), tivemos aproximadamente `r nrow(contratos_rescindidos_2018)` contratos administrativos cuja situação foi mutada. Dentre estes, `r nrow(contratos_interrompidos)` foram interrompidos devido a *Impedimento*, *Paralisação*, *Rescisão*, *Suspensão* ou *Sustação*. De modo que estão assim distribuídos:
+
+<br>
+
+```{r}
+kable(contratos_interrompidos %>%
+        group_by(tipo_mutacao) %>%
+        dplyr::summarise(TotalTipo = n()) %>%
+        arrange(-TotalTipo),
+      col.names = c("Tipo da Mutação", "Nº Ocorrências")) %>%
+kable_styling()
+```
+
+<br>
+
+Destes, `r contratos_interrompidos %>% select(cnpj_fornecedor) %>% na.omit() %>% nrow()` foram firmados com Pessoas Jurídicas, e `r contratos_interrompidos %>% select(cpf_fornecedor) %>% na.omit() %>% nrow()` com Pessoas Físicas.
+
+<br>
+
+```{r, include=FALSE}
+# Vou deixar isso aqui para quando tivermos mais dados sobre contratos rescindidos
+
+# get_ano_contrato <- function(numero_contrato) {
+#   library(plyr)
+#   result <- data.frame(
+#     ano_contrato = stri_sub(numero_contrato, -4))
+#   return(result$ano_contrato)
+# }
+#
+# contratos_interrompidos <- contratos_interrompidos %>%
+#   mutate(ano_contrato = as.numeric(as.character(get_ano_contrato(numero_contrato))))
+#
+# verificacao <- contratos_interrompidos %>%
+#   left_join(contratos %>% select(cd_UGestora, dt_Ano, nu_Contrato, dt_Assinatura, nu_CPFCNPJ,
+#                                  nu_Licitacao, tp_Licitacao, vl_TotalContrato, de_Municipio),
+#             by = c("numero_contrato" = "nu_Contrato", "ano_contrato" = "dt_Ano"))
+```
+
+
+
+<!--
+- Um fornecedor participa de licitações realizadas apenas em seu município, ou também em municípios mais distantes?
+
+- quais foram os forncedores mais contratatos nos últimos 3 anos? de quantas licitações particiou? quantos contratos foram celebrados?
+-->
+
+--------
+
+          Dados Extraídos do Sagres (até março de 2019).
+          Tabelas: Empenhos, Licitações, Contratos, Tipo da Modalidade da Licitação,
+                   Fornecedores, Participantes.
+          Dados Externos: Mapa da Paraíba, Código dos Municípios Paraibanos (IBGE).
+
+--------

@@ -262,3 +262,37 @@ fetch_codigo_municipio <- function(sagres_con) {
 
   return(codigo_munipio)
 }
+
+#' @title Busca participantes de licitações no banco SAGRES 2019
+#' @param sagres_con Conexão com o Banco de Dados
+#' @return Dataframe contendo informações sobre participantes
+#' @rdname fetch_participantes
+#' @examples
+fetch_participantes <- function(sagres_con) {
+  participantes <- tibble::tibble()
+  tryCatch({
+    participantes <- DBI::dbGetQuery(sagres_con, "SELECT * FROM Participantes;") %>%
+      assert_dataframe_completo(COLNAMES_PARTICIPANTES)
+  },
+  error = function(e) print(paste0("Erro ao buscar Participantes no Banco Sagres (SQLServer): ", e))
+  )
+
+  return(participantes)
+}
+
+#' @title Busca fornecedores cadastrados no banco SAGRES 2019
+#' @param sagres_con Conexão com o Banco de Dados
+#' @return Dataframe contendo informações sobre fornecedores
+#' @rdname fetch_fornecedores
+#' @examples
+fetch_fornecedores <- function(sagres_con) {
+  fornecedores <- tibble::tibble()
+  tryCatch({
+    fornecedores <- DBI::dbGetQuery(sagres_con, "SELECT * FROM Fornecedores;") %>%
+      assert_dataframe_completo(COLNAMES_FORNECEDORES)
+  },
+  error = function(e) print(paste0("Erro ao buscar Fornecedores no Banco Sagres (SQLServer): ", e))
+  )
+
+  return(fornecedores)
+}

@@ -48,11 +48,17 @@ readr::write_csv(codigo_unidade_gestora, here::here("./data/codigo_unidade_gesto
 empenhos <- fetch_empenhos(sagres)
 readr::write_csv(empenhos, here::here("./data/empenhos.csv"))
 
+fornecedores<- fetch_fornecedores(sagres)
+readr::write_csv(fornecedores, here::here("./data/fornecedores.csv"))
+
 licitacoes <- fetch_licitacoes(sagres)
 readr::write_csv(licitacoes, here::here("./data/licitacoes.csv"))
 
 pagamentos <- fetch_pagamentos(sagres)
 readr::write_csv(pagamentos, here::here("./data/pagamentos.csv"))
+
+participantes<- fetch_participantes(sagres)
+readr::write_csv(participantes, here::here("./data/participantes.csv"))
 
 regime_execucao <- fetch_regime_execucao(sagres)
 readr::write_csv(regime_execucao, here::here("./data/regime_execucao.csv"))
@@ -62,6 +68,5 @@ readr::write_csv(tipo_objeto_licitacao, here::here("./data/tipo_objeto_licitacao
 
 tipo_modalidade_licitacao <- fetch_tipo_modalidade_licitacao(sagres)
 readr::write_csv(tipo_modalidade_licitacao, here::here("./data/tipo_modalidade_licitacao.csv"))
-
 
 DBI::dbDisconnect(sagres)

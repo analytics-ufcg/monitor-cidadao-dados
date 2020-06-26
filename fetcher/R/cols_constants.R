@@ -65,6 +65,15 @@ COLNAMES_EMPENHOS <- c("cd_UGestora"="character", "dt_Ano"="integer", "cd_UnidOr
                        "nu_CPF"="character"
 )
 
+COLNAMES_FORNECEDORES <-c("cd_UGestora"="integer","dt_Ano"="integer",
+                      			"nu_CPFCNPJ"="character","tp_Credor"="integer",
+                      			"no_Fornecedor"="character","nu_IncEstadual"="character",
+                      			"de_Endereco"="character","de_Bairro"="character",
+                      			"de_Complemento"="character","nu_CEP"="character",
+                      			"de_Municipio"="character","cd_UF"="character",
+                      			"nu_ddd"="character","nu_Fone"="character",
+                      			"dt_MesAno"="character","dt_MesAnoReferencia"="character"
+)
 
 COLNAMES_LICITACOES <- c("cd_UGestora"="integer","dt_Ano"="integer",
                          "nu_Licitacao"="character","tp_Licitacao"="integer",
@@ -81,6 +90,11 @@ COLNAMES_PAGAMENTOS <-  c("cd_UGestora"="character","dt_Ano"="character","cd_Uni
                           "cd_AgenciaRec"="character","nu_ContaRec"="character","tp_FonteRecursos"="integer",
                           "dt_MesAno"="character","cd_Banco"="character","cd_Agencia"="character",
                           "tp_ContaBancaria"="character"
+)
+
+COLNAMES_PARTICIPANTES <- c("cd_UGestora"="integer","dt_Ano"="integer",
+                        			"nu_Licitacao"="character","tp_Licitacao"="integer",
+                        			"nu_CPFCNPJ"="character","dt_MesAno"="character"
 )
 
 COLNAMES_REGIME_EXECUCAO <- c("tp_regimeExecucao"="integer",
