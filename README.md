@@ -13,7 +13,7 @@ A Camada de dados consiste em uma arquitetura que fornece meios para a extraçã
 
 Abaixo é apresentado o fluxo de dados geral das camadas citadas acima.
 
-![Fluxo de dados](https://github.com/analytics-ufcg/monitor-cidadao/tree/dev/img/data-pipeline.png?raw=true)
+![Fluxo de dados](https://github.com/analytics-ufcg/monitor-cidadao/blob/dev/img/data-pipeline.png?raw=true)
 
 
 ## Tecnologias/framework usadas
