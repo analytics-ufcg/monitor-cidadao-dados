@@ -28,7 +28,7 @@ generate_contrato_id <- function(contratos_df) {
     dplyr::select(id_contrato, dplyr::everything())
 }
 
-#' @title Processa datagrame de contratos
+#' @title Processa dataframe de contratos
 #' @description Manipula tabela pra forma que será utilizada no banco
 #' @param contratos_df Dataframe contendo informações dos contratos
 #' @return Dataframe contendo informações dos contratos processados
@@ -38,7 +38,7 @@ process_contrato <- function(contratos_df) {
     generate_contrato_id()
 }
 
-#' @title Processa datagrame de licitações
+#' @title Processa dataframe de licitações
 #' @description Manipula tabela pra forma que será utilizada no banco
 #' @param licitacoes_df Dataframe contendo informações das licitações
 #' @return Dataframe contendo informações das licitações processados
@@ -47,10 +47,18 @@ process_licitacao <- function(licitacoes_df) {
     generate_licitacao_id()
 }
 
-#' @title Processa datagrame de municipios
+#' @title Processa dataframe de municipios
 #' @description Manipula tabela pra forma que será utilizada no banco
 #' @param municipios_df Dataframe contendo informações dos municipios
 #' @return Dataframe contendo informações dos municipios processados
 process_municipio <- function(municipios_df) {
   municipios_df %<>% dplyr::select(cd_municipio, dplyr::everything())
+}
+
+#' @title Processa dataframe de codigos das unidades gestoras
+#' @description Manipula tabela pra forma que será utilizada no banco
+#' @param codigo_unidade_gestora_df Dataframe contendo informações dos codigos das unidades gestoras
+#' @return Dataframe contendo informações dos codigos das unidades gestoras processados
+process_codigo_unidade_gestora <- function(codigo_unidade_gestora_df) {
+  codigo_unidade_gestora_df %<>% dplyr::select(cd_ugestora, dplyr::everything())
 }
