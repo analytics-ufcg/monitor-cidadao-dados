@@ -1,0 +1,656 @@
+---
+title: "Licitações e Contratos Paraibanos"
+subtitle: "Fonte de dados: Sagres"
+author: "Monitor Cidadão - Laboratório Analytics"
+output:
+  html_document:
+    df_print: paged
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+    # toc: true
+    # toc_float: true
+
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  fig.retina = 2,
+  collapse = TRUE,
+  out.width = "100%",
+  fig.asp = 0.618  # 1 / phi
+  # fig.show = "hold"
+)
+
+options(scipen = 999)
+Sys.setlocale(category = "LC_ALL", locale = "pt_PT.UTF-8")
+```
+
+
+```{r libraries, message=FALSE, warning=FALSE, include=FALSE}
+library(here) 
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(easyGgplot2)
+
+library(knitr) # tabelas bonitas
+library(kableExtra)
+
+library(leaflet) # mapas
+library(rgdal)
+
+library(lubridate)
+library(stringi)
+
+theme_set(theme_minimal())
+```
+
+```{r funcoes, include=FALSE}
+source(here::here("lib/utils-sagres.R"))
+
+# Listagem de tabelas existentes
+# dbListTables(sagres)
+```
+
+```{r readME, include=FALSE}
+# --------
+# Os dados que serão utilizados na composição deste relatório devem ser 
+# baixados com antecedência através do componente fetcher (docker).
+# --------
+```
+
+-----
+<br>
+
+
+
+## Processo de Despesa Pública
+
+
+O Processo de Despesa Pública é uma ferramenta através da qual qualquer órgão ou autarquia pública brasileiro que deseje adquirir um bem ou serviço deve passar, sem exceção. De maneira geral, este processo atravessa as seguintes fases: 1) Licitação, 2) Contrato, 3) Empenho, 4) Liquidação e, por fim, 5) Pagamento.
+
+Este relatório tem a finalidade de trazer luz sobre duas etapas desta execução na Administração Pública: a **Licitação** e o **Contrato**.
+<br>
+
+A **Licitação** é uma ferramenta e parte do processo administrativo através da qual realiza-se um concurso para aquisição de bens voltados à população. É neste momento que os concorrentes devem submeter suas propostas ao comitê de licitação, e este irá julgar e avaliar a proposição mais vantajosa ao interesse público - em princípio a que possua menor valor e com a maior qualidade possível; sempre garantindo um tratamento igualitário entre todos os participantes. Como veremos mais adiante, este instrumento é utilizado para aquisições dos mais variados tipos: obras, serviços, produtos, locações ou alienações.
+
+Para participação em certames licitatórios, as empresas devem estar habilitadas, certificadas e cadastradas no SICAF - Sistema de Cadastramento Unificado de Fornecedores. [Mais informações](http://www.justicaeleitoral.jus.br/arquivos/tre-ma-perguntas-frequentes-faq-cadastro-no-sicaf).
+
+
+O **Contrato** configura-se como uma garantia de vínculo entre ambas as partes, relacionada ao cumprimento das obrigações acordadas previamente entre a Administação Pública e a pessoa jurídica ou física selecionada via Licitação. Neste contexto, é papel da Administração pública fiscalizar a execução e cumprimento do contrato firmado entre as partes. 
+
+Mais sobre o processo como um todo ou suas partes pode ser visto na Lei Nº 8.666, De 21 de junho de 1991, denominada [Lei de Licitação](http://www.planalto.gov.br/ccivil_03/leis/L8666cons.htm). E também na [Lei Geral de Instituição do Pregão](https://www.comprasgovernamentais.gov.br/images/conteudo/ArquivosCGNOR/SEBRAE/PREGO-PRESENCIAL-E-ELETRNICO.pdf).
+
+
+Abaixo, iremos conferir um panorama sobre as licitações que tiveram início nos 223 municípios da Paraíba.
+
+<br>
+
+
+
+## Mergulhando nos dados
+
+```{r licitacoes, include=FALSE}
+licitacoes <- read_csv(here::here("fetcher/data/licitacoes.csv"), 
+    col_types = cols(cd_UGestora = col_character(), 
+        nu_Licitacao = col_character(), tp_Licitacao = col_character(),
+        tp_Licitacao = col_character()))
+
+licitacoes <- licitacoes %>% 
+  mutate(ano_Homologacao = as.numeric(format(dt_Homologacao, "%Y")))
+
+range_ano <- licitacoes$ano_Homologacao
+range_ano <- range_ano %>% na.omit()
+```
+
+
+```{r, include=FALSE}
+contratos <- read_csv(here::here("fetcher/data/contratos.csv"), 
+    col_types = cols(cd_UGestora = col_character(), 
+        nu_Contrato = col_character(), tp_Licitacao = col_character()))
+
+
+contratos$registroCGE <- NULL
+contratos$dt_Recebimento <- NULL
+contratos$foto <- NULL
+contratos$planilha <- NULL
+contratos$ordemServico <- NULL
+contratos$cd_SIAFI <- NULL
+
+contratos_lic <- contratos %>% 
+  semi_join(licitacoes, by = c('cd_UGestora', 'nu_Licitacao', 'tp_Licitacao'))
+
+contratos_lic <- contratos_lic %>% 
+  mutate(ano_Assinatura = as.numeric(format(dt_Assinatura, "%Y")))
+
+range_ano_contratos <- contratos_lic$ano_Assinatura
+range_ano_contratos <- range_ano_contratos %>% na.omit()
+```
+
+
+
+Na Paraíba, dados do Processo de Despesa Pública (PDP) são divulgados através do Sistema de Acompanhamento da Gestão dos Recursos da Sociedade ([SAGRES](https://sagres.tce.pb.gov.br/)). Neste sistema, de dados **públicos**, é possível encontrar as etapas do PDP, folha de pagamento de funcionários públicos, contas municipais e diversas outras informações sobre a Administração Pública paraibana tanto a nível estadual como a nível municipal. Neste relatório, focaremos nossos esforços em conhecer mais sobre a administração pública dos municípios. 
+
+
+Possuímos dados sobre Licitações desde `r min(range_ano)` a `r max(range_ano)` (utilizando a data de homolocação da licitação), e contratos desde `r min(range_ano_contratos)` até `r max(range_ano_contratos)`.  Entretanto, é sabido que o SAGRES só começou a ser efetivamente utilizado pelo Governo da Paraíba no ano de 2003. Dessa maneira, é possível que tenha havido retroativo na adição dos dados ao sistema ou até mesmo tenha sido inserido ruído no banco de dados. Caso o processo da licitação caminhe com normalidade, estará associado a esta também informações sobre empenhos, contratos, liquidações e pagamentos. Nos ateremos a explorar dados de licitações e, quando necessário, realizar a conexão com outras entidades presentes no SAGRES.
+
+<br>
+
+
+
+
+### Através de quais modalidades as empresas licitam?
+
+```{r tipoModalidade, include=FALSE}
+tipo_modalidade_licitacao <- read_csv(here::here("fetcher/data/tipo_modalidade_licitacao.csv"), 
+    col_types = cols(de_TipoLicitacao = col_character(), tp_Licitacao = col_character()))
+```
+
+
+Além de princípios, a Lei Geral de Licitação (LGL) detalha também as modalidades de licitação praticadas, as fases da licitação, os tipos de licitação, tipos de contrato, aspectos da qualificação das empresas concorrentes e também antevê sanções administrativas ou penais para toda e qualquer prática que obstrua as diretrizes estabelecidas na lei.
+
+Especificamente a modalidade da licitação a ser utilizada depende diretamente de qual objeto está sendo posto como alvo no certame, bem como do seu valor. Para licitações na modalidade Carta Convite - onde a Administração convida minimamente 3 licitantes para participação no certame, por exemplo, existe um valor máximo de objeto a ser licitado.
+
+Dessa maneira, as possíveis modalidades ou tipos são:
+
+
+```{r tabelaModalidade, results='asis'}
+# kable(tipo_modalidade_licitacao, caption = "Tipos de Licitação")
+
+tipo_modalidade_licitacao %>%
+  mutate(Modalidades = de_TipoLicitacao) %>% 
+  select(Modalidades) %>% 
+  kable() %>%
+  kable_styling()
+```
+<br>
+
+
+
+A partir disso, podemos conferir como segue a distribuição das licitações no SAGRES em relação a modalidade eleita.
+
+<br>
+
+```{r, include=FALSE}
+# Adicionando a descrição do tipo de licitação na tabela de licitações
+licitacoes <- licitacoes %>% 
+  left_join(tipo_modalidade_licitacao, by = c("tp_Licitacao" = "tp_Licitacao"))
+```
+
+```{r}
+# Calcula o total de Licitações por Modalidade de Licitação
+licitacoes %>% 
+  group_by(de_TipoLicitacao) %>% 
+  dplyr::summarise(totalPorTipo = n()) %>% 
+  ggplot(aes(x = reorder(de_TipoLicitacao, -totalPorTipo), y = totalPorTipo)) +
+  geom_bar(stat = "identity", fill = "dodgerblue4") +
+  coord_flip() +
+  labs(x = "", y = "Contagem", 
+       title = "Frequência das Modalidades de Licitação", subtitle = "nos municípios paraibanos")
+```
+<br>
+
+```{r, include=FALSE}
+# # Adiciona a descrição do tipo de licitação na tabela de contratos
+contratos_lic <- contratos_lic %>%
+  left_join(tipo_modalidade_licitacao, by = c("tp_Licitacao" = "tp_Licitacao"))
+
+# Calcula o total de Licitações por Modalidade de Licitação nos Contratos Firmados
+# contratos_lic %>%
+#   group_by(de_TipoLicitacao) %>%
+#   dplyr::summarise(totalPorTipo = n()) %>%
+#   ggplot(aes(x = reorder(de_TipoLicitacao, -totalPorTipo), y = totalPorTipo)) +
+#   geom_bar(stat = "identity", fill = "indianred3") +
+#   coord_flip() +
+#   labs(x = "", y = "Contagem",
+#        title = "Frequência das Modalidades nos Contratos Celebrados", subtitle = "nos municípios paraibanos")
+```
+<br>
+
+Vemos que grande maioria das licitações realizadas na Paraíba são através da **Modalidade Convite**, seguida pelo **Pregão Presencial**. Um pouco mais sobre os riscos associados a estas duas modalidades em específico pode ser lido nas seguintes referências: [Ref1](https://congressousp.fipecafi.org/anais/artigos162016/63.pdf), [Ref2](https://www.univates.br/media/graduacao/direito/MODALIDADE_DE_LICITACAO_PUBLICA.pdf).
+
+<!--É interessante notar que as duas modalidade mais comum dentre licitações e contratos estão alternadas entre uma visualização e outra. -->
+
+
+
+<br>
+
+Levando em consideração o ano de homologação das licitações, temos que:
+
+<br>
+
+```{r, include=FALSE}
+lic_por_modalidade <- function (dataframe, range) {
+  dataframe %>% 
+  group_by(de_TipoLicitacao, ano_Homologacao) %>% 
+  dplyr::summarise(totalPorTipo = n()) %>%
+  na.omit() %>% 
+  dplyr::filter(ano_Homologacao %in% range) %>% 
+  ggplot(aes(x = reorder(de_TipoLicitacao, -totalPorTipo), y = totalPorTipo)) +
+  geom_bar(stat = "identity", fill = "dodgerblue4") +
+  coord_flip() +
+  labs(x = "", y = "Contagem", 
+       title = "Frequência das Modalidades de Licitação", subtitle = "nos municípios paraibanos por ano") +
+  facet_wrap(~ ano_Homologacao)
+}
+```
+
+
+```{r}
+t1 <- c(2014, 2015, 2016)
+
+lic_por_modalidade(licitacoes, t1)
+```
+<br>
+
+```{r}
+t2 <- c(2017, 2018, 2019)
+
+lic_por_modalidade(licitacoes, t2)
+```
+
+<br>
+
+
+Em períodos mais recentes, percebe-se que o **Pregão Presencial** assume o primeiro lugar na preferência de utilização e, em seguida, temos a **Inexigibilidade** como segundo colocado. A não necessidade do procedimento licitatório está previsto na LGL e pode ser justificado por hipóteses tais como: fornecedor exclusivo, serviços técnicos especializados, profissional consagrado ou de setor artístico, dentre outros. Mais sobre isso, pode ser conferido na própria LGL.
+
+<br>
+
+O RDC (Regime Diferenciado de Contratações Públicas) se mostra como uma modalidade recente. O RDC foi criado "para atender às necessidades de contratações para obras destinadas aos Jogos Olímpicos e Paraolímpicos de 2016, e da Copa do Mundo FIFA de 2014, além de obras de infraestrutura aeroportuária em capitais distantes até 350 quilômetros daqueles eventos esportivos" [Fonte: Wikipedia](https://pt.wikipedia.org/wiki/Regime_Diferenciado_de_Contrata%C3%A7%C3%B5es_P%C3%BAblicas#:~:text=O%20Regime%20Diferenciado%20de%20Contrata%C3%A7%C3%B5es,infraestrutura%20aeroportu%C3%A1ria%20em%20capitais%20distantes). Mais sobre o RDC pode ser visto [aqui](http://www.planalto.gov.br/ccivil_03/_Ato2011-2014/2011/Lei/L12462.htm).
+
+<br>
+
+
+Já essa distribuição no conjunto de contratos firmados:
+
+<br>
+
+```{r, include=FALSE}
+contratos_por_modalidade <- function (dataframe, range) {
+  dataframe %>% 
+    group_by(de_TipoLicitacao, ano_Assinatura) %>% 
+    dplyr::summarise(totalPorTipo = n()) %>%
+    na.omit() %>% 
+    dplyr::filter(ano_Assinatura %in% range) %>% 
+    ggplot(aes(x = reorder(de_TipoLicitacao, -totalPorTipo), y = totalPorTipo/1000)) +
+    geom_bar(stat = "identity", fill = "indianred3") +
+    coord_flip() +
+    labs(x = "", y = "Contagem (em milhares)", 
+         title = "Frequência das Modalidades em Contratos", subtitle = "nos municípios paraibanos por ano") +
+    facet_wrap(~ ano_Assinatura)
+}
+```
+
+```{r}
+contratos_por_modalidade(contratos_lic, t1)
+```
+<br>
+
+```{r}
+contratos_por_modalidade(contratos_lic, t2)
+```
+
+<br>
+
+Vemos que há um expressivo aumento dos contratos firmados a partir de licitações propostas na modalidade **Pregão Presencial**, e também uma diminuição de contratos firmados a partir da modalidade **Convite**.
+
+Neste contexto, é interessante notar o esforço da Administração na criação de mecanismos para mitigar a prática de corrupção ou fraude no processo licitatório, ou simplesmente garantir uma maior concorrência entre os participantes. Como, por exemplo, a criação do **Pregão** presencial em 2000 e regulamentação do **Pregão Eletrônico** em 2005.
+
+
+
+<br>
+
+### Há grande concorrência nas licitações?
+
+Outro fator importante na garantia da escolha da melhor proposta no concurso da Licitação é uma quantidade representativa de empresas interessadas em fornecer aquele bem ou serviço. Aqui, desejamos verificar a quantidade de participantes presentes nos certames.
+
+<br>
+
+```{r}
+# melhoria: inserir a média e a mediana no próprio gráfico
+licitacoes %>% 
+  group_by(nu_Propostas) %>% 
+  dplyr::summarise(total_Propostas = n()) %>% 
+  na.omit() %>% 
+  filter(nu_Propostas < 50) %>% 
+  ggplot(aes(x = nu_Propostas, y = total_Propostas)) +
+  geom_bar(stat = "identity", fill = "dodgerblue4") +
+  labs(x = "", y = "Contagem", 
+       title = "Frequência da Quantidade de Proponentes", subtitle = "nas licitações de municípios paraibanos")
+```
+<br>
+
+```{r}
+summary(licitacoes$nu_Propostas)
+```
+<br>
+
+Via de regra, os concursos possuem um baixo número de competidores. Do ponto do visto da população, isso não é algo tão interessante dado que, em geral, quanto mais concorrentes, maior a chance da existência de uma proposta menos onerosa e mais vantajosa.
+
+A partir do sumário, é notável o baixo número de participantes nos certames como um todo. Em 75% dos certames temos até 3 participantes. Também vemos que os valores de média e mediana são distintos, o que leva a pensar que podem existir licitações pontuais com um grande número de participantes - elevando o valor da média.
+
+<br>
+
+
+### O que é o tipo do objeto?
+
+```{r, include=FALSE}
+tipo_objeto_licitacao <- read_csv(here::here("fetcher/data/tipo_objeto_licitacao.csv"), 
+    col_types = cols(de_TipoObjeto = col_character()))
+
+licitacoes <- licitacoes %>% 
+  left_join(tipo_objeto_licitacao, by = c("tp_Objeto" = "tp_Objeto"))
+```
+
+Pode-se dizer que o tipo do objeto da licitação é a "coisa" que será adquirida pela administração pública. Abaixo, conferimos como isso está posto nas licitações presentes no SAGRES.
+
+<br>
+
+```{r}
+licitacoes %>% 
+  group_by(de_TipoObjeto) %>% 
+  dplyr::summarise(totalPorTipo = n()) %>% 
+  na.omit() %>% 
+  ggplot(aes(x = reorder(de_TipoObjeto, -totalPorTipo), y = totalPorTipo)) +
+  geom_bar(stat = "identity", fill = "dodgerblue4") +
+  coord_flip() +
+  labs(x = "", y = "Contagem", 
+       title = "Frequência dos Tipos de Objeto", subtitle = "nos municípios paraibanos")
+```
+<br>
+
+O Tipo de Objeto da Licitação é um dado inerente a própria licitação. Como observado no gráfico acima, o Tipo do Objeto não descreve o que está especificamente sendo licitado, por exemplo: uma construção de escola, uma compra de merenda escolar, etc. Neste caso temos um dado mais genérico e não há níveis que sejam efetivamente informativos sobre objeto.
+
+Para uma descrição mais apurada do que é adiquirido via licitação, utilizaremos outro caminho: **Função, Subfunção, Elemento e Subelemento** são propriedades inerentes ao **Empenho** referente à Licitação, e serão comentados em outro momento.
+
+<br>
+
+
+
+### Qual o volume de licitações por município?
+
+
+Como vimos, a **Licitação** é o meio através do qual um município ou **Unidade Gestora** (Secretarias de Saúde, Universidades Públicas, e demais organizações públicas) obtém bens, serviços e produtos. É interessante, então, notar como a proposição de editais de licitação está concentrado/dividido em território paraibano.
+<br>
+
+```{r, include=FALSE, message=FALSE}
+# Carrega dados sobre os municípios paraibanos
+municipios <- read_csv(here::here("fetcher/data/Municipios-Sagres2017.csv"), 
+    col_types = cols(cd_IBGE = col_character(), 
+        cd_Municipio = col_character(), de_Municipio = col_character()))
+
+municipios$de_Municipio[municipios$de_Municipio == "Quixaba"] <- "Quixabá"
+```
+
+```{r, include=FALSE, message=FALSE, warning=FALSE}
+mapa_pb <- readOGR(here::here("dados/mapa_paraiba_ibge/Municipios.shp"))
+```
+
+
+```{r, include=FALSE}
+# Corrigindo nomes de municípios que mudaram ao longo dos anos
+levels_mapa = levels(mapa_pb@data$Nome_Munic)
+levels_mapa[51] = "Tacima" # Era Campo de Santana -> Virou Tacima
+levels_mapa[175] = "Joca Claudino" # Era Santarém -> Virou Joca Claudino
+levels_mapa[200] = "São Vicente do Seridó" # Era Seridó -> Virou São Vicente do Seridó
+
+levels(mapa_pb@data$Nome_Munic) = levels_mapa
+```
+
+
+```{r, message=FALSE, include=FALSE}
+# Adiciona o nome do respectivo município onde a licitação foi realizada
+licitacoes <- licitacoes %>% 
+  mutate(de_Municipio = get_municipio(cd_UGestora))
+
+# Montante de Licitações por Municipio
+sumario_municipio <- licitacoes %>% 
+  group_by(de_Municipio) %>% 
+  dplyr::summarise(volume_Municipio = n(), montate_Municipio = sum(vl_Licitacao, na.rm = TRUE))
+
+# Montante de Licitações por Municipio por Ano
+sumario_municipio_ano <- licitacoes %>% 
+  group_by(de_Municipio, ano_Homologacao) %>% 
+  dplyr::summarise(volume_Municipio = n(), montate_Municipio = sum(vl_Licitacao, na.rm = TRUE))
+```
+
+
+```{r, include=FALSE}
+# Criação de níveis através dos ranges de valor
+sumario_municipio$vlm_niveis <- cut(sumario_municipio$volume_Municipio,
+                                    breaks = c(0, 400, 800, 2000, 6000, 20000), 
+                                    labels = c('1 a 400', '401 a 800', '801 a 2000', '2001 a 6000', 'acima de 6000'),
+                                    include.lowest = TRUE, ordered_result = TRUE)
+
+# Inclui a sumarização de montante e volume de licitações na camada de dados do mapa
+mapa_pb@data <- mapa_pb@data %>%
+  left_join(sumario_municipio, by = c('Nome_Munic' = 'de_Municipio'))
+```
+
+
+```{r, include=FALSE}
+colors <- colorFactor('OrRd', mapa_pb@data$vlm_niveis)
+
+# Para cada município cria uma string contendo <Nome, Volume de Licitações>
+labs <- lapply(seq(nrow(mapa_pb@data)), function(i) {
+            paste0('Município: ', mapa_pb@data[i, "Nome_Munic"], '</br>', 
+                'Volume de Licitações: ', mapa_pb@data[i, "volume_Municipio"]) 
+        })
+```
+
+```{r}
+leaflet(data = mapa_pb) %>%
+  addProviderTiles(providers$Esri.WorldGrayCanvas) %>%
+  addPolygons(opacity = 0.5, 
+              weight = 1, 
+              fillColor = colors(mapa_pb@data$vlm_niveis),
+              color = 'black',
+              label = lapply(labs, htmltools::HTML),
+              fillOpacity = 1) %>%
+  addLegend(position = "bottomright", 
+            pal = colors, values = mapa_pb@data$vlm_niveis,
+            title = "Volume de licitações por município",
+            opacity = 1
+  )
+```
+
+<br>
+
+Esta visualização permite comparar municípios e também instigar questionamentos para compreender melhor as características que podem levar um município a uma quantidade maior ou menor de licitações propostas.
+
+Como destaques temos as cidades de João Pessoa, Campina Grande e Santa Rita - algo já esperado.
+
+
+
+<br>
+
+
+### Qual a ordem dos montantes pagos pelos municípios?
+
+
+Entender como tipicamente um município gasta a verba pública pode nos dar a noção de normalidade ou estranheza ao analisar outros conjuntos de dados. Pensando nisso, iremos averiguar também como estão distribuídos os valores atribuídos aos bens licitados.
+
+<br>
+
+```{r, include=FALSE}
+# melhoria: adicionar média e mediana no gráfico
+
+p1 <- licitacoes %>% 
+  ggplot(aes(y = vl_Licitacao/1000000000, x = "")) +
+    geom_jitter(na.rm = TRUE, alpha = 0.4, aes(color = "darkpink")) +
+    labs(y = "Valor da Licitação (em bilhões)", x = "", subtitle = "Valores praticados") + 
+    stat_summary(fun.y = mean, fun.ymin=mean, fun.ymax=mean, geom="crossbar", width=0.6, color="green") +
+    stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median, geom="crossbar", width=0.3, color="navy") +
+    theme(legend.position = "none") 
+
+p2 <- licitacoes %>% 
+  filter(vl_Licitacao < 100000000) %>% 
+  ggplot(aes(y = vl_Licitacao/1000000, x = "")) +
+    geom_jitter(na.rm = TRUE, alpha = 0.4, aes(color = "darkpink")) +
+    labs(y = "Valor da Licitação - Outliers (em milhões)", x = "", subtitle="") + 
+    stat_summary(fun.y = mean, fun.ymin = mean, fun.ymax = mean, geom="crossbar", width=0.6, color="green") +
+    stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median, geom="crossbar", width=0.3, color="navy") +
+    theme(legend.position = "none") 
+```
+
+```{r}
+ggplot2.multiplot(p1, p2, cols = 2)
+```
+<br>
+
+No gráfico acima, à esquerda, claramente vemos dois valores que se destacam em relação aos demais. A licitação de maior valor é a de código 000092012, realizada homologda em 2012, descrita como *Obras de drenagem pluvial, macrodrenagem da canalização do córrego de Santa Rosa - Campina Grande*, no valor de R$ 9.979.587.055 (mais de 9 bilhões de reais). É bastante provável que tais valores sejam ruído no dado, já que o valor da licitação é exorbitante comparado aos demais. Assim iremos excluir da análise estes valores extremos. 
+
+A linha verde representa a média, enquanto a linha azul representa a mediana. Apesar de, visualmente, a remoção dos valores extremos não provocar muita mudança, na prática temos que: a mediana dos valores Licitados é de 48.000 reais, enquanto a média é de 247.835 reais; após a remoção dos outliers temos uma média de 181.617 reais e mediana de, também, 48.000 reais. 
+
+<br>
+
+Entender a ocorrência dos valores praticados, ocorrência de valores incomuns e em quais contextos é comum que isso aconteça são conhecimentos importantes para o entendimento do processo público. 
+
+É importante atentar ao fato de que os valores limite para cada modalidade de licitação são passíveis de alteração, a última ocorreu através do [Decreto Nº 9.412, de 18 de junho de 2018](http://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/decreto/D9412.htm).
+
+<br>
+
+```{r}
+# Valor da licitação por Modalidade
+licitacoes %>% 
+  filter(vl_Licitacao < 150000000) %>% 
+  ggplot(aes(y = vl_Licitacao/1000000, x = de_TipoLicitacao)) +
+    geom_jitter(aes(colour = de_TipoLicitacao), alpha = 0.5) +
+    coord_flip() +
+    labs(y = "Valor da Licitação (em mihões)", x = "", subtitle = "Distribuição dos preços por Modalidade") +
+    theme(legend.position = "none")
+```
+<br>
+
+Como um exemplo de gasto dos municípios, iremos filtrar os valores propostos em licitações no ano de 2016.
+
+<br>
+
+```{r, include=FALSE}
+sumario_municipio_ano$montante_niveis <- cut(sumario_municipio_ano$montate_Municipio,
+                                    breaks = c(0, 4000000, 6000000, 10000000, 30000000, 600000000), 
+                                    labels = c('1 real a 4 Milhões', 'de 4 a 6 Milhões', 'de 6 a 10 Milhões', 
+                                               'de 10 a 30 Milhões', 'acima de 30 Milhões'),
+                                    include.lowest = TRUE, ordered_result = TRUE)
+
+
+sumario_municipio_ano_f <- sumario_municipio_ano %>% 
+  filter(ano_Homologacao == 2016) %>% 
+  mutate(volume2016 = volume_Municipio, montante2016 = montate_Municipio, montante_niveis_2016 = montante_niveis) %>% 
+  select(-c(volume_Municipio, montate_Municipio, ano_Homologacao, montante_niveis))
+
+# Inclui a sumarização de montante e volume de licitações na camada de dados do mapa
+mapa_pb@data <- mapa_pb@data %>%
+  left_join(sumario_municipio_ano_f, by = c('Nome_Munic' = 'de_Municipio'))
+```
+
+
+```{r, include=FALSE}
+colors <- colorFactor('OrRd', mapa_pb@data$montante_niveis_2016)
+
+mapa_pb@data <- mapa_pb@data %>% 
+  mutate(montante2016_formatado = paste("R$", format(montante2016, decimal.mark = ",", big.mark = ".")))
+
+# Para cada município cria uma string contendo <Nome, Volume de Licitações>
+labs_2016_montante <- lapply(seq(nrow(mapa_pb@data)), function(i) {
+            paste0('Município: ', mapa_pb@data[i, "Nome_Munic"], '</br>', 
+                'Montante em 2016: ', mapa_pb@data[i, "montante2016_formatado"]) 
+        })
+```
+
+```{r}
+# melhoria: conferir dados para Mato Grosso. Realmente não existem?
+# adicionar texto sobre esse gráfico
+
+leaflet(data = mapa_pb) %>%
+  addProviderTiles(providers$Esri.WorldGrayCanvas) %>%
+  addPolygons(opacity = 0.5, 
+              weight = 1, 
+              fillColor = colors(mapa_pb@data$montante_niveis_2016),
+              color = 'black',
+              label = lapply(labs_2016_montante, htmltools::HTML),
+              fillOpacity = 1) %>%
+                addLegend(position = "bottomright", pal = colors, values = mapa_pb@data$montante_niveis_2016,
+                title = "Total licitado em 2016  (R$)",
+                opacity = 1
+  )
+```
+<br>
+
+Vemos que os municípios maiores valores licitados no ano de 2016 são, de fato, municípios de destaque econômico ou que possuam alguma atividade característica em sua região. É notável que a capital do Estado, João Pessoa, tenha um valor total licitado inferior a Campina Grande, por exemplo. 
+
+<br>
+
+Para comparação, abaixo a distribuição dos valores firmados em contrato no ano de 2018 por cada município da Paraíba.
+
+
+```{r, message=FALSE, include=FALSE}
+contratos_lic <- contratos_lic %>% 
+  mutate(de_Municipio = get_municipio(cd_UGestora))
+
+sumario_contrato <- contratos_lic %>% 
+  group_by(de_Municipio, ano_Assinatura) %>% 
+  dplyr::summarise(montante_Contratos = sum(vl_TotalContrato, na.rm = TRUE)) %>% 
+  filter(ano_Assinatura == 2018) %>% 
+  select(-ano_Assinatura)
+```
+
+
+```{r, include=FALSE}
+sumario_contrato$niveis_contrato <- cut(sumario_contrato$montante_Contratos,
+                                    breaks = c(0, 4000000, 6000000, 10000000, 30000000, 600000000),
+                                    labels = c('1 real a 4 Milhões', 'de 4 a 6 Milhões', 'de 6 a 10 Milhões',
+                                               'de 10 a 30 Milhões', 'acima de 30 Milhões'),
+                                    include.lowest = TRUE, ordered_result = TRUE)
+
+# Inclui a sumarização de montante e volume de licitações na camada de dados do mapa
+mapa_pb@data <- mapa_pb@data %>%
+  left_join(sumario_contrato, by = c('Nome_Munic' = 'de_Municipio'))
+
+mapa_pb@data <- mapa_pb@data %>% 
+  mutate(montante_Contratos_For = paste("R$", format(montante_Contratos, decimal.mark = ",", big.mark = ".")))
+```
+
+
+```{r, include=FALSE}
+colors <- colorFactor('OrRd', mapa_pb@data$niveis_contrato)
+
+# Para cada município cria uma string contendo <Nome, Volume de Licitações>
+labs_contratos <- lapply(seq(nrow(mapa_pb@data)), function(i) {
+            paste0('Município: ', mapa_pb@data[i, "Nome_Munic"], '</br>', 
+                'Montante em Contratos: ', mapa_pb@data[i, "montante_Contratos_For"]) 
+        })
+```
+
+```{r}
+leaflet(data = mapa_pb) %>%
+  addProviderTiles(providers$Esri.WorldGrayCanvas) %>%
+  addPolygons(opacity = 0.5, 
+              weight = 1, 
+              fillColor = colors(mapa_pb@data$niveis_contrato),
+              color = 'black',
+              label = lapply(labs_contratos, htmltools::HTML),
+              fillOpacity = 1) %>%
+  addLegend(position = "bottomright", pal = colors, values = mapa_pb@data$niveis_contrato,
+            title = "Montante em contratos firmados por município",
+            opacity = 1
+  )
+```
+
+<br>
+
+É importante ressaltar que: **o valor da licitação não é, necessariamente, o valor a ser contratado - a constar no contrato com a empresa em questão**. Um exemplo simples desse caso é: uma escola que deseje propor uma licitação para merenda escolar, onde cada item da merenda seja proveniente de um fornecedor específico. Dessa maneira é possível que a mesma licitação seja utilizada para descrever o conjunto de itens de interesse na aquisição e também que diferentes empresas firmem um contrato para diferentes itens. 
+
+
+
+
+
+--------
+
+          Dados Extraídos do Sagres (até março de 2019).
+          Tabelas: Licitação, Regime de Execução, Objeto da Licitação, 
+                   Contrato e Tipo da Modalidade da Licitação.
+          Dados Externos: Mapa da Paraíba, Código dos Municípios Paraibanos (IBGE).
+
+--------

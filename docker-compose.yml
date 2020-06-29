@@ -2,19 +2,19 @@ version: '3.5'
 
 services:   
 
-  rbase:
+  fetcher:
     build: 
       context: fetcher/
-    container_name: r-container-fetcher
+    container_name: fetcher
     restart: always
     environment:
       - USER=${USER:-admin}
       - PASSWORD=${PASSWORD:-secret} 
-      - MYSQL_HOST=${MYSQL_HOST:-host}
-      - MYSQL_DB=${MYSQL_DB:-db}
-      - MYSQL_PORT=${MYSQL_PORT:-3306}
-      - MYSQL_USER=${MYSQL_USER:-user}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-secret}
+      - SQLSERVER_SAGRES19_HOST=${SQLSERVER_SAGRES19_HOST:-host}
+      - SQLSERVER_SAGRES19_Database=${SQLSERVER_SAGRES19_Database:-db}
+      - SQLSERVER_SAGRES19_PORT=${SQLSERVER_SAGRES19_PORT:-1401}
+      - SQLSERVER_SAGRES19_USER=${SQLSERVER_SAGRES19_USER:-user}
+      - SQLSERVER_SAGRES19_PASS=${SQLSERVER_SAGRES19_PASS:-secret}
     volumes:
       - ./fetcher:/app/fetcher
     ports:
@@ -22,6 +22,56 @@ services:
     networks:
       - proxynet
 
+  transformer:
+    build: 
+      context: transformador/
+    container_name: transformador
+    restart: always
+    environment:
+      - USER=${USER:-admin}
+      - PASSWORD=${PASSWORD:-secret} 
+    volumes:
+      - ./transformador:/app/transformador
+      - ./fetcher/data:/app/fetcher/data
+    networks:
+      - proxynet
+
+  feed-al:
+    build:
+      context: feed-al/
+    container_name: feed-al
+    env_file:
+      - .env
+    volumes:
+      - ./transformador/data:/data
+      - ./feed-al:/feed-al
+    ports:
+      - 7643:7643
+    depends_on:
+      - postgres
+    networks:
+      - proxynet
+
+  postgres:
+    image: postgres:11.1-alpine
+    container_name: postgres-analytics
+    restart: always
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-al_db}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-secret}
+      - TZ=GMT
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/    
+    ports:
+      - 7655:5432
+    networks:
+      - proxynet
+
 networks:
   proxynet:
     name: monitor_cidadao_network
+
+volumes:
+  postgres_data:
+      
