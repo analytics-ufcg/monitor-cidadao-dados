@@ -1,14 +1,14 @@
 
 ## Monitor Cidadão - Camada de Dados
-O Monitor Cidadão é um sistema desenvolvido através da parceria entre a CampinaTec e o laboratório Analytics da Universidade Federal de Campina Grande-PB com finalidade possibilitar aos cidadãos o acompanhamento dos contratos realizados pelos municípios do estado da Paraíba. 
+O Monitor Cidadão é um sistema desenvolvido através da parceria entre a CampinaTec e o laboratório Analytics, da Universidade Federal de Campina Grande-PB, com finalidade de possibilitar aos cidadãos o acompanhamento dos contratos realizados pelos municípios do estado da Paraíba. 
 
 ## Camada de Dados
 
 A Camada de dados consiste em uma arquitetura que fornece meios para a extração e tratamento de dados provindos de diversas fontes. Essa estrutura é formada por quatro subcategorias distintas com suas próprias responsabilidades:
 
-* **Fetch** : responsável por buscar os dados em suas fontes; 
-* **Tradutor**:  responsável por traduzir os dados para um formato tabular - especialmente útil para dados que são disponibilizados em formato *.csv*; 
-* **Transformador**: realiza manipulações nos dados como, por exemplo, joins.
+* **Fetch** : responsável por buscar os dados em suas fontes;
+* **Tradutor**:  responsável por traduzir os dados para um formato tabular - especialmente útil para dados que são disponibilizados em formato *.csv*;
+* **Transformador**: realiza manipulações nos dados como, por exemplo, joins;
 * **Preditor**: encapsula diversas funções para a realização das predições em torno dos contratos públicos.
 
 Abaixo é apresentado o fluxo de dados geral das camadas citadas acima.
@@ -22,9 +22,9 @@ Abaixo é apresentado o fluxo de dados geral das camadas citadas acima.
 - [R](https://www.r-project.org/)
 
 ## Setup
-Os serviços deste módulo utilizam docker para configuração do ambiente e execução do script. Instale o  [docker](https://docs.docker.com/install/), [docker-compose](https://docs.docker.com/compose/install/) e tenha certeza que você também o  [Make](https://www.gnu.org/software/make/)  instalado.
+Os serviços deste módulo utilizam docker para configuração do ambiente e execução do script. Instale o  [docker](https://docs.docker.com/install/), [docker-compose](https://docs.docker.com/compose/install/) e tenha certeza que você também tem o  [Make](https://www.gnu.org/software/make/)  instalado.
 
-Adicione os seguintes arquivos com variáveis de ambiente e credenciais: 
+Adicione os seguintes arquivos com variáveis de ambiente e credenciais:
 
  - Adicione o arquivo [*.env*](https://doc-08-6s-docs.googleusercontent.com/docs/securesc/qph2akfo04c7b0qviq0omfmbqectvj9r/90pf21leaqv39j5e5hjskd5tf70b2ekb/1593364725000/02066499184667500127/02066499184667500127/1cnKe1G0nO0SukbyHM06iVZ0t1CcPv0H1?e=download&authuser=0&nonce=v1c2japd9r2tu&user=02066499184667500127&hash=kddfpumuv1enicl51mbg80p5a7f5fdj0) na pasta raiz do projeto;
  - Adicione os arquivos [*config*, *id_rsa*, *id_rsa.pub* e *known_hosts*](https://drive.google.com/drive/u/0/folders/1QgxQlKgNCvGtUrFAXSl-mm0S3z2GZ2XV) na pasta fetcher/credenciais.
@@ -41,11 +41,11 @@ Nesta camada o make é utilizado como facilitador para execução. Abaixo estão
  6. Agora importe os dados para as tabelas do banco com `sudo make feed-al-import`;
  7. Você pode verificar se a(s) tabela(s) estão no banco com `sudo make feed-al-shell` e `\dt`.
 
-Caso você queira executar os comandos docker diretamente confira o código correspondente a seu comando no arquivo  `Makefile`. Abaixo estão todos os comandos disponíveis para serem executados com `sudo make <Comando>`:
+Caso você queira executar os comandos docker diretamente, confira o código correspondente a seu comando no arquivo  `Makefile`. Abaixo estão todos os comandos disponíveis para serem executados com `sudo make <Comando>`:
 Comando | Descrição
 ------------ | -------------
 help |Mostra esta mensagem de ajuda
-build | Realiza o build das imagens com as dependências necessária para a obtenção e dos dados.
+build | Realiza o build das imagens com as dependências necessárias para a obtenção dos dados.
 up  | Cria e inicia os containers.
 stop | Para todos os serviços.
 clean-volumes | Para e remove todos os volumes.
@@ -63,4 +63,3 @@ feed-al-shell | Acessa terminal do Banco de Dados Analytics
 ## License
 
 GNU Affero General Public License v3.0 © [Monitor Cidadão]()
-
