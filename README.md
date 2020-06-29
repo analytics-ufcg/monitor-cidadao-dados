@@ -1,55 +1,65 @@
 
-# Monitor Cidadão
+## Monitor Cidadão - Camada de Dados
+O Monitor Cidadão é um sistema desenvolvido através da parceria entre a CampinaTec e o laboratório Analytics, da Universidade Federal de Campina Grande-PB, com finalidade de possibilitar aos cidadãos o acompanhamento dos contratos realizados pelos municípios do estado da Paraíba. 
 
-Repositório do projeto Monitor Cidadão. Ufcg + Laboratório Analytics + CampinaTec.
+## Camada de Dados
 
-## Módulo de Busca e Processamento
-Os serviços deste módulo utilizam docker para configuração do ambiente e execução do script.
+A Camada de dados consiste em uma arquitetura que fornece meios para a extração e tratamento de dados provindos de diversas fontes. Essa estrutura é formada por quatro subcategorias distintas com suas próprias responsabilidades:
 
-Instale o  [docker](https://docs.docker.com/install/)  e o  [docker-compose](https://docs.docker.com/compose/install/). Tenha certeza que você também tem o  [Make](https://www.gnu.org/software/make/)  instalado.
+* **Fetch** : responsável por buscar os dados em suas fontes;
+* **Tradutor**:  responsável por traduzir os dados para um formato tabular - especialmente útil para dados que são disponibilizados em formato *.csv*;
+* **Transformador**: realiza manipulações nos dados como, por exemplo, joins;
+* **Preditor**: encapsula diversas funções para a realização das predições em torno dos contratos públicos.
 
-Obs: todos comandos citados nesse README utilizam o make como facilitador para execução. Caso você queira executar os comandos docker diretamente confira o código correspondende a seu comando no arquivo  `Makefile`  na raiz desse repositório.
+Abaixo é apresentado o fluxo de dados geral das camadas citadas acima.
 
-### Setup
-
-#### Acesso à VM
-
-Para que nossos serviços tenham o devido acesso aos dados (hospedados em uma Máquina Virtual remota e privada), preencha os arquivos em  `fetcher/credenciais`  com as credenciais e chaves necessárias.
-
-#### Acesso aos Bancos
-
-Crie uma cópia do arquivo .env.sample no diretório raiz desse repositório e renomeie para .env (deve também estar no diretório raiz desse repositório)
-
-Preencha as variáveis contidas no .env.sample também para o .env. Altere os valores conforme sua necessidade.
+![Fluxo de dados](https://github.com/analytics-ufcg/monitor-cidadao/blob/dev/img/data-pipeline.png?raw=true)
 
 
-#### Serviços
+## Tecnologias/framework usadas
 
-Faça o build das imagens docker com as dependências:
+<b>Desenvolvido em: </b>
+- [R](https://www.r-project.org/)
 
-sudo make build
+## Setup
+Os serviços deste módulo utilizam docker para configuração do ambiente e execução do script. Instale o  [docker](https://docs.docker.com/install/), [docker-compose](https://docs.docker.com/compose/install/) e tenha certeza que você também tem o  [Make](https://www.gnu.org/software/make/)  instalado.
 
-Execute os serviços:
+Adicione os seguintes arquivos com variáveis de ambiente e credenciais:
 
-sudo make run
-
-## Executando back-end (server)
-
-A execução do back-end ainda não está sendo feita com o auxílio do docker. Dessa forma, antes de tudo, garanta que você tenha instalado em sua máquina o **nodejs**, **npm** e o **nodemon**.
-
-Adicione as informações do SQLServer no .env (essas informações estão no arquivo '07 - Instruções e Acessos Monitor Cidadão') .
-- SQLSERVER_SAGRES19_HOST
-- SQLSERVER_SAGRES19_Database
-- SQLSERVER_SAGRES19_USER
-- SQLSERVER_SAGRES19_PASS
-- SQLSERVER_SAGRES19_PORT
+ - Adicione o arquivo [*.env*](https://doc-08-6s-docs.googleusercontent.com/docs/securesc/qph2akfo04c7b0qviq0omfmbqectvj9r/90pf21leaqv39j5e5hjskd5tf70b2ekb/1593364725000/02066499184667500127/02066499184667500127/1cnKe1G0nO0SukbyHM06iVZ0t1CcPv0H1?e=download&authuser=0&nonce=v1c2japd9r2tu&user=02066499184667500127&hash=kddfpumuv1enicl51mbg80p5a7f5fdj0) na pasta raiz do projeto;
+ - Adicione os arquivos [*config*, *id_rsa*, *id_rsa.pub* e *known_hosts*](https://drive.google.com/drive/u/0/folders/1QgxQlKgNCvGtUrFAXSl-mm0S3z2GZ2XV) na pasta fetcher/credenciais.
 
 
-Agora, para executar, bastar entrar na pasta **server** via terminal e inserir o comando:
- > nodemon
- 
- Você pode testar se tudo deu certo com o link abaixo:
- > [http://localhost:3000/api/licitacoes](http://localhost:3000/api/licitacoes)
- 
+## Como usar?
+Nesta camada o make é utilizado como facilitador para execução. Abaixo estão descritos os passos necessários para importar os dados para o banco de dados Analytics (também chamado de AL_DB):
+
+ 1. Faça o build das imagens necessárias com `sudo make build`;
+ 2. Crie e inicie os containers do docker com `sudo make up`;
+ 3. Obtenha os dados através do `sudo make fetch-data`. Nesta etapa você também pode testar a integridade dos dados obtidos utilizando os testes unitários de cada tabela com `sudo docker exec -it fetcher sh -c "Rscript tests/<nome-da-tabela>.R"`;
+ 4. Traduza e transforme os dados colhidos `sudo make transform-data`;
+ 5. Crie as tabelas no banco AL_DB com `sudo make feed-al-create`;
+ 6. Agora importe os dados para as tabelas do banco com `sudo make feed-al-import`;
+ 7. Você pode verificar se a(s) tabela(s) estão no banco com `sudo make feed-al-shell` e `\dt`.
+
+Caso você queira executar os comandos docker diretamente, confira o código correspondente a seu comando no arquivo  `Makefile`. Abaixo estão todos os comandos disponíveis para serem executados com `sudo make <Comando>`:
+Comando | Descrição
+------------ | -------------
+help |Mostra esta mensagem de ajuda
+build | Realiza o build das imagens com as dependências necessárias para a obtenção dos dados.
+up  | Cria e inicia os containers.
+stop | Para todos os serviços.
+clean-volumes | Para e remove todos os volumes.
+enter-fetcher-container  | Abre cli do container fetcher
+fetch-data | Obtem dados
+enter-transformer-container | Abre cli do container transformador
+transform-data | Traduz e transforma os dados colhidos
+enter-feed-al-container | Abre cli do container feed-al
+feed-al-create | Cria as tabelas do Banco de Dados Analytics
+feed-al-import | Importa dados para as tabelas do Banco de Dados Analytics
+feed-al-clean | Dropa as tabelas do Banco de Dados Analytics
+feed-al-shell | Acessa terminal do Banco de Dados Analytics
 
 
+## License
+
+GNU Affero General Public License v3.0 © [Monitor Cidadão]()
