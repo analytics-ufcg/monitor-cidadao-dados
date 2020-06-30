@@ -14,3 +14,19 @@ join_contratos_licitacao <- function(df_contratos, df_licitacoes) {
   df_contratos %<>% dplyr::left_join(df_licitacoes) %>%
     dplyr::select(id_contrato, id_licitacao, cd_municipio, dplyr::everything())
 }
+
+#' @title Realiza o join dos contratos com os códigos das unidades gestoras
+#' @param df_contratos dataframe com os contratos
+#' @param df_codigo_unidade_gestora dataframe com os códigos das unidades gestoras
+#' @return Dataframe contendo informações dos contratos com nomes das unidades gestoras
+#' @rdname join_contratos_codigo_unidade_gestora
+#' @examples
+#' join_contratos_codigo_unidade_gestora_dt <- join_contratos_codigo_unidade_gestora(
+#'          df_contratos, df_codigo_unidade_gestora)
+#'
+join_contratos_codigo_unidade_gestora <- function(df_contratos, df_codigo_unidade_gestora) {
+  df_codigo_unidade_gestora %<>% dplyr::select(cd_u_gestora, de_ugestora)
+
+  df_contratos %<>% dplyr::left_join(df_codigo_unidade_gestora) %>%
+    dplyr::select(cd_u_gestora, cd_municipio, dplyr::everything())
+}

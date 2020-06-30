@@ -28,7 +28,8 @@ convenios_df <- get_convenios()
 #Transforma tabelas
 licitacoes_transformadas <- licitacoes_df %>% mcTransformador::process_licitacao()
 contratos_transformados <- contratos_df %>% mcTransformador::process_contrato() %>%
-  join_contratos_licitacao(licitacoes_transformadas)
+  join_contratos_licitacao(licitacoes_transformadas) %>%
+  join_contratos_codigo_unidade_gestora(codigo_unidade_gestora_df)
 municipios_transformados <- municipios_df %>% mcTransformador::process_municipio()
 
 #Salva tabelas localmente
@@ -47,4 +48,3 @@ readr::write_csv(aditivos_df, here::here("data/aditivos.csv"))
 readr::write_csv(pagamentos_df, here::here("data/pagamentos.csv"))
 readr::write_csv(convenios_df, here::here("data/convenios.csv"))
 readr::write_csv(municipios_transformados, here::here("data/municipios.csv"))
-
