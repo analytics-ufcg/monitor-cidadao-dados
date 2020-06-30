@@ -27,8 +27,6 @@ convenios_df <- get_convenios()
 
 #Transforma tabelas
 licitacoes_transformadas <- licitacoes_df %>% mcTransformador::process_licitacao()
-codigo_unidade_gestora_transformada <- codigo_unidade_gestora_df %>%
-  mcTransformador::process_codigo_unidade_gestora()
 contratos_transformados <- contratos_df %>% mcTransformador::process_contrato() %>%
   join_contratos_licitacao(licitacoes_transformadas) %>%
   join_contratos_codigo_unidade_gestora(codigo_unidade_gestora_df)

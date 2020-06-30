@@ -54,11 +54,3 @@ process_licitacao <- function(licitacoes_df) {
 process_municipio <- function(municipios_df) {
   municipios_df %<>% dplyr::select(cd_municipio, dplyr::everything())
 }
-
-#' @title Processa dataframe de codigos das unidades gestoras
-#' @description Manipula tabela pra forma que será utilizada no banco
-#' @param codigo_unidade_gestora_df Dataframe contendo informações dos codigos das unidades gestoras
-#' @return Dataframe contendo informações dos codigos das unidades gestoras processados
-process_codigo_unidade_gestora <- function(codigo_unidade_gestora_df) {
-  codigo_unidade_gestora_df %<>% dplyr::select(cd_ugestora, dplyr::everything())
-}

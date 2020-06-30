@@ -25,7 +25,7 @@ join_contratos_licitacao <- function(df_contratos, df_licitacoes) {
 #'          df_contratos, df_codigo_unidade_gestora)
 #'
 join_contratos_codigo_unidade_gestora <- function(df_contratos, df_codigo_unidade_gestora) {
-  df_codigo_unidade_gestora %<>% dplyr::select(cd_ugestora, de_ugestora)
+  df_codigo_unidade_gestora %<>% dplyr::select(cd_u_gestora, de_ugestora)
 
   df_contratos %<>% dplyr::left_join(df_codigo_unidade_gestora) %>%
     dplyr::select(cd_u_gestora, cd_municipio, dplyr::everything())

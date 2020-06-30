@@ -50,7 +50,7 @@ translate_regime_execucao <- function(regime_execucao_raw) {
 #' codigo_unidade_gestora_dt <- translate_codigo_unidade_gestora(codigo_unidade_gestora_raw)
 translate_codigo_unidade_gestora <- function(codigo_unidade_gestora_raw) {
   codigo_unidade_gestora_raw %<>% janitor::clean_names() %>%
-  dplyr::mutate(codigo_u_gestora = cd_ugestora)
+  dplyr::rename(cd_u_gestora = cd_ugestora)
 }
 
 #' @title Traduz dado recebido para dataset
