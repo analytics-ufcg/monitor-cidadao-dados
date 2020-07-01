@@ -2,7 +2,7 @@
 # tabelas em ordem alfabética
 
 
-COLNAMES_ADITIVOS <-  c("cd_UGestora"="character","dt_Ano"="character","nu_Contrato"="character",
+COLNAMES_ADITIVOS <-  c("cd_UGestora"="integer","dt_Ano"="character","nu_Contrato"="character",
                         "nu_Aditivo"="character","dt_Assinatura"="character","de_Motivo"="character",
                         "vl_Aditivo"="numeric","dt_MesAno"="character","dt_Aditado"="character"
 )
@@ -18,7 +18,7 @@ COLNAMES_CONTRATOS <- c("cd_UGestora"="integer", "dt_Ano"="integer",
                         "ordemServico"="character"
 )
 
-COLNAMES_CONVENIOS <-  c("cd_Ugestora"="character","dt_Ano"="character","nu_Convenio"="character",
+COLNAMES_CONVENIOS <-  c("cd_Ugestora"="integer","dt_Ano"="character","nu_Convenio"="character",
                          "dt_AnoCelebracao"="character","no_Convenio"="character","cd_Concedente"="numeric",
                          "no_Concedente"="numeric","de_Objeto"="character","tp_OrigemRecursoConvenio"="integer",
                          "dt_MesAno"="character"
@@ -52,7 +52,7 @@ COLNAMES_CODIGO_UNIDADE_GESTORA <- c("cd_Ibge"="integer", "cd_Municipio"="charac
                                      "de_Ugestora"="character", "previdencia"="character"
 )
 
-COLNAMES_EMPENHOS <- c("cd_UGestora"="character", "dt_Ano"="integer", "cd_UnidOrcamentaria"="character",
+COLNAMES_EMPENHOS <- c("cd_UGestora"="integer", "dt_Ano"="integer", "cd_UnidOrcamentaria"="character",
                        "cd_Funcao"="character", "cd_Subfuncao"="character", "cd_Programa"="character",
                        "cd_Acao"="character", "cd_classificacao"="character", "cd_CatEconomica"="character",
                        "cd_NatDespesa"="character", "cd_Modalidade"="character", "cd_Elemento"="character",
@@ -83,7 +83,7 @@ COLNAMES_LICITACOES <- c("cd_UGestora"="integer","dt_Ano"="integer",
                          "registroCGE"="character","tp_regimeExecucao"="integer"
                         )
 
-COLNAMES_PAGAMENTOS <-  c("cd_UGestora"="character","dt_Ano"="character","cd_UnidOrcamentaria"="character",
+COLNAMES_PAGAMENTOS <-  c("cd_UGestora"="integer","dt_Ano"="character","cd_UnidOrcamentaria"="character",
                           "nu_Empenho"="character","nu_Parcela"="character","tp_Lancamento"="integer",
                           "vl_Pagamento"="numeric","dt_Pagamento"="character","cd_Conta"="character",
                           "nu_ChequePag"="character","nu_DebAut"="character","cd_BancoRec"="character",

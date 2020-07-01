@@ -94,7 +94,7 @@ read_contratos <- function() {
   contratos_df <- readr::read_csv(here::here("../fetcher/data/contratos.csv"),
                                    col_types = list(
                                      .default = readr::col_character(),
-                                     cd_UGestora = readr::col_integer(),
+                                     cd_UGestora = readr::col_number(),
                                      dt_Ano = readr::col_integer(),
                                      tp_Licitacao = readr::col_integer(),
                                      vl_TotalContrato = readr::col_double(),
@@ -158,7 +158,6 @@ read_empenhos <- function() {
   empenhos_df <- readr::read_csv(here::here("../fetcher/data/empenhos.csv"),
                                  col_types = list(
                                    .default = readr::col_number(),
-                                   cd_UGestora = readr::col_character(),
                                    dt_Ano = readr::col_character(),
                                    cd_UnidOrcamentaria = readr::col_character(),
                                    cd_Funcao = readr::col_character(),
@@ -201,7 +200,6 @@ read_aditivos <- function() {
   aditivos_df <- readr::read_csv(here::here("../fetcher/data/aditivos.csv"),
                                            col_types = list(
                                              .default = readr::col_number(),
-                                             cd_UGestora = readr::col_character(),
                                              dt_Ano = readr::col_character(),
                                              nu_Contrato = readr::col_character(),
                                              nu_Aditivo = readr::col_character(),
@@ -222,7 +220,6 @@ read_pagamentos <- function() {
   pagamentos_df <- readr::read_csv(here::here("../fetcher/data/pagamentos.csv"),
                                            col_types = list(
                                              .default = readr::col_number(),
-                                             cd_UGestora = readr::col_character(),
                                              dt_Ano = readr::col_character(),
                                              cd_UnidOrcamentaria = readr::col_character(),
                                              nu_Empenho = readr::col_character(),
@@ -253,7 +250,6 @@ read_convenios <- function() {
   convenios_df <- readr::read_csv(here::here("../fetcher/data/convenios.csv"),
                                    col_types = list(
                                      .default = readr::col_number(),
-                                     cd_UGestora = readr::col_character(),
                                      dt_Ano = readr::col_character(),
                                      nu_Convenio = readr::col_character(),
                                      dt_AnoCelebracao = readr::col_character(),
