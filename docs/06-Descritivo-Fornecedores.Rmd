@@ -50,12 +50,16 @@ source(here::here("lib/utils-sagres.R"))
 source(here::here("lib/get-dados.R"))
 ```
 
-```{r, include=FALSE}
-contratos_rescindidos_2018 <- read_delim(here::here("dados/contratos_rescindidos_2018/contratos_mutacoes_tramita_08_11_2018_corrigido.csv"), ";", escape_double = FALSE, col_types = cols(cnpj_fornecedor = col_character(),
+```{r, include=FALSE, message=FALSE}
+contratos_rescindidos_2018 <- read_delim(here::here("dados/contratos_rescindidos_2018/contratos_mutacoes_tramita_08_11_2018_corrigido-original.csv"), ";", escape_double = FALSE, col_types = cols(cnpj_fornecedor = col_character(),
         cpf_fornecedor = col_character(),
         data_ato_mutacao = col_character(),
         data_mutacao = col_character(), numero_contrato = col_character()),
     trim_ws = TRUE)
+
+contratos_tratados <- read_csv(here::here("dados/contratos_rescindidos_2018/contratos_tramita_tratado.csv"))
+
+contratos_tratados$cd_Ugestora <- as.character(contratos_tratados$cd_Ugestora)
 ```
 
 
@@ -98,6 +102,9 @@ participantes <- get_participantes()
 
 # Dados de fornecedores eleitos em Licitações
 fornecedores <- get_fornecedores()
+
+# Dados do tipo de objeto a ser adquirido com a licitação
+tipo_objeto_licitacao <- get_tipo_objeto()
 ```
 
 ```{r, include=FALSE}
@@ -532,20 +539,21 @@ kable(aplicado_ganho %>%
 <br>
 
 
+
+
 ## Fornecedores com contratos interrompidos
+
 
 ```{r, include=FALSE}
 contratos_rescindidos_2018$data_mutacao <- as.Date(contratos_rescindidos_2018$data_mutacao)
 contratos_rescindidos_2018$ano_rescisao <- as.numeric(format(contratos_rescindidos_2018$data_mutacao, "%Y"))
 
 contratos_interrompidos <- contratos_rescindidos_2018 %>%
-  filter(tipo_mutacao == "IMPEDIMENTO" | tipo_mutacao == "PARALISACAO" |
-           tipo_mutacao == "RESCISAO" | tipo_mutacao == "SUSPENSAO" | tipo_mutacao == "SUSTACAO") %>%
+  filter(tipo_mutacao == "IMPEDIMENTO" | tipo_mutacao == "RESCISAO" | tipo_mutacao == "SUSPENSAO" | tipo_mutacao == "SUSTACAO") %>%
   select(-protocolo_contrato_tce, -justificativa_mutacao)
 ```
 
-
-Entre 2014 e 2018, segundo o [TRAMITA](https://tramita.tce.pb.gov.br/), tivemos aproximadamente `r nrow(contratos_rescindidos_2018)` contratos administrativos cuja situação foi mutada. Dentre estes, `r nrow(contratos_interrompidos)` foram interrompidos devido a *Impedimento*, *Paralisação*, *Rescisão*, *Suspensão* ou *Sustação*. De modo que estão assim distribuídos:
+Entre 2014 e 2018, segundo o [TRAMITA](https://tramita.tce.pb.gov.br/), tivemos aproximadamente `r nrow(contratos_rescindidos_2018)` contratos administrativos cuja situação foi mutada. Dentre estes, `r nrow(contratos_interrompidos)` foram interrompidos devido a *Impedimento*, *Rescisão*, *Suspensão* ou *Sustação*. De modo que estão assim distribuídos:
 
 <br>
 
@@ -564,24 +572,142 @@ Destes, `r contratos_interrompidos %>% select(cnpj_fornecedor) %>% na.omit() %>%
 
 <br>
 
-```{r, include=FALSE}
-# Vou deixar isso aqui para quando tivermos mais dados sobre contratos rescindidos
 
-# get_ano_contrato <- function(numero_contrato) {
-#   library(plyr)
-#   result <- data.frame(
-#     ano_contrato = stri_sub(numero_contrato, -4))
-#   return(result$ano_contrato)
-# }
-#
-# contratos_interrompidos <- contratos_interrompidos %>%
-#   mutate(ano_contrato = as.numeric(as.character(get_ano_contrato(numero_contrato))))
-#
-# verificacao <- contratos_interrompidos %>%
-#   left_join(contratos %>% select(cd_UGestora, dt_Ano, nu_Contrato, dt_Assinatura, nu_CPFCNPJ,
-#                                  nu_Licitacao, tp_Licitacao, vl_TotalContrato, de_Municipio),
-#             by = c("numero_contrato" = "nu_Contrato", "ano_contrato" = "dt_Ano"))
+```{r, include=FALSE}
+contratos_tratados_info <- contratos_tratados %>%
+  left_join(contratos, by = c('cd_Ugestora' = 'cd_UGestora', 
+                              'numero_contrato' = 'nu_Contrato',
+                              'nu_CPFCNPJ' = 'nu_CPFCNPJ'))
+
+contratos_tratados_info <- contratos_tratados_info %>% 
+  select(-c("ordemServico", "planilha", "foto", "dt_Recebimento",
+            "cd_SIAFI", "registroCGE", "dt_MesAno", "de_Obs"))
+
+contratos_tratados_info <- contratos_tratados_info %>%
+  left_join(tipos_modalidade, by = "tp_Licitacao")
+
+contratos_tratados_info <- contratos_tratados_info %>% 
+  left_join(licitacoes, by = c('cd_Ugestora' = 'cd_UGestora',
+                               'nu_Licitacao' = 'nu_Licitacao',
+                               'tp_Licitacao' = 'tp_Licitacao'))
+
+contratos_tratados_info <- contratos_tratados_info %>%
+  left_join(tipo_objeto_licitacao, by = "tp_Objeto")
 ```
+
+Destes, apenas 294 contratos possuem, no SAGRES, dados de licitações associadas a si. Para esta parcela:
+
+<br>
+
+
+```{r}
+contratos_tratados_info %>%
+  group_by(de_TipoLicitacao) %>% 
+  dplyr::summarise(Ocorrencias = n()) %>% 
+  ggplot(aes(x = reorder(de_TipoLicitacao, -Ocorrencias), y = Ocorrencias)) +
+  geom_bar(stat = "identity", fill = "turquoise4") +
+  labs(x = "", y = "Contagem",
+       title = "Modalidade da licitação proveniente", subtitle = "contratos rescindidos") +
+  theme(axis.text.x = element_blank()) +
+  coord_flip()
+```
+
+```{r, include=FALSE}
+# ggsave(here::here("01-ContratosRescindidos-Modalidades.png"), width = 10, height = 6)
+# dev.off()
+```
+
+
+<br>
+
+O *Pregão Presencial* é, conhecidamente, uma modalidade onde pode ocorrer conluio entre fornecedores, fornecedores e unidades gestoras, intimidação de participantes, e outras práticas ilegítimas. Esta pode ser uma das explicações de, à parte os contratos onde não temos dados, o maior número de contratos vetados é pertencente a categoria Pregão Presencial.
+
+<br>
+
+```{r}
+contratos_tratados_info %>%
+  group_by(de_TipoObjeto) %>% 
+  dplyr::summarise(Ocorrencias = n()) %>% 
+  ggplot(aes(x = reorder(de_TipoObjeto, -Ocorrencias), y = Ocorrencias)) +
+  geom_bar(stat = "identity", fill = "turquoise4") +
+  labs(x = "", y = "Contagem",
+       title = "Tipo do Objeto", subtitle = "contratos rescindidos") +
+  theme(axis.text.x = element_blank()) +
+  coord_flip()
+```
+
+```{r, include=FALSE}
+# ggsave(here::here("01-ContratosRescindidos-TipoObjeto.png"), width = 10, height = 6)
+# dev.off()
+```
+
+<br>
+
+Dada a complexidade, imaginamos que os contratos mais frequentemente rescindidos dados os motivos citados acima seriam os de obras. Entretanto vemos que, a partir dos dados disponíveis, a seara com maior número de cancelamentos é a de Compras e Serviços. Por fim, temos uma visão geral dos municípios com o maior número de rescisões.
+
+<br>
+
+```{r, include=FALSE}
+sumario_rescisoes <- contratos_tratados_info %>% 
+  select(cd_Ugestora)
+  
+sumario_rescisoes <- sumario_rescisoes %>%
+  mutate(de_Municipio = get_municipio(cd_Ugestora)) %>% 
+  group_by(de_Municipio) %>% 
+  dplyr::summarise(rescisoes = n()) %>% 
+  na.omit()
+```
+
+
+
+```{r, include=FALSE}
+# Criação de níveis através dos ranges de valor
+sumario_rescisoes$resc_levels <- cut(sumario_rescisoes$rescisoes,
+                                    breaks = c(0, 10, 50, 100, 300),
+                                    labels = c('1 a 10', '11 a 50', '51 a 100', 'Acima de 50'),
+                                    include.lowest = TRUE, ordered_result = TRUE)
+
+mapa_pb@data <- mapa_pb@data %>%
+  left_join(sumario_rescisoes, by = c('Nome_Munic' = 'de_Municipio'))
+
+colors <- colorFactor('OrRd', mapa_pb@data$resc_levels)
+
+# Para cada município cria uma string contendo <Nome, Volume de Rescisões>
+labs_rescisoes <- lapply(seq(nrow(mapa_pb@data)), function(i) {
+                                  paste0('Município: ', mapa_pb@data[i, "Nome_Munic"], '</br>',
+                                      'Rescisões: ', mapa_pb@data[i, "rescisoes"])
+                              })
+```
+
+```{r}
+leaflet(data = mapa_pb) %>%
+              addProviderTiles(providers$Esri.WorldGrayCanvas) %>%
+              addPolygons(opacity = 0.5,
+                          weight = 1,
+                          fillColor = colors(mapa_pb@data$resc_levels),
+                          color = 'black',
+                          label = lapply(labs_rescisoes, htmltools::HTML),
+                          fillOpacity = 1) %>%
+              addLegend(position = "bottomright",
+                        pal = colors, values = mapa_pb@data$resc_levels,
+                        title = "Nº de rescisões",
+                        opacity = 1)
+```
+
+
+<br>
+
+É importante ressaltar que nos municípios assinalados em cinza não necessariamente significam que não existem contratos rescindidos.
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -596,6 +722,6 @@ Destes, `r contratos_interrompidos %>% select(cnpj_fornecedor) %>% na.omit() %>%
           Dados Extraídos do Sagres (até março de 2019).
           Tabelas: Empenhos, Licitações, Contratos, Tipo da Modalidade da Licitação,
                    Fornecedores, Participantes.
-          Dados Externos: Mapa da Paraíba, Código dos Municípios Paraibanos (IBGE).
+          Dados Externos: Mapa da Paraíba, Código dos Municípios Paraibanos (IBGE), Rescisões Tramita.
 
 --------

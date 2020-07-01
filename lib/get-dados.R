@@ -69,6 +69,12 @@ get_tipo_modalidade <- function() {
   return(tipos_modalidade)
 }
 
+get_tipo_objeto <- function() {
+  tipo_objeto <- read_csv(here::here("fetcher/data/tipo_objeto_licitacao.csv"),
+                               col_types = cols(tp_Licitacao = col_character()))
+  return(tipo_objeto)
+}
+
 
 
 
