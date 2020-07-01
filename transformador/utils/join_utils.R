@@ -30,3 +30,19 @@ join_contratos_codigo_unidade_gestora <- function(df_contratos, df_codigo_unidad
   df_contratos %<>% dplyr::left_join(df_codigo_unidade_gestora) %>%
     dplyr::select(cd_u_gestora, cd_municipio, dplyr::everything())
 }
+
+#' @title Realiza o join das licitações com os tipos de modalidade de licitações
+#' @param df_licitacoes dataframe com as licitações
+#' @param df_tipo_modalidade_licitacao dataframe com os tipos de modalidade de licitações
+#' @return Dataframe contendo informações das licitações com nome da modalidade de licitação
+#' @rdname join_licitacoes_tipo_modalidade_licitacao
+#' @examples
+#' join_licitacoes_tipo_modalidade_licitacao_dt <- join_licitacoes_tipo_modalidade_licitacao(
+#'          df_licitacoes, df_tipo_modalidade_licitacao)
+#'
+join_licitacoes_tipo_modalidade_licitacao <- function(df_licitacoes, df_tipo_modalidade_licitacao) {
+  df_tipo_modalidade_licitacao %<>% dplyr::select(tp_licitacao, de_tipo_licitacao)
+
+  df_licitacoes %<>% dplyr::left_join(df_tipo_modalidade_licitacao) %>%
+    dplyr::select(tp_licitacao, dplyr::everything())
+}
