@@ -26,7 +26,8 @@ pagamentos_df <- get_pagamentos()
 convenios_df <- get_convenios()
 
 #Transforma tabelas
-licitacoes_transformadas <- licitacoes_df %>% mcTransformador::process_licitacao()
+licitacoes_transformadas <- licitacoes_df %>% mcTransformador::process_licitacao() %>%
+  join_licitacoes_codigo_unidade_gestora(codigo_unidade_gestora_df)
 contratos_transformados <- contratos_df %>% mcTransformador::process_contrato() %>%
   join_contratos_licitacao(licitacoes_transformadas) %>%
   join_contratos_codigo_unidade_gestora(codigo_unidade_gestora_df)
