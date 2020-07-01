@@ -280,3 +280,15 @@ read_codigo_municipio <- function() {
                                            ))
 }
 
+#' @title Lê dataframe contendo informações dos fornecedores
+#' @return Dataframe contendo informações sobre os fornecedores
+#' @rdname read_fornecedores
+#' @examples
+#' fornecedores_dt <- read_fornecedores()
+read_fornecedores <- function() {
+  fornecedores_dt <- readr::read_csv(here::here("../fetcher/data/fornecedores.csv"),
+                                           col_types = list(
+                                             .default = readr::col_number(),
+                                             nu_CPFCNPJ = readr::col_character()
+                                           ))
+}

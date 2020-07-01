@@ -153,3 +153,12 @@ get_codigo_municipio <- function() {
     translate_codigo_municipio()
 }
 
+#' @title Obtem dados dos fornecedores
+#' @return Dataframe contendo informações sobre os fornecedores
+#' @rdname get_fornecedores
+#' @examples
+#' fornecedores_dt <- get_fornecedores()
+get_fornecedores <- function() {
+  fornecedores_dt <- read_fornecedores() %>%
+    translate_fornecedores()
+}

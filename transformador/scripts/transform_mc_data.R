@@ -24,6 +24,7 @@ empenhos_df <- get_empenhos()
 aditivos_df <- get_aditivos()
 pagamentos_df <- get_pagamentos()
 convenios_df <- get_convenios()
+fornecedores_df <- get_fornecedores()
 
 #Transforma tabelas
 licitacoes_transformadas <- licitacoes_df %>% mcTransformador::process_licitacao() %>%
@@ -49,3 +50,4 @@ readr::write_csv(aditivos_df, here::here("data/aditivos.csv"))
 readr::write_csv(pagamentos_df, here::here("data/pagamentos.csv"))
 readr::write_csv(convenios_df, here::here("data/convenios.csv"))
 readr::write_csv(municipios_transformados, here::here("data/municipios.csv"))
+readr::write_csv(fornecedores_df, here::here("data/fornecedores.csv"))
