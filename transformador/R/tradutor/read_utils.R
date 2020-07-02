@@ -94,7 +94,7 @@ read_contratos <- function() {
   contratos_df <- readr::read_csv(here::here("../fetcher/data/contratos.csv"),
                                    col_types = list(
                                      .default = readr::col_character(),
-                                     cd_UGestora = readr::col_integer(),
+                                     cd_Ugestora = readr::col_integer(),
                                      dt_Ano = readr::col_integer(),
                                      tp_Licitacao = readr::col_integer(),
                                      vl_TotalContrato = readr::col_double(),
