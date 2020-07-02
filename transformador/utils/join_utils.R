@@ -45,6 +45,7 @@ join_licitacoes_codigo_unidade_gestora <- function(df_licitacoes, df_codigo_unid
 
   df_licitacoes %<>% dplyr::left_join(df_codigo_unidade_gestora) %>%
     dplyr::select(cd_u_gestora, cd_municipio, dplyr::everything())
+}
 
 #' @title Realiza o join das licitações com os tipos de modalidade de licitações
 #' @param df_licitacoes dataframe com as licitações
