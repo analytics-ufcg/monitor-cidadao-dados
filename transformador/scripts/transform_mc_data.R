@@ -6,7 +6,7 @@ source(here::here("utils/join_utils.R"))
 .HELP <- "Rscript transform_mc_data.R"
 
 #Instala pacote mcTransformador
-devtools::install()
+devtools::document()
 
 #Busca tabelas traduzidas
 licitacoes_df <- get_licitacoes()
@@ -35,7 +35,8 @@ licitacoes_transformadas <- licitacoes_df %>% mcTransformador::process_licitacao
 contratos_transformados <- contratos_df %>% mcTransformador::process_contrato() %>%
   join_contratos_licitacao(licitacoes_transformadas) %>%
   join_contratos_codigo_unidade_gestora(codigo_unidade_gestora_df) %>%
-  join_contratos_fornecedores (fornecedores_df)
+  join_contratos_fornecedores(fornecedores_df)
+
 municipios_transformados <- municipios_df %>% mcTransformador::process_municipio()
 
 #Salva tabelas localmente
