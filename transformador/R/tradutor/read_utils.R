@@ -253,7 +253,7 @@ read_convenios <- function() {
   convenios_df <- readr::read_csv(here::here("../fetcher/data/convenios.csv"),
                                    col_types = list(
                                      .default = readr::col_number(),
-                                     cd_UGestora = readr::col_character(),
+                                     cd_Ugestora = readr::col_character(),
                                      dt_Ano = readr::col_character(),
                                      nu_Convenio = readr::col_character(),
                                      dt_AnoCelebracao = readr::col_character(),
