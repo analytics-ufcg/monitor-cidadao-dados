@@ -286,9 +286,21 @@ read_codigo_municipio <- function() {
 #' @examples
 #' fornecedores_dt <- read_fornecedores()
 read_fornecedores <- function() {
-  fornecedores_dt <- readr::read_csv(here::here("../fetcher/data/fornecedores.csv"),
+   fornecedores_dt <- readr::read_csv(here::here("../fetcher/data/fornecedores.csv"),
                                            col_types = list(
                                              .default = readr::col_number(),
-                                             nu_CPFCNPJ = readr::col_character()
+                                             nu_CPFCNPJ = readr::col_character(),
+                                             no_Fornecedor = readr::col_character(),
+                                             nu_IncEstadual = readr::col_character(),
+                                             de_Endereco = readr::col_character(),
+                                             de_Bairro = readr::col_character(),
+                                             de_Complemento = readr::col_character(),
+                                             nu_CEP = readr::col_character(),
+                                             de_Municipio = readr::col_character(),
+                                             cd_UF = readr::col_character(),
+                                             nu_ddd = readr::col_character(),
+                                             nu_Fone = readr::col_character(),
+                                             dt_MesAno = readr::col_character(),
+                                             dt_MesAnoReferencia = readr::col_character()
                                            ))
 }

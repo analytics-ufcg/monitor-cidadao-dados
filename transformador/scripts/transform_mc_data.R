@@ -26,12 +26,14 @@ pagamentos_df <- get_pagamentos()
 convenios_df <- get_convenios()
 fornecedores_df <- get_fornecedores()
 
+
 #Transforma tabelas
 licitacoes_transformadas <- licitacoes_df %>% mcTransformador::process_licitacao() %>%
   join_licitacoes_tipo_modalidade_licitacao(tipo_modalidade_licitacao_df)
 contratos_transformados <- contratos_df %>% mcTransformador::process_contrato() %>%
   join_contratos_licitacao(licitacoes_transformadas) %>%
-  join_contratos_codigo_unidade_gestora(codigo_unidade_gestora_df)
+  join_contratos_codigo_unidade_gestora(codigo_unidade_gestora_df) %>%
+  join_contratos_fornecedores (fornecedores_df)
 municipios_transformados <- municipios_df %>% mcTransformador::process_municipio()
 
 #Salva tabelas localmente
