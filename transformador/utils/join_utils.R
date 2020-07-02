@@ -31,6 +31,7 @@ join_contratos_codigo_unidade_gestora <- function(df_contratos, df_codigo_unidad
     dplyr::select(cd_u_gestora, cd_municipio, dplyr::everything())
 }
 
+
 #' @title Realiza o join das licitações com os códigos das unidades gestoras
 #' @param df_licitacoes dataframe com as licitações
 #' @param df_codigo_unidade_gestora dataframe com os códigos das unidades gestoras
@@ -46,6 +47,24 @@ join_licitacoes_codigo_unidade_gestora <- function(df_licitacoes, df_codigo_unid
   df_licitacoes %<>% dplyr::left_join(df_codigo_unidade_gestora) %>%
     dplyr::select(cd_u_gestora, cd_municipio, dplyr::everything())
 }
+
+
+#' @title Realiza o join dos contratos com os fornecedores
+#' @param df_contratos dataframe com os contratos
+#' @param df_fornecedores dataframe com os fornecedores
+#' @return Dataframe contendo informações dos contratos com os nomes dos fornecedores
+#' @rdname join_contratos_fornecedores
+#' @examples
+#' join_contratos_fornecedores_dt <- join_contratos_fornecedores(
+#'          df_contratos, df_fornecedores)
+#'
+join_contratos_fornecedores <- function(df_contratos, df_fornecedores) {
+  df_fornecedores %<>% dplyr::select(nu_cpfcnpj, no_fornecedor)
+
+  df_contratos %<>% dplyr::left_join(df_fornecedores) %>%
+    dplyr::select(nu_cpfcnpj, dplyr::everything())
+}
+
 
 #' @title Realiza o join das licitações com os tipos de modalidade de licitações
 #' @param df_licitacoes dataframe com as licitações

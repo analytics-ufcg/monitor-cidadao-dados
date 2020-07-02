@@ -152,3 +152,12 @@ translate_convenios <- function(convenios_raw) {
 translate_codigo_municipio <- function(codigo_municipio_raw) {
   codigo_municipio_raw %<>% janitor::clean_names()
 }
+
+#' @param fornecedores_raw Dados brutos dos fornecedores
+#' @return Dataframe contendo informações sobre os fornecedores
+#' @rdname translate_fornecedores
+#' @examples
+#' fornecedores_dt <- translate_fornecedores(translate_fornecedores_raw)
+translate_fornecedores <- function(fornecedores_raw) {
+  fornecedores_raw %<>% janitor::clean_names()
+}
