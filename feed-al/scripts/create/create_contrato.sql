@@ -21,6 +21,8 @@ CREATE TABLE IF NOT EXISTS "contrato" (
     "foto" VARCHAR(150),
     "planilha" VARCHAR(150),
     "ordem_servico" VARCHAR(150),
+    "de_ugestora" VARCHAR(100),
+    "no_fornecedor" VARCHAR(100),
     PRIMARY KEY("id_contrato"),
     CONSTRAINT contrato_key UNIQUE (cd_u_gestora, dt_ano, nu_licitacao, tp_licitacao, nu_contrato),
     FOREIGN KEY("cd_municipio") REFERENCES municipio("cd_municipio") ON DELETE CASCADE ON UPDATE CASCADE,

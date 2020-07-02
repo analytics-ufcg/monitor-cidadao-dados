@@ -2,7 +2,7 @@
 % Please edit documentation in R/sagres.R
 \name{process_licitacao}
 \alias{process_licitacao}
-\title{Processa datagrame de licitações}
+\title{Processa dataframe de licitações}
 \usage{
 process_licitacao(licitacoes_df)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/sagres.R
 \name{process_contrato}
 \alias{process_contrato}
-\title{Processa datagrame de contratos}
+\title{Processa dataframe de contratos}
 \usage{
 process_contrato(contratos_df)
 }

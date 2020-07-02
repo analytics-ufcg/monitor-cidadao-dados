@@ -28,7 +28,7 @@ join_contratos_codigo_unidade_gestora <- function(df_contratos, df_codigo_unidad
   df_codigo_unidade_gestora %<>% dplyr::select(cd_u_gestora, de_ugestora)
 
   df_contratos %<>% dplyr::left_join(df_codigo_unidade_gestora) %>%
-    dplyr::select(cd_u_gestora, cd_municipio, dplyr::everything())
+    dplyr::select(id_contrato, id_licitacao, cd_municipio, dplyr::everything())
 }
 
 
@@ -45,7 +45,7 @@ join_licitacoes_codigo_unidade_gestora <- function(df_licitacoes, df_codigo_unid
   df_codigo_unidade_gestora %<>% dplyr::select(cd_u_gestora, de_ugestora)
 
   df_licitacoes %<>% dplyr::left_join(df_codigo_unidade_gestora) %>%
-    dplyr::select(cd_u_gestora, cd_municipio, dplyr::everything())
+    dplyr::select(id_licitacao, cd_municipio, dplyr::everything())
 }
 
 
@@ -59,10 +59,11 @@ join_licitacoes_codigo_unidade_gestora <- function(df_licitacoes, df_codigo_unid
 #'          df_contratos, df_fornecedores)
 #'
 join_contratos_fornecedores <- function(df_contratos, df_fornecedores) {
-  df_fornecedores %<>% dplyr::select(nu_cpfcnpj, no_fornecedor)
+  df_fornecedores %<>% dplyr::select(nu_cpfcnpj, no_fornecedor) %>%
+    dplyr::distinct(nu_cpfcnpj, .keep_all=TRUE)
 
   df_contratos %<>% dplyr::left_join(df_fornecedores) %>%
-    dplyr::select(nu_cpfcnpj, dplyr::everything())
+    dplyr::select(id_contrato, dplyr::everything())
 }
 
 
@@ -79,5 +80,5 @@ join_licitacoes_tipo_modalidade_licitacao <- function(df_licitacoes, df_tipo_mod
   df_tipo_modalidade_licitacao %<>% dplyr::select(tp_licitacao, de_tipo_licitacao)
 
   df_licitacoes %<>% dplyr::left_join(df_tipo_modalidade_licitacao) %>%
-    dplyr::select(tp_licitacao, dplyr::everything())
+    dplyr::select(id_licitacao, dplyr::everything())
 }
