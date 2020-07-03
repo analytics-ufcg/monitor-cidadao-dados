@@ -280,6 +280,23 @@ read_codigo_municipio <- function() {
                                            ))
 }
 
+
+#' @title Lê dataframe contendo informações dos participantes de licitações
+#' @return Dataframe contendo informações sobre os participantes
+#' @rdname read_participantes
+#' @examples
+#' participantes_dt <- read_participantes()
+read_participantes <- function() {
+  pagamentos_df <- readr::read_csv(here::here("../fetcher/data/participantes.csv"),
+                                   col_types = list(
+                                     .default = readr::col_character(),
+                                     cd_UGestora = readr::col_integer(),
+                                     dt_Ano = readr::col_integer(),
+                                     tp_Licitacao = readr::col_integer()
+                                   ))
+}
+
+
 #' @title Lê dataframe contendo informações dos fornecedores
 #' @return Dataframe contendo informações sobre os fornecedores
 #' @rdname read_fornecedores

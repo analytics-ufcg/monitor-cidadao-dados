@@ -25,6 +25,7 @@ aditivos_df <- get_aditivos()
 pagamentos_df <- get_pagamentos()
 convenios_df <- get_convenios()
 fornecedores_df <- get_fornecedores()
+participantes_df <- get_participantes()
 
 
 #Transforma tabelas
@@ -38,6 +39,11 @@ contratos_transformados <- contratos_df %>% mcTransformador::process_contrato() 
   join_contratos_fornecedores(fornecedores_df)
 
 municipios_transformados <- municipios_df %>% mcTransformador::process_municipio()
+
+participantes_transformados <- participantes_df %>% mcTransformador::process_participante() %>%
+  join_participantes_licitacao(licitacoes_transformadas) %>%
+  join_participantes_fornecedores (fornecedores_df)
+
 
 #Salva tabelas localmente
 readr::write_csv(licitacoes_transformadas, here::here("data/licitacoes.csv"))
@@ -56,3 +62,4 @@ readr::write_csv(pagamentos_df, here::here("data/pagamentos.csv"))
 readr::write_csv(convenios_df, here::here("data/convenios.csv"))
 readr::write_csv(municipios_transformados, here::here("data/municipios.csv"))
 readr::write_csv(fornecedores_df, here::here("data/fornecedores.csv"))
+readr::write_csv(participantes_transformados, here::here("data/participantes.csv"))

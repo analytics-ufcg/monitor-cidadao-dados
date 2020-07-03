@@ -153,6 +153,15 @@ translate_codigo_municipio <- function(codigo_municipio_raw) {
   codigo_municipio_raw %<>% janitor::clean_names()
 }
 
+#' @param participantes_raw Dados brutos dos participantes
+#' @return Dataframe contendo informações sobre os participantes
+#' @rdname translate_participantes
+#' @examples
+#' participantes_dt <- translate_participantes(participantes_raw)
+translate_participantes <- function(participantes_raw) {
+  participantes_raw %<>% janitor::clean_names()
+}
+
 #' @param fornecedores_raw Dados brutos dos fornecedores
 #' @return Dataframe contendo informações sobre os fornecedores
 #' @rdname translate_fornecedores
