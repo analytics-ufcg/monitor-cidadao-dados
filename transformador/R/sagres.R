@@ -28,6 +28,19 @@ generate_contrato_id <- function(contratos_df) {
     dplyr::select(id_contrato, dplyr::everything())
 }
 
+#' @title Gera um identificador único para cada participante
+#' @param participantes_df Dataframe contendo informações sobre os participantes
+#' @return Dataframe contendo informações sobre os participantes e seus ids
+#' @rdname generate_participante_id
+#' @examples
+#' participantes_dt <- generate_licitacao_id(licitacoes_df)
+generate_participante_id <- function(participantes_df) {
+  participantes_df %<>% .generate_hash_id(c("nu_licitacao", "dt_ano",
+                                            "cd_u_gestora", "tp_licitacao", "nu_cpfcnpj"),
+                                       "id_participante") %>%
+    dplyr::select(id_participante, dplyr::everything())
+}
+
 #' @title Processa dataframe de contratos
 #' @description Manipula tabela pra forma que será utilizada no banco
 #' @param contratos_df Dataframe contendo informações dos contratos
@@ -45,6 +58,14 @@ process_contrato <- function(contratos_df) {
 process_licitacao <- function(licitacoes_df) {
   licitacoes_df %<>% .extract_cd_municipio("cd_u_gestora") %>%
     generate_licitacao_id()
+}
+
+#' @title Processa dataframe dos participantes
+#' @description Manipula tabela que será utilizada no banco
+#' @param participantes_df Dataframe contendo informações dos participantes
+#' @return Dataframe contendo informações os participantes processados
+process_participante <- function(participantes_df) {
+  participantes_df %<>% generate_participante_id()
 }
 
 #' @title Processa dataframe de municipios

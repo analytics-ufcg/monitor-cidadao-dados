@@ -82,3 +82,38 @@ join_licitacoes_tipo_modalidade_licitacao <- function(df_licitacoes, df_tipo_mod
   df_licitacoes %<>% dplyr::left_join(df_tipo_modalidade_licitacao) %>%
     dplyr::select(id_licitacao, dplyr::everything())
 }
+
+#' @title Realiza o join dos participantes com o dataframe das licitações
+#' @param df_participantes dataframe com os participantes
+#' @param df_licitacoes dataframe com as licitações
+#' @return Dataframe contendo informações dos participantes com os ids das licitações
+#' @rdname join_participantes_licitacao
+#' @examples
+#' join_participantes_licitacao_dt <- join_participante_licitacao(df_participantes, df_licitacoes)
+#'
+join_participantes_licitacao <- function(df_participantes, df_licitacoes) {
+  df_licitacoes %<>% dplyr::select(cd_u_gestora, dt_ano, nu_licitacao,
+                                   tp_licitacao, id_licitacao)
+
+  df_participantes %<>% dplyr::left_join(df_licitacoes) %>%
+    dplyr::select(id_participante, id_licitacao, dplyr::everything())
+}
+
+
+#' @title Realiza o join dos participantes com os fornecedores
+#' @param df_participantes dataframe com os participantes
+#' @param df_fornecedores dataframe com os fornecedores
+#' @return Dataframe contendo informações dos participantes com os nomes dos fornecedores
+#' @rdname join_participantes_fornecedores
+#' @examples
+#' join_participantes_fornecedores_dt <- join_participantes_fornecedores(
+#'          df_participantes, df_fornecedores)
+#'
+join_participantes_fornecedores <- function(df_participantes, df_fornecedores) {
+  df_fornecedores %<>% dplyr::select(nu_cpfcnpj, no_fornecedor) %>%
+    dplyr::distinct(nu_cpfcnpj, .keep_all=TRUE)
+
+  df_participantes %<>% dplyr::left_join(df_fornecedores) %>%
+    dplyr::select(id_participante, dplyr::everything())
+}
+
