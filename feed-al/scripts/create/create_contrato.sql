@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS "contrato" (
     "foto" VARCHAR(150),
     "planilha" VARCHAR(150),
     "ordem_servico" VARCHAR(150),
+    "language" VARCHAR(10),
     "de_ugestora" VARCHAR(100),
     "no_fornecedor" VARCHAR(100),
     PRIMARY KEY("id_contrato"),

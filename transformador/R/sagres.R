@@ -48,7 +48,8 @@ generate_participante_id <- function(participantes_df) {
 process_contrato <- function(contratos_df) {
   contratos_df %<>% .extract_cd_municipio("cd_u_gestora") %>%
     dplyr::filter(cd_municipio != "612") %>%  #registro preenchido errado
-    generate_contrato_id()
+    generate_contrato_id() %>%
+    dplyr::mutate(language = 'portuguese')
 }
 
 #' @title Processa dataframe de licitações
