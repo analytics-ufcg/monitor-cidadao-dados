@@ -2,7 +2,7 @@
 % Please edit documentation in R/sagres.R
 \name{process_municipio}
 \alias{process_municipio}
-\title{Processa datagrame de municipios}
+\title{Processa dataframe de municipios}
 \usage{
 process_municipio(municipios_df)
 }

@@ -49,7 +49,8 @@ translate_regime_execucao <- function(regime_execucao_raw) {
 #' @examples
 #' codigo_unidade_gestora_dt <- translate_codigo_unidade_gestora(codigo_unidade_gestora_raw)
 translate_codigo_unidade_gestora <- function(codigo_unidade_gestora_raw) {
-  codigo_unidade_gestora_raw %<>% janitor::clean_names()
+  codigo_unidade_gestora_raw %<>% janitor::clean_names() %>%
+  dplyr::rename(cd_u_gestora = cd_ugestora)
 }
 
 #' @title Traduz dado recebido para dataset
@@ -150,4 +151,22 @@ translate_convenios <- function(convenios_raw) {
 #' codigo_municipio_dt <- translate_codigo_municipio(codigo_municipio_raw)
 translate_codigo_municipio <- function(codigo_municipio_raw) {
   codigo_municipio_raw %<>% janitor::clean_names()
+}
+
+#' @param participantes_raw Dados brutos dos participantes
+#' @return Dataframe contendo informações sobre os participantes
+#' @rdname translate_participantes
+#' @examples
+#' participantes_dt <- translate_participantes(participantes_raw)
+translate_participantes <- function(participantes_raw) {
+  participantes_raw %<>% janitor::clean_names()
+}
+
+#' @param fornecedores_raw Dados brutos dos fornecedores
+#' @return Dataframe contendo informações sobre os fornecedores
+#' @rdname translate_fornecedores
+#' @examples
+#' fornecedores_dt <- translate_fornecedores(translate_fornecedores_raw)
+translate_fornecedores <- function(fornecedores_raw) {
+  fornecedores_raw %<>% janitor::clean_names()
 }
