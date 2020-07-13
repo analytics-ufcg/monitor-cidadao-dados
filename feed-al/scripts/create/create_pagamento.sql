@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS pagamento;
 
 CREATE TABLE IF NOT EXISTS "pagamento" (
+  "id_pagamento" VARCHAR(80),
   "cd_u_gestora" VARCHAR(6),
   "dt_ano" VARCHAR(4),
   "cd_unid_orcamentaria" VARCHAR(5),
@@ -20,6 +21,7 @@ CREATE TABLE IF NOT EXISTS "pagamento" (
   "cd_banco" VARCHAR(3),
   "cd_agencia" VARCHAR(5),
   "tp_conta_bancaria" VARCHAR(1),
-  PRIMARY KEY("nu_parcela"),
-  CONSTRAINT pagamento_key UNIQUE (cd_u_gestora, dt_ano, cd_unid_orcamentaria, nu_empenho, tp_lancamento)
+  PRIMARY KEY("id_pagamento"),
+  CONSTRAINT pagamento_key UNIQUE (cd_u_gestora, dt_ano, cd_unid_orcamentaria,
+     nu_empenho, nu_parcela, tp_lancamento)
 );
