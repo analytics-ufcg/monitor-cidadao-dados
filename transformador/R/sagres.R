@@ -41,6 +41,19 @@ generate_participante_id <- function(participantes_df) {
     dplyr::select(id_participante, dplyr::everything())
 }
 
+#' @title Gera um identificador único para cada proposta
+#' @param propostas_df Dataframe contendo informações sobre as propostas
+#' @return Dataframe contendo informações sobre as propostas e seus ids
+#' @rdname generate_proposta_id
+#' @examples
+#' propostas_dt <- generate_proposta_id(propostas_df)
+generate_proposta_id <- function(propostas_df) {
+  propostas_df %<>% .generate_hash_id(c("cd_u_gestora", "dt_ano", "nu_licitacao",
+                                        "tp_licitacao", "nu_cpfcnpj"),
+                                      "id_proposta") %>%
+    dplyr::select(id_proposta, dplyr::everything())
+}
+
 #' @title Processa dataframe de contratos
 #' @description Manipula tabela pra forma que será utilizada no banco
 #' @param contratos_df Dataframe contendo informações dos contratos
@@ -75,4 +88,13 @@ process_participante <- function(participantes_df) {
 #' @return Dataframe contendo informações dos municipios processados
 process_municipio <- function(municipios_df) {
   municipios_df %<>% dplyr::select(cd_municipio, dplyr::everything())
+}
+
+#' @title Processa dataframe de propostas
+#' @description Manipula tabela pra forma que será utilizada no banco
+#' @param propostas_df Dataframe contendo informações das propostas
+#' @return Dataframe contendo informações das propostas processadss
+process_proposta <- function(propostas_df) {
+  propostas_df %<>% generate_proposta_id() %>%
+  dplyr::select(-cd_item, -cd_sub_grupo_item, -nu_contrato, -cd_u_gestora_item)
 }
