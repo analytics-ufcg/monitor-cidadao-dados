@@ -220,7 +220,7 @@ fetch_aditivos <- function(sagres_con) {
 fetch_pagamentos <- function(sagres_con) {
   pagamentos <- tibble::tibble()
   tryCatch({
-    pagamentos <- DBI::dbGetQuery(sagres_con, "SELECT TOP 10 * FROM Pagamentos;") %>%
+    pagamentos <- DBI::dbGetQuery(sagres_con, "SELECT TOP 1000 * FROM Pagamentos;") %>%
       assert_dataframe_completo(COLNAMES_PAGAMENTOS)
   },
   error = function(e) print(paste0("Erro ao buscar pagamentos no Banco Sagres (SQLServer): ", e))

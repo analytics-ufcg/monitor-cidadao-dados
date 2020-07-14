@@ -3,3 +3,5 @@
 \copy contrato FROM '/data/contratos.csv' WITH NULL AS 'NA' DELIMITER ',' CSV HEADER;
 \copy participante FROM '/data/participantes.csv' WITH NULL AS 'NA' DELIMITER ',' CSV HEADER;
 \copy proposta FROM '/data/propostas.csv' WITH NULL AS 'NA' DELIMITER ',' CSV HEADER;
+\copy pagamento FROM '/data/pagamentos.csv' WITH NULL AS 'NA' DELIMITER ',' CSV HEADER;
+

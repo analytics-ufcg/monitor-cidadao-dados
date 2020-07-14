@@ -36,6 +36,8 @@ create <- function() {
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_contrato.sql"))
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_participante.sql"))
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_proposta.sql"))
+  system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_pagamento.sql"))	
+
 }
 
 

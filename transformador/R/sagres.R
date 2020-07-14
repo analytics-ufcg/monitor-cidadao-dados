@@ -54,6 +54,19 @@ generate_proposta_id <- function(propostas_df) {
     dplyr::select(id_proposta, dplyr::everything())
 }
 
+#' @title Gera um identificador único para cada pagamento
+#' @param pagamentos_df Dataframe contendo informações sobre os pagamentos
+#' @return Dataframe contendo informações sobre os pagamentos e seus ids
+#' @rdname generate_pagamento_id
+#' @examples
+#' pagamentos_dt <- generate_pagamento_id(pagamento_df)
+generate_pagamento_id <- function(pagamentos_df) {
+  pagamentos_df %<>% .generate_hash_id(c("cd_u_gestora", "dt_ano", "cd_unid_orcamentaria",
+                                         "nu_empenho", "nu_parcela", "tp_lancamento"),
+                                         "id_pagamento") %>%
+    dplyr::select(id_pagamento, dplyr::everything())
+}
+
 #' @title Processa dataframe de contratos
 #' @description Manipula tabela pra forma que será utilizada no banco
 #' @param contratos_df Dataframe contendo informações dos contratos
@@ -96,4 +109,12 @@ process_municipio <- function(municipios_df) {
 #' @return Dataframe contendo informações das propostas processadss
 process_proposta <- function(propostas_df) {
   propostas_df %<>% generate_proposta_id()
+}
+
+#' @title Processa dataframe dos pagamentos
+#' @description Manipula tabela que será utilizada no banco
+#' @param pagamentos_df Dataframe contendo informações dos pagamentos
+#' @return Dataframe contendo informações os pagamentos processados
+process_pagamento <- function(pagamentos_df) {
+  pagamentos_df %<>% generate_pagamento_id()
 }
