@@ -296,3 +296,19 @@ fetch_fornecedores <- function(sagres_con) {
 
   return(fornecedores)
 }
+
+#' @title Busca os Estornos de Pagamentos realizados no Banco do Sagres SQLServer
+#' @param sagres_con Conexão com o Banco de Dados
+#' @return Dataframe contendo informações sobre os estornos de pagamentos
+#' @rdname fetch_estorno_pagamento
+#' @examples
+fetch_estorno_pagamento <- function(sagres_con) {
+  estorno_pagamento <- tibble::tibble()
+  tryCatch({
+    estorno_pagamento <- DBI::dbGetQuery(sagres_con, "SELECT * FROM EstornoPagamento;") 
+  },
+  error = function(e) print(paste0("Erro ao buscar estorno de pagamento no Banco Sagres (SQLServer): ", e))
+  )
+
+  return(estorno_pagamento)
+}
