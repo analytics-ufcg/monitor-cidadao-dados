@@ -35,7 +35,9 @@ create <- function() {
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_licitacao.sql"))
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_contrato.sql"))
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_participante.sql"))
+  system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_proposta.sql"))
 }
+
 
 #' @title Importa dados para as tabelas do Banco de dados
 import <- function() {

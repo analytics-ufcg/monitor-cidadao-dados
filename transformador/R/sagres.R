@@ -48,7 +48,7 @@ generate_participante_id <- function(participantes_df) {
 #' @examples
 #' propostas_dt <- generate_proposta_id(propostas_df)
 generate_proposta_id <- function(propostas_df) {
-  propostas_df %<>% .generate_hash_id(c("cd_u_gestora", "dt_ano", "nu_licitacao",
+  propostas_df %<>% .generate_hash_id(c("cd_u_gestora", "nu_licitacao",
                                         "tp_licitacao", "nu_cpfcnpj"),
                                       "id_proposta") %>%
     dplyr::select(id_proposta, dplyr::everything())
@@ -95,6 +95,5 @@ process_municipio <- function(municipios_df) {
 #' @param propostas_df Dataframe contendo informações das propostas
 #' @return Dataframe contendo informações das propostas processadss
 process_proposta <- function(propostas_df) {
-  propostas_df %<>% generate_proposta_id() %>%
-  dplyr::select(-cd_item, -cd_sub_grupo_item, -nu_contrato, -cd_u_gestora_item)
+  propostas_df %<>% generate_proposta_id()
 }

@@ -46,7 +46,8 @@ participantes_transformados <- participantes_df %>% mcTransformador::process_par
   join_participantes_fornecedores (fornecedores_df)
 
 propostas_transformadas <- propostas_df %>% mcTransformador::process_proposta() %>%
-  join_propostas_licitacao(licitacoes_transformadas) 
+  join_propostas_licitacao(licitacoes_transformadas)  %>%
+  join_propostas_participantes(participantes_transformados)
 
 #Salva tabelas localmente
 readr::write_csv(licitacoes_transformadas, here::here("data/licitacoes.csv"))

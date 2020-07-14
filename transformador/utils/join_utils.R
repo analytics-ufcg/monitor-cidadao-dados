@@ -118,7 +118,7 @@ join_participantes_fornecedores <- function(df_participantes, df_fornecedores) {
 }
 
 #' @title Realiza o join das propostas com o dataframe das licitações
-#' @param df_propostas dataframe com os contratos
+#' @param df_propostas dataframe com as propostas
 #' @param df_licitacoes dataframe com as licitações
 #' @return Dataframe contendo informações das propostas com os ids das licitações
 #' @rdname join_propostas_licitacao
@@ -131,4 +131,21 @@ join_propostas_licitacao <- function(df_propostas, df_licitacoes) {
 
   df_propostas %<>% dplyr::left_join(df_licitacoes) %>%
     dplyr::select(id_proposta, id_licitacao, dplyr::everything())
+}
+
+#' @title Realiza o join das propostas com o dataframe dos participantes
+#' @param df_propostas dataframe com as propostas
+#' @param df_licitacoes dataframe com os participantes
+#' @return Dataframe contendo informações das propostas com os ids dos participantes
+#' @rdname join_propostas_participantes
+#' @examples
+#' join_propostas_participantes_dt <- join_propostas_licitacao(df_propostas, df_licitacoes)
+#'
+join_propostas_participantes <- function(df_propostas, df_participantes) {
+  df_participantes %<>% dplyr::select(nu_licitacao, dt_ano,
+                                      cd_u_gestora, tp_licitacao, nu_cpfcnpj,
+                                      id_participante)
+
+  df_propostas %<>% dplyr::left_join(df_participantes) %>%
+    dplyr::select(id_proposta, id_licitacao, id_participante, dplyr::everything())
 }
