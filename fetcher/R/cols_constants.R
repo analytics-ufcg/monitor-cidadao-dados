@@ -66,9 +66,9 @@ COLNAMES_EMPENHOS <- c("cd_UGestora"="character", "dt_Ano"="integer", "cd_UnidOr
 )
 
 COLNAMES_ESTORNO_PAGAMENTO <- c("cd_UGestora"="character", "dt_Ano"="integer", "cd_UnidOrcamentaria"="character",
-                                  "nu_EmpenhoEstorno"="character", "nu_ParcelaEstorno"="character",
-                                  "tp_Lancamento"="integer","dt_Estorno"="character","de_MotivoEstorno"="character",
-                                  "st_DespesaLiquida"="numeric", "vl_Estorno"="numeric","dt_MesAno"="character"
+                                "nu_EmpenhoEstorno"="character", "nu_ParcelaEstorno"="character",
+                                "tp_Lancamento"="integer","dt_Estorno"="character","de_MotivoEstorno"="character",
+                                "st_DespLiquidada"="numeric", "vl_Estorno"="numeric","dt_MesAno"="character"
 )
 
 COLNAMES_FORNECEDORES <-c("cd_UGestora"="integer","dt_Ano"="integer",

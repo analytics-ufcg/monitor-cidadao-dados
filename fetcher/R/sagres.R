@@ -305,7 +305,8 @@ fetch_fornecedores <- function(sagres_con) {
 fetch_estorno_pagamento <- function(sagres_con) {
   estorno_pagamento <- tibble::tibble()
   tryCatch({
-    estorno_pagamento <- DBI::dbGetQuery(sagres_con, "SELECT * FROM EstornoPagamento;") 
+    estorno_pagamento <- DBI::dbGetQuery(sagres_con, "SELECT * FROM EstornoPagamento;") %>%
+       assert_dataframe_completo(COLNAMES_ESTORNO_PAGAMENTO)
   },
   error = function(e) print(paste0("Erro ao buscar estorno de pagamento no Banco Sagres (SQLServer): ", e))
   )
