@@ -82,7 +82,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER:-user}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-secret}
     volumes:
-      - ./tipologias/data:/app/tipologias/data
+      - ./tipologias:/app/tipologias
     ports:
       - 9090:9090
     networks:

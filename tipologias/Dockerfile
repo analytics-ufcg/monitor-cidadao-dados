@@ -1,6 +1,6 @@
 FROM rocker/tidyverse:3.6.1
 
-WORKDIR /app
+WORKDIR /app/tipologias
 
 ## Cria arquivo para indicar raiz do repositório (Usado pelo pacote here)
 RUN touch .here

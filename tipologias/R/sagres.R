@@ -23,17 +23,17 @@
 carrega_licitacoes <- function(al_db_con, ano_inicial = 2010, ano_final = 2019) {
   licitacoes <- tibble::tibble()
   
-  template <- ('SELECT cd_UGestora, nu_Licitacao, tp_Licitacao, dt_Ano, dt_Homologacao, vl_Licitacao
+  template <- ('SELECT cd_u_gestora, nu_licitacao, tp_licitacao, dt_ano, dt_homologacao, vl_licitacao
                 FROM licitacao
-                WHERE dt_Ano BETWEEN %d and %d')
+                WHERE dt_ano BETWEEN %d and %d')
   
   query <- template %>% 
     sprintf(ano_inicial, ano_final) %>% 
     dplyr::sql()
-  
+  print("oi")
   tryCatch({
     # licitacoes <- DBI::dbGetQuery(al_db_con, "SELECT * FROM licitacao;") 
-    licitacoes <- tbl(al_db_con, query) %>% collect(n = Inf)
+    licitacoes <- dplyr::tbl(al_db_con, query) %>% dplyr::collect(n = Inf)
   },
   error = function(e) print(paste0("Erro ao buscar licitações no Banco AL_BD (Postgres): ", e))
   )
