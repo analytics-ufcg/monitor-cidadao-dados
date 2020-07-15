@@ -16,6 +16,9 @@ tryCatch({al_db_con <- DBI::dbConnect(RPostgres::Postgres(),
 }, error = function(e) print(paste0("Erro ao tentar se conectar ao Banco ALDB (Postgres): ", e)))
 
 
-licitacoes <- fetch_licitacoes(al_db_con)
+licitacoes <- carrega_licitacoes(al_db_con)
 readr::write_csv(licitacoes, here::here("./data/licitacoes.csv"))
 str(licitacoes)
+
+
+DBI::dbDisconnect(al_db_con)
