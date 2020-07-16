@@ -170,3 +170,13 @@ translate_participantes <- function(participantes_raw) {
 translate_fornecedores <- function(fornecedores_raw) {
   fornecedores_raw %<>% janitor::clean_names()
 }
+
+#' @title Traduz dado recebido para dataset
+#' @param estorno_pagamento_raw Dados brutos dos estornos de pagamentos
+#' @return Dataframe contendo informações sobre os estornos de pagamentos
+#' @rdname translate_estorno_pagamento
+#' @examples
+#' estorno_pagamento_dt <- translate_estorno_pagamento(estorno_pagamento_raw)
+translate_estorno_pagamento <- function(estorno_pagamento_raw) {
+  estorno_pagamento_raw %<>% janitor::clean_names()
+}

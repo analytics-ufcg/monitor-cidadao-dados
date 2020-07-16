@@ -54,6 +54,19 @@ generate_pagamento_id <- function(pagamentos_df) {
     dplyr::select(id_pagamento, dplyr::everything())
 }
 
+#' @title Gera um identificador único para cada estorno de pagamento
+#' @param estorno_pagamento_df Dataframe contendo informações sobre os estornos de pagamentos
+#' @return Dataframe contendo informações sobre os estornos de pagamentos e seus ids
+#' @rdname generate_estorno_pagamento_id
+#' @examples
+#' estorno_pagamento_dt <- generate_estorno_pagamento_id(estorno_pagamento_df)
+generate_estorno_pagamento_id <- function(estorno_pagamento_df) {
+  estorno_pagamento_df %<>% .generate_hash_id(c("cd_u_gestora", "dt_ano", "cd_unid_orcamentaria",
+                                         "nu_empenho_estorno", "nu_parcela_estorno", "tp_lancamento"),
+                                         "id_estorno_pagamento") %>%
+    dplyr::select(id_estorno_pagamento, dplyr::everything())
+}
+
 #' @title Processa dataframe de contratos
 #' @description Manipula tabela pra forma que será utilizada no banco
 #' @param contratos_df Dataframe contendo informações dos contratos
@@ -93,7 +106,15 @@ process_municipio <- function(municipios_df) {
 #' @title Processa dataframe dos pagamentos
 #' @description Manipula tabela que será utilizada no banco
 #' @param pagamentos_df Dataframe contendo informações dos pagamentos
-#' @return Dataframe contendo informações os pagamentos processados
+#' @return Dataframe contendo informações dos pagamentos processados
 process_pagamento <- function(pagamentos_df) {
   pagamentos_df %<>% generate_pagamento_id()
+}
+
+#' @title Processa dataframe dos estornos de pagamentos
+#' @description Manipula tabela que será utilizada no banco
+#' @param estorno_pagamento_df Dataframe contendo informações dos estornos de pagamentos
+#' @return Dataframe contendo informações dos estornos de pagamentos processados
+process_estorno_pagamento <- function(estorno_pagamento_df) {
+  estorno_pagamento_df %<>% generate_estorno_pagamento_id()
 }

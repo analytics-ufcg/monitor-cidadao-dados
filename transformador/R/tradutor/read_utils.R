@@ -321,3 +321,19 @@ read_fornecedores <- function() {
                                              dt_MesAnoReferencia = readr::col_character()
                                            ))
 }
+
+
+#' @title Lê dataframe contendo informações dos estornos de pagamentos
+#' @return Dataframe contendo informações sobre estornos de pagamentos
+#' @rdname read_estorno_pagamento
+#' @examples
+#' estorno_pagamento_dt <- read_estorno_pagamento()
+read_estorno_pagamento <- function() {
+  estorno_pagamento_df <- readr::read_csv(here::here("../fetcher/data/estorno_pagamento.csv"),
+                                   col_types = list(
+                                     .default = readr::col_character(),
+                                     dt_Ano = readr::col_integer(),
+                                     tp_Lancamento = readr::col_integer(),
+                                     vl_Estorno = readr::col_number()
+                                   ))
+}

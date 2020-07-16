@@ -172,3 +172,13 @@ get_fornecedores <- function() {
   fornecedores_dt <- read_fornecedores() %>%
     translate_fornecedores()
 }
+
+#' @title Obtem dados do estorno de pagamento
+#' @return Dataframe contendo informações sobre o estorno de pagamento
+#' @rdname get_estorno_pagamento
+#' @examples
+#' estorno_pagamento_dt <- get_estorno_pagamento()
+get_estorno_pagamento <- function() {
+  estorno_pagamento_dt <- read_estorno_pagamento() %>%
+    translate_estorno_pagamento()
+}
