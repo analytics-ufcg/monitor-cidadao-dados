@@ -29,10 +29,10 @@ tipologias_contratos_gerais <- function(ano_inicial = 2014, ano_final = 2019) {
     
     tipologias_fornecimento <- carrega_info_fornecimento(ano_inicial, ano_final, cnpjs_datas_contratos) #Depende de empenhos
     
-    tipologias_licitacao <- carrega_info_licitacao(ano_inicial, ano_final, cnpjs_datas_contratos) #Focar refatoramento aqui
+    tipologias_licitacao <- carrega_info_licitacao(ano_inicial, ano_final, cnpjs_datas_contratos) #Já feito
     
-    tipologias_proposta <- carrega_info_proposta(ano_inicial, ano_final, cnpjs_datas_contratos)
     #REFATORAMENTO CHEGOU AQUI
+    tipologias_proposta <- carrega_info_proposta(ano_inicial, ano_final, cnpjs_datas_contratos)
     
     tipologias_cadastrais_empresas <- gera_tipologias_empresa(cnpjs_datas_contratos,
                                                               rfb_info_empresas_contratos_path = here::here("data/rfb_info_empresas_geral.csv"),

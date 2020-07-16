@@ -3,6 +3,7 @@ library(magrittr)
 source(here::here("R/setup/constants.R"))
 source(here::here("R/DAO.R"))
 source(here::here("R/process_contratos.R"))
+source(here::here("R/tipologias.R"))
 
 .HELP <- "Rscript gera_tipologias.R"
 
@@ -27,11 +28,12 @@ contratos_by_cnpj <- contratos_processados %>% count_contratos_by_cnpj() %>%
   dplyr::mutate(nu_cpfcnpj = gsub ("\\D", "", nu_cpfcnpj))
 licitacoes_vencedoras <- contratos_processados %>% get_vencedores_by_contratos()
 
-#Carrega dados
+#Carrega dados dependentes
 participantes <- carrega_participantes(al_db_con, contratos_by_cnpj$nu_cpfcnpj)
 
-readr::write_csv(participantes,"data/participantes.csv")
 
+#Gera tipologias
+tipologias_licitacao <- gera_tipologia_licitacao(licitacoes, contratos_processados, contratos_by_cnpj, licitacoes_vencedoras, participantes)
 
 
 
