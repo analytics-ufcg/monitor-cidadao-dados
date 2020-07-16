@@ -14,7 +14,7 @@ Rscript DAO.R -f <funct>
 #' @title Obtém argumentos passados por linha de comando
 get_args <- function() {
   args = commandArgs(trailingOnly=TRUE)
-  
+
   option_list = list(
     optparse::make_option(c("-f", "--funct"),
                           type="character",
@@ -22,9 +22,9 @@ get_args <- function() {
                           help=.FUNCT_HELP,
                           metavar="character")
   );
-  
+
   opt_parser <- optparse::OptionParser(option_list = option_list, usage = .HELP)
-  
+
   opt <- optparse::parse_args(opt_parser)
   return(opt);
 }
@@ -35,9 +35,9 @@ create <- function() {
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_licitacao.sql"))
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_contrato.sql"))
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_participante.sql"))
-  system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_proposta.sql"))
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_pagamento.sql"))	
-
+  system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_proposta.sql"))
+  system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_estorno_pagamento.sql"))	
 }
 
 
@@ -80,7 +80,3 @@ if (funct == "create") {
 } else {
   shell()
 }
-
-
-
-
