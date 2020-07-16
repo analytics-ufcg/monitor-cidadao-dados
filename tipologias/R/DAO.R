@@ -1,21 +1,3 @@
-#' #' @title Busca licitações no Banco AL_DB do Postgres
-#' #' @param al_db_con Conexão com o Banco de Dados
-#' #' @return Dataframe contendo informações sobre as licitações
-#' #' @rdname fetch_licitacoes
-#' #' @examples
-#' #' licitacoes <- fetch_licitacoes(al_db_con)
-#' fetch_licitacoes <- function(al_db_con) {
-#'   licitacoes <- tibble::tibble()
-#'   tryCatch({
-#'     licitacoes <- DBI::dbGetQuery(al_db_con, "SELECT * FROM licitacao;") 
-#'   },
-#'   error = function(e) print(paste0("Erro ao buscar licitações no Banco AL_BD (Postgres): ", e))
-#'   )
-#' 
-#'   return(licitacoes)
-#' }
-
-
 #' @description Carrega a informações de licitações associadas a CNPJ's participantes da licitação
 #' @param ano_inicial Ano inicial do intervalo de tempo (limite inferior). Default é 2011
 #' @param ano_final Ano final do intervalo de tempo (limite superior). Default é 2019
@@ -40,10 +22,6 @@ carrega_licitacoes <- function(al_db_con, ano_inicial = 2010, ano_final = 2019) 
   
   return(licitacoes)
 }
-
-
-
-
 
 
 
@@ -285,21 +263,32 @@ fetch_codigo_municipio <- function(al_db_con) {
   return(codigo_munipio)
 }
 
-#' @title Busca participantes de licitações no banco SAGRES 2019
-#' @param al_db_con Conexão com o Banco de Dados
-#' @return Dataframe contendo informações sobre participantes
-#' @rdname fetch_participantes
-#' @examples
-fetch_participantes <- function(al_db_con) {
-  participantes <- tibble::tibble()
-  tryCatch({
-    participantes <- DBI::dbGetQuery(al_db_con, "SELECT * FROM Participantes;")
-  },
-  error = function(e) print(paste0("Erro ao buscar Participantes no Banco AL_BD (Postgres): ", e))
-  )
 
-  return(participantes)
+carrega_participantes <- function(al_db_con, list_cnpjs) {
+  participacoes <- tibble::tibble()
+  
+  template <- ('
+                SELECT * 
+                FROM participante
+                WHERE nu_cpfcnpj IN (%s)
+                 ')
+  
+  query <- template %>% 
+    sprintf(paste(list_cnpjs, collapse = ", ")) %>% 
+    dplyr::sql()
+  
+  print(query)
+  tryCatch({
+    participacoes <- dplyr::tbl(al_db_con, query) %>% dplyr::collect(n = Inf)
+  },
+  error = function(e) print(paste0("Erro ao buscar participantes no Banco AL_BD (Postgres): ", e))
+  )
+  
+  return(licitacoes)
 }
+
+
+
 
 #' @title Busca fornecedores cadastrados no banco SAGRES 2019
 #' @param al_db_con Conexão com o Banco de Dados

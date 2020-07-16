@@ -94,6 +94,7 @@ carrega_licitacoes_vencedores <- function(ano_inicial = 2011, ano_final = 2016) 
     
     DBI::dbDisconnect(sagres)
     
+    
     licitacoes_vencedores <- empenhos %>% 
         group_by(cd_UGestora, nu_Licitacao, tp_Licitacao, cd_Credor) %>% 
         summarise(min_dt_Empenho = min(dt_Empenho)) %>% 

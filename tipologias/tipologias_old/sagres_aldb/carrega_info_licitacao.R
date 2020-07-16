@@ -22,7 +22,7 @@ carrega_info_licitacao <- function(ano_inicial = 2011, ano_final = 2016, cnpjs_d
     
     participacoes <- carrega_participantes(lista_cnpjs) #TODO
     
-    licitacoes_vencedores <- carrega_licitacoes_vencedores(ano_inicial_sagres, ano_final) #TODO usar contratos para encontrar vencedores
+    licitacoes_vencedores <- carrega_licitacoes_vencedores(ano_inicial_sagres, ano_final) #Já feito
     
     ## Cruza as propostas para licitações (a partir da lista de cnpjs) com todas as licitações do sagres usando a chave de licitação
     licitacoes_fornecedor <- participacoes %>% 

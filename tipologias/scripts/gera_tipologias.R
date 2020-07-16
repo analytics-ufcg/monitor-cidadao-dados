@@ -19,14 +19,18 @@ tryCatch({al_db_con <- DBI::dbConnect(RPostgres::Postgres(),
 #Carrega dados
 licitacoes <- carrega_licitacoes(al_db_con)
 contratos <- carrega_contratos(al_db_con) 
-  
+
+
 #Processa dados
 contratos_processados <- contratos %>% process_contratos()
 contratos_by_cnpj <- contratos_processados %>% count_contratos_by_cnpj()
+#licitacoes_vencedoras <- contratos_processados %>% gera_tipologia_licitacao()
 
-readr::write_csv(licitacoes, here::here("./data/licitacoes.csv"))
-readr::write_csv(contratos, here::here("./data/contratos.csv"))
-readr::write_csv(contratos_by_cnpj, here::here("./data/contratos_by_cnpj.csv"))
+#Carrega dados
+participantes <- carrega_participantes(al_db_con, contratos_by_cnpj)
+
+readr::write_csv(participantes,"data/participantes.csv")
+
 
 
 

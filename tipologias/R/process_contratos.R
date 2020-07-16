@@ -12,3 +12,15 @@ count_contratos_by_cnpj <- function(contratos_df) {
     dplyr::select(nu_cpfcnpj, data_inicio) %>% 
     dplyr::filter(nu_cpfcnpj != "")
 }
+
+get_vencedores_by_contratos <- function(contratos_df){
+  contratos_df %<>% 
+    dplyr::group_by(cd_u_gestora, nu_licitacao, tp_licitacao, nu_cpfcnpj) %>% 
+    dplyr::summarise(min_dt_contrato = min(dt_ano)) %>% 
+    dplyr::ungroup() %>% 
+    dplyr::mutate(venceu = 1)  
+}
+
+
+
+  
