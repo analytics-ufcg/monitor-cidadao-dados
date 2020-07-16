@@ -297,6 +297,26 @@ fetch_fornecedores <- function(sagres_con) {
   return(fornecedores)
 }
 
+
+#' @title Busca propostas cadastradas no banco SAGRES 2019
+#' @param sagres_con Conexão com o Banco de Dados
+#' @return Dataframe contendo informações sobre as propostas
+#' @rdname fetch_propostas
+#' @examples
+fetch_propostas <- function(sagres_con) {
+  propostas <- tibble::tibble()
+  tryCatch({
+    propostas <- DBI::dbGetQuery(sagres_con, "SELECT * FROM Propostas;") %>%
+      assert_dataframe_completo(COLNAMES_PROPOSTAS)
+  },
+  error = function(e) print(paste0("Erro ao buscar Propostas no Banco Sagres (SQLServer): ", e))
+  )
+
+  return(propostas)
+
+}
+
+
 #' @title Busca os Estornos de Pagamentos realizados no Banco do Sagres SQLServer
 #' @param sagres_con Conexão com o Banco de Dados
 #' @return Dataframe contendo informações sobre os estornos de pagamentos

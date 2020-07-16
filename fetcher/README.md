@@ -28,6 +28,7 @@ Abaixo está a listagem das tabelas adicionadas ([seguindo as convenções de no
 | Licitacao | x | x | x | x | licitacao |
 | Pagamentos | x | x | x |  | |
 | Participantes | x | x | x | x | participante |
+| Propostas | x | x | x | x | proposta |
 | RegimeExecucao | x | x | x |  | |
 | Tipo_Modalidade_Licitacao | x | x | x |  | |
 | Tipo_Objeto_Licitacao | x | x | x |  | |
