@@ -270,21 +270,21 @@ carrega_participantes <- function(al_db_con, list_cnpjs) {
   template <- ('
                 SELECT * 
                 FROM participante
-                WHERE nu_cpfcnpj IN (%s)
+                WHERE nu_cpfcnpj = ANY (\'{%s}\')
                  ')
   
   query <- template %>% 
     sprintf(paste(list_cnpjs, collapse = ", ")) %>% 
     dplyr::sql()
+  print (query)
   
-  print(query)
   tryCatch({
     participacoes <- dplyr::tbl(al_db_con, query) %>% dplyr::collect(n = Inf)
   },
   error = function(e) print(paste0("Erro ao buscar participantes no Banco AL_BD (Postgres): ", e))
   )
   
-  return(licitacoes)
+  return(participacoes)
 }
 
 

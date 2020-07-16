@@ -23,11 +23,12 @@ contratos <- carrega_contratos(al_db_con)
 
 #Processa dados
 contratos_processados <- contratos %>% process_contratos()
-contratos_by_cnpj <- contratos_processados %>% count_contratos_by_cnpj()
-#licitacoes_vencedoras <- contratos_processados %>% gera_tipologia_licitacao()
+contratos_by_cnpj <- contratos_processados %>% count_contratos_by_cnpj() %>% 
+  dplyr::mutate(nu_cpfcnpj = gsub ("\\D", "", nu_cpfcnpj))
+licitacoes_vencedoras <- contratos_processados %>% get_vencedores_by_contratos()
 
 #Carrega dados
-participantes <- carrega_participantes(al_db_con, contratos_by_cnpj)
+participantes <- carrega_participantes(al_db_con, contratos_by_cnpj$nu_cpfcnpj)
 
 readr::write_csv(participantes,"data/participantes.csv")
 
