@@ -172,3 +172,13 @@ get_fornecedores <- function() {
   fornecedores_dt <- read_fornecedores() %>%
     translate_fornecedores()
 }
+
+#' @title Obtem dados das propostas
+#' @return Dataframe contendo informações sobre as propostas
+#' @rdname get_propostas
+#' @examples
+#' propostas_dt <- get_propostas()
+get_propostas <- function() {
+  propostas_dt <- read_propostas() %>%
+    translate_propostas()
+}

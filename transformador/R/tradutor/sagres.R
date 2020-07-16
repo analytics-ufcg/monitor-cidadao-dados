@@ -170,3 +170,12 @@ translate_participantes <- function(participantes_raw) {
 translate_fornecedores <- function(fornecedores_raw) {
   fornecedores_raw %<>% janitor::clean_names()
 }
+
+#' @param propostas_raw Dados brutos das propostas
+#' @return Dataframe contendo informações sobre as propostas
+#' @rdname translate_propostas
+#' @examples
+#' propostas_dt <- translate_propostas(propostas_raw)
+translate_propostas <- function(propostas_raw) {
+  propostas_raw %<>% janitor::clean_names()
+}

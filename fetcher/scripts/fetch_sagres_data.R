@@ -60,6 +60,9 @@ readr::write_csv(pagamentos, here::here("./data/pagamentos.csv"))
 participantes<- fetch_participantes(sagres)
 readr::write_csv(participantes, here::here("./data/participantes.csv"))
 
+propostas<- fetch_propostas(sagres)
+readr::write_csv(propostas, here::here("./data/propostas.csv"))
+
 regime_execucao <- fetch_regime_execucao(sagres)
 readr::write_csv(regime_execucao, here::here("./data/regime_execucao.csv"))
 
