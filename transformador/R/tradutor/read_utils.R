@@ -321,3 +321,22 @@ read_fornecedores <- function() {
                                              dt_MesAnoReferencia = readr::col_character()
                                            ))
 }
+
+#' @title Lê dataframe contendo informações das propostas das licitações
+#' @return Dataframe contendo informações sobre as propostas
+#' @rdname read_propostas
+#' @examples
+#' propostas_dt <- read_propostas()
+read_propostas <- function() {
+  propostas_df <- readr::read_csv(here::here("../fetcher/data/propostas.csv"),
+                                   col_types = list(
+                                     .default = readr::col_character(),
+                                     cd_UGestora = readr::col_integer(),
+                                     dt_Ano = readr::col_integer(),
+                                     tp_Licitacao = readr::col_integer(),
+                                     cd_UGestoraItem = readr::col_integer(),
+                                     qt_Ofertada = readr::col_number(),
+                                     vl_Ofertado = readr::col_number(),
+                                     st_Proposta = readr::col_integer()
+                                   ))
+}

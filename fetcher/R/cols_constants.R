@@ -97,6 +97,14 @@ COLNAMES_PARTICIPANTES <- c("cd_UGestora"="integer","dt_Ano"="integer",
                         			"nu_CPFCNPJ"="character","dt_MesAno"="character"
 )
 
+
+COLNAMES_PROPOSTAS <- c("cd_UGestora"="integer", "dt_Ano"="integer", "nu_Licitacao"="character",
+                        "tp_Licitacao"="integer", "cd_Item"="character", "cd_SubGrupoItem"="character",
+                        "nu_CPFCNPJ"="character", "cd_UGestoraItem"="integer", "nu_Contrato"="character",
+                        "qt_Ofertada"="numeric", "vl_Ofertado"="numeric", "st_Proposta"="integer", 
+                        "dt_MesAno"="character"
+                        )
+
 COLNAMES_REGIME_EXECUCAO <- c("tp_regimeExecucao"="integer",
                               "de_regimeExecucao"="character"
 )
