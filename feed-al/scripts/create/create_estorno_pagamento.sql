@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS pagamento;
+DROP TABLE IF EXISTS estorno_pagamento;
 
 CREATE TABLE IF NOT EXISTS "estorno_pagamento" (
   "id_estorno_pagamento" VARCHAR(80),
