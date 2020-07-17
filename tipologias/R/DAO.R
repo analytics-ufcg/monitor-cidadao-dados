@@ -23,6 +23,57 @@ carrega_licitacoes <- function(al_db_con, ano_inicial = 2010, ano_final = 2019) 
   return(licitacoes)
 }
 
+#' @description Carrega a informações das propostas associadas a licitações que ocorreram dentro de um intervalo de tempo
+#' @param ano_inicial Ano inicial do intervalo de tempo (limite inferior). Default é 2011.
+#' @param ano_final Ano final do intervalo de tempo (limite superior). Default é 2016.
+#' @return Data frame com informações das propostas para licitações em um intervalo de tempo
+carrega_propostas_licitacao <- function(al_db_con, ano_inicial = 2011, ano_final = 2019) {
+  propostas_licitacao <- tibble::tibble()
+  
+  template <- ('SELECT cd_u_gestora, nu_licitacao, tp_licitacao, dt_ano, dt_homologacao, vl_licitacao
+                FROM propostas_licitacao
+                WHERE dt_Ano BETWEEN %d and %d')
+  
+  query <- template %>%
+    sprintf(ano_inicial, ano_final) %>%
+    dplyr::sql()
+  
+  tryCatch({
+    propostas_licitacao <- dplyr::tbl(al_db_con, query) %>% dplyr::collect(n = Inf)
+  },
+  error = function(e) print(paste0("Erro ao buscar propostas de licitações no Banco AL_BD (Postgres): ", e))
+  )
+  
+  return(propostas_licitacao)
+  
+  # licitacoes <- tbl(sagres, query) %>%
+  #   compute(name = "lic") %>%
+  #   collect(n = Inf)
+  # 
+  
+  # query <- sql('
+  #             SELECT p.cd_UGestora, p.nu_Licitacao, p.tp_Licitacao, lic.dt_Homologacao, lic.dt_Ano, p.cd_Item, p.cd_SubGrupoItem, p.nu_CPFCNPJ, p.vl_Ofertado
+  #             FROM Propostas p
+  #             INNER JOIN lic
+  #             USING (cd_UGestora, nu_Licitacao, tp_Licitacao)
+  #             ')
+  # 
+  # propostas <- tbl(sagres, query) %>% 
+  #     collect(n = Inf)
+  # 
+  # DBI::dbDisconnect(sagres)
+  
+  
+  # licitacoes <- read_csv(here::here("data/licitacoes.csv"))
+  # propostas <- read_csv(here::here("data/propostas.csv"))
+  # 
+  # 
+  # 
+  # return(propostas)
+}
+
+
+
 
 
 #' @title Busca codigos de funções no Banco AL_DB do Postgres
