@@ -178,5 +178,6 @@ translate_fornecedores <- function(fornecedores_raw) {
 #' @examples
 #' estorno_pagamento_dt <- translate_estorno_pagamento(estorno_pagamento_raw)
 translate_estorno_pagamento <- function(estorno_pagamento_raw) {
-  estorno_pagamento_raw %<>% janitor::clean_names()
+  estorno_pagamento_raw %<>% janitor::clean_names() %>%
+    dplyr::mutate(de_motivo_estorno = gsub("[^[:alnum:][:blank:]?&/\\-]", "", de_motivo_estorno))
 }
