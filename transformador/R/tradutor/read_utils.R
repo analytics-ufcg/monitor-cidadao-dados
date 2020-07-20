@@ -322,6 +322,7 @@ read_fornecedores <- function() {
                                            ))
 }
 
+
 #' @title Lê dataframe contendo informações das propostas das licitações
 #' @return Dataframe contendo informações sobre as propostas
 #' @rdname read_propostas
@@ -338,5 +339,21 @@ read_propostas <- function() {
                                      qt_Ofertada = readr::col_number(),
                                      vl_Ofertado = readr::col_number(),
                                      st_Proposta = readr::col_integer()
+                                   ))
+}
+
+
+#' @title Lê dataframe contendo informações dos estornos de pagamentos
+#' @return Dataframe contendo informações sobre estornos de pagamentos
+#' @rdname read_estorno_pagamento
+#' @examples
+#' estorno_pagamento_dt <- read_estorno_pagamento()
+read_estorno_pagamento <- function() {
+  estorno_pagamento_df <- readr::read_csv(here::here("../fetcher/data/estorno_pagamento.csv"),
+                                   col_types = list(
+                                     .default = readr::col_character(),
+                                     dt_Ano = readr::col_integer(),
+                                     tp_Lancamento = readr::col_integer(),
+                                     vl_Estorno = readr::col_number()
                                    ))
 }

@@ -173,6 +173,7 @@ get_fornecedores <- function() {
     translate_fornecedores()
 }
 
+
 #' @title Obtem dados das propostas
 #' @return Dataframe contendo informações sobre as propostas
 #' @rdname get_propostas
@@ -181,4 +182,15 @@ get_fornecedores <- function() {
 get_propostas <- function() {
   propostas_dt <- read_propostas() %>%
     translate_propostas()
+}
+
+
+#' @title Obtem dados do estorno de pagamento
+#' @return Dataframe contendo informações sobre o estorno de pagamento
+#' @rdname get_estorno_pagamento
+#' @examples
+#' estorno_pagamento_dt <- get_estorno_pagamento()
+get_estorno_pagamento <- function() {
+  estorno_pagamento_dt <- read_estorno_pagamento() %>%
+    translate_estorno_pagamento()
 }

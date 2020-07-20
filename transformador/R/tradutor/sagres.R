@@ -179,3 +179,14 @@ translate_fornecedores <- function(fornecedores_raw) {
 translate_propostas <- function(propostas_raw) {
   propostas_raw %<>% janitor::clean_names()
 }
+
+#' @title Traduz dado recebido para dataset
+#' @param estorno_pagamento_raw Dados brutos dos estornos de pagamentos
+#' @return Dataframe contendo informações sobre os estornos de pagamentos
+#' @rdname translate_estorno_pagamento
+#' @examples
+#' estorno_pagamento_dt <- translate_estorno_pagamento(estorno_pagamento_raw)
+translate_estorno_pagamento <- function(estorno_pagamento_raw) {
+  estorno_pagamento_raw %<>% janitor::clean_names() %>%
+    dplyr::mutate(de_motivo_estorno = gsub("[^[:alnum:][:blank:]?&/\\-]", "", de_motivo_estorno))
+}
