@@ -1,15 +1,15 @@
 version: '3.5'
 
-services:   
+services:
 
   fetcher:
-    build: 
+    build:
       context: fetcher/
     container_name: fetcher
     restart: always
     environment:
       - USER=${USER:-admin}
-      - PASSWORD=${PASSWORD:-secret} 
+      - PASSWORD=${PASSWORD:-secret}
       - SQLSERVER_SAGRES19_HOST=${SQLSERVER_SAGRES19_HOST:-host}
       - SQLSERVER_SAGRES19_Database=${SQLSERVER_SAGRES19_Database:-db}
       - SQLSERVER_SAGRES19_PORT=${SQLSERVER_SAGRES19_PORT:-1401}
@@ -23,13 +23,13 @@ services:
       - proxynet
 
   transformer:
-    build: 
+    build:
       context: transformador/
     container_name: transformador
     restart: always
     environment:
       - USER=${USER:-admin}
-      - PASSWORD=${PASSWORD:-secret} 
+      - PASSWORD=${PASSWORD:-secret}
     volumes:
       - ./transformador:/app/transformador
       - ./fetcher/data:/app/fetcher/data
@@ -62,9 +62,29 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-secret}
       - TZ=GMT
     volumes:
-      - postgres_data:/var/lib/postgresql/data/    
+      - postgres_data:/var/lib/postgresql/data/
     ports:
       - 7655:5432
+    networks:
+      - proxynet
+
+  tipologias:
+    build:
+      context: tipologias/
+    container_name: tipologias
+    restart: always
+    environment:
+      - USER=${USER:-admin}
+      - PASSWORD=${PASSWORD:-secret}
+      - POSTGRES_HOST=${POSTGRES_HOST:-host}
+      - POSTGRES_DB=${POSTGRES_DB:-al_db}
+      - POSTGRES_PORT=${POSTGRES_PORT:-7655}
+      - POSTGRES_USER=${POSTGRES_USER:-user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-secret}
+    volumes:
+      - ./tipologias:/app/tipologias
+    ports:
+      - 9090:9090
     networks:
       - proxynet
 
@@ -74,4 +94,3 @@ networks:
 
 volumes:
   postgres_data:
-      
