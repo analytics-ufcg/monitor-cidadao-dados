@@ -3,8 +3,6 @@ title: "Contratos Gerais"
 subtitle: "modelagem e avaliação"
 output:
   html_document:
-    toc: true
-    toc_float: true
     df_print: paged
     code_folding: hide
 ---
@@ -33,6 +31,9 @@ library(tidymodels)
 library(kableExtra)
 # library(tidyr)
 
+# library(themis) # Balanceamento de classes
+library(unbalanced)
+
 theme_set(theme_minimal())
 options(scipen = 999)
 
@@ -40,7 +41,7 @@ set.seed(123)
 Sys.setlocale(category = "LC_ALL", locale = "pt_PT.UTF-8")
 ```
 
-```{r}
+```{r, include=FALSE}
 source(here::here("../utils/medidas_avaliacao.R"))
 ```
 
@@ -55,16 +56,10 @@ tipologias_cgerais <- read_csv(here::here("../tipologias/tipologias_arquivos/tip
 
 
 # Leitura gabarito (Contratos rescindidos)
-contratos_tramita <- read_csv(here::here("../dados/contratos_rescindidos_2018/contratos_tramita_tratado.csv"), 
-    col_types = cols(cd_Ugestora = col_character(), numero_contrato = col_character(), nu_CPFCNPJ = col_character()))
-```
+# contratos_tramita <- read_csv(here::here("../dados/contratos_rescindidos_2018/contratos_tramita_tratado.csv"), 
+#     col_types = cols(cd_Ugestora = col_character(), numero_contrato = col_character(), nu_CPFCNPJ = col_character()))
 
-Impedimento, Rescisão e Sustação
-
-Temos um total de `r ` linhas com valores faltantes.
-
-
-```{r, include=FALSE}
+# Remove observações com valores faltantes
 tipologias_cgerais <- tipologias_cgerais %>% 
   drop_na()
 
@@ -73,59 +68,165 @@ tipologias_cgerais$tp_licitacao <- as.factor(tipologias_cgerais$tp_licitacao)
 ```
 
 
-```{r}
-tipologias_cgerais %>% 
-  filter(status_tramita == "1") %>% View()
-```
-
-<br>
-
-
-## Modelagem Floresta Aleatória
-
 ```{r, include=FALSE}
 exc_features <- c("cd_u_gestora", "nu_licitacao", "nu_contrato", "dt_ano",
                   "data_inicio", "nu_cpfcnpj")
 ```
 
-```{r}
-# preprocess <- recipe(quality ~ ., data = treinamento) %>%
-#   step_zv(all_predictors())
 
-
-# Separação em treino e teste
+```{r, include=FALSE}
+# Geração do índice separação em treino e teste
 index <- initial_split(tipologias_cgerais, prop = 0.8, strata = status_tramita)
 
-treino <- tipologias_cgerais[index,]
-teste <- tipologias_cgerais[-index,]
 
+# Separação dos dados em conjuntos de treino e teste
 treino <- training(index)
 teste <- testing(index)
+
+
+# Removendo as colunas não necessárias para o treinamento
+treino_exc <- treino %>% select(!exc_features)
+# teste_exc <- treino %>% select(!exc_features)
 ```
 
 
-```{r}
-rf_fit <- rand_forest(trees = 100) %>% 
+
+
+Neste relatório, a partir de características comportamentais das empresas que celebraram os contratos desejamos prever o risco de que novos contratos sejam rompidos. <br>
+
+Será utilizado um conjunto de 15 atributos de contratos que descrevem características comportamentais das empresas fornecedoras dos contratos. Associado a isso, temos um gabarito para esta tarefa de classificação que informará, dado um contrato, seu teor de risco. Assumiremos contratos de alto risco como contratos rompidos por ocasião de um *Impedimento, Sustação ou Rescisão*. Nosso conjunto de dados dispõe de `r nrow(tipologias_cgerais)` contratos administrativos.  <br>
+
+
+Para modelagem serão utilizados os algoritmos: Floresta Aleatória e Regressão Logística. Os modelos serão treinados utilizando divisão de 80%/20% para conjuntos de treino e teste respectivamente, e avaliados utilizando a métrica AUC/ROC. <br><br>
+
+
+
+## Modelagem Floresta Aleatória
+
+
+```{r, include=FALSE}
+## 
+# ---- Definições gerais
+##
+
+
+# Modelo que será utilizado e tipo de tarefa
+random_forest_m <- rand_forest() %>% 
   set_engine("randomForest") %>% 
-  set_mode("classification") %>% 
-  fit(status_tramita ~ ., treino %>% select(-exc_features))
+  set_mode("classification") 
+
+
+# Conjunto de métricas para avaliação dos modelos
+con_metrics <- metric_set(roc_auc)
+```
+
+
+```{r versaoTidySimples, include=FALSE}
+
+# versão mais simples
+treino_part <- treino_exc %>% 
+  slice(1:20000)
+
+
+rf_fit <- random_forest_m %>% 
+  fit(status_tramita ~ ., data = treino_part)
+
+rf_class_pred <- rf_fit %>% predict(teste %>% select(-exc_features)) %>% 
+  mutate(rf_class_pred = .pred_class) %>% select(-.pred_class)
+
+teste <- teste %>% 
+  cbind(rf_class_pred)
+
+# Calcula as métricas avaliativas para a previsão
+av_rf <- avaliacao("Floresta Al.", teste, "rf_class_pred", "status_tramita")
+```
+<br>
+```{r}
+av_rf
+```
+
+
+<br>
+
+A AUC (Área sob a curva ROC) é uma métrica frequentemente utilizada para avaliação e comparação de classificadores. Quanto mais próximo a 0.5 mais o classificador gerado teve dificuldades em reconhecer a separação entre as classes aprendidas. <br>
+
+Neste caso, vemos que o classificador gerado neste treinamento não é eficaz. A partir da Matriz de Confusão (TP, TN, FP, FN) vemos que o modelo acerta bastante observações da classe negativa (baixo risco), entretanto tem dificuldades em reconhecer observações da classe positiva (alto risco). Vejamos como está dividido o balanço de observações, no nosso conjunto de treinamento, então: <br>
+
+
+```{r}
+kable(table(tipologias_cgerais$status_tramita),
+      col.names = c("Classe", "Frequência")) %>% 
+  kable_styling()
+```
+
+O desbalanceamento entre classes é um problema presente no conjunto de dados de treinamento e isso é refletido no resultado do modelo. Dadas as quantidades em cada classe, temos um modelo que aprende muitíssimo mais sobre as observações de baixo risco do que sobre observações de alto risco. <br>
+
+Para mitigar esse desbalanço vamos utilizar algumas estratégias já conhecidas na literatura e amplamente difundidas (*upsampling*, *undersampling*, dentre outros). <br>
+
+<br>
+
+
+
+## Balanceamentos artificiais
+
+Como vimos, há um severo desbalanço entre as classes de alto e baixo risco em nossos contratos e esse fator impacta diretamente na capacidade de aprendizagem do modelo - aprende-se muito mais sobre a classe de contratos denominada de baixo risco, e pouco sobre a classe alvo que chamamos de alto risco. <br>
+
+O balanceamento artificial de classes é realizado na experimentação científica quando não é possível retornar ao mundo real e coletar um maior número de observações da classe minoritária. No nosso caso, desejamos modelar um fenômeno atípico, a rescisão de contratos, então é natural que tenhamos um número muito maior de contratos que não foram rompidos (baixo risco) do que de contratos rompidos (alto risco). Por essa razão é preciso realizar o balanceamento artifial do conjunto de treinamento, neste experimento utilizaremos o [SMOTE](https://arxiv.org/pdf/1106.1813.pdf).<br><br>
+
+
+### SMOTE
+
+
+Utilizando o SMOTE a classe majoritária será reduzida e a minoritária acrescida. A nova quantidade de observações em cada classe então será: <br>
+
+
+```{r, include=FALSE}
+balance <- ubBalance(treino_exc, treino_exc$status_tramita, 
+                     type = "ubSMOTE", positive = 1, k = 5, percOver = 1000, verbose = TRUE)
+
+treino_upsample <- balance$X
 ```
 
 ```{r}
-teste <- rf_fit %>% 
-  predict(teste %>% select(-exc_features)) %>% 
-  bind_cols(teste)
+kable(table(treino_upsample$status_tramita),
+      col.names = c("Classe", "Frequência")) %>% 
+  kable_styling()
+```
+<br>
+
+```{r, include=FALSE, message=FALSE}
+rf_fit_smote <- random_forest_m %>% 
+  fit(status_tramita ~ ., data = treino_upsample)
+
+rf_smote_class_pred <- rf_fit_smote %>% predict(teste %>% select(-exc_features)) %>% 
+  mutate(rf_smote = .pred_class) %>% select(-.pred_class)
+
+teste <- teste %>% 
+  cbind(rf_smote_class_pred)
+
+# Calcula as métricas avaliativas para a previsão
+av_rf_smote <- avaliacao("Floresta Al. Smote", teste, "rf_smote", "status_tramita")
+```
+```{r}
+av_rf_smote
 ```
 
+<br>
 
-```{r, message=FALSE, include=FALSE}
-av_rf <- avaliacao("Floresta Al.", teste, ".pred_class", "status_tramita")
-```
 
+
+## Avaliando Modelos
+
+Abaixo temos uma visão geral da perfomance dos modelos. <br>
 
 ```{r}
+avaliacao <- av_rf %>% 
+  rbind(av_rf_smote)
+```
+
+```{r avaliacao}
 # Visão geral da avaliação de modelos
-kable(av_rf, col.names = c("Modelo", "F1", "AUC", 
+kable(avaliacao, col.names = c("Modelo", "F1", "AUC", 
                                   "Precisão", "Revocação", "MCC",
                                   "VP", "VN", "FP", "FN")) %>% 
   kable_styling()
@@ -139,33 +240,15 @@ kable(av_rf, col.names = c("Modelo", "F1", "AUC",
 
 
 
+```{r salvaArquivos, include=FALSE}
+output_path <- paste("../tipologias/tipologias_arquivos/outputs/", Sys.Date(), sep = "")
 
+dir.create(here::here(output_path))
 
+# Salva arquivos da modelagem
+write.csv(teste, file = paste(output_path, "/teste_predictions.csv", sep = ""), row.names = FALSE)
+write.csv(treino_exc, file = paste(output_path, "/treino_exc.csv", sep = ""), row.names = FALSE)
+write.csv(treino, file = paste(output_path, "/treino_original.csv", sep = ""), row.names = FALSE)
 
-
-                           
-```{r}
-# código com boas práticas
-
-# random_forest <- rand_forest() %>% 
-#   set_engine("randomForest") %>% 
-#   set_mode("classification") 
-# 
-# wf_ranforest <- workflow() %>% 
-#   add_model(random_forest)
-# 
-# # wf_ranforest
-# 
-# nfolds <- vfold_cv(treino, v = 5, strata = status_tramita)
+write.csv(treino_upsample, file = paste(output_path, "/treino_up.csv", sep = ""), row.names = FALSE)
 ```
-
-```{r}
-# params_preproc <- preProcess(contratos_gerais_filtro, method = c("nzv", "YeoJohnson", "corr"))
-# contratos_gerais_trans <- predict(params_preproc, contratos_gerais_filtro)
-
-# index <- createDataPartition(contratos_gerais_trans$status, p=0.8, list = FALSE)
-# 
-# treino <- contratos_gerais_trans[index,]
-# teste <- contratos_gerais_trans[-index,]
-```
-
