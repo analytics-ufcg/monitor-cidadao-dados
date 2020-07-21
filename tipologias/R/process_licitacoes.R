@@ -111,7 +111,7 @@ media_vitorias_by_empresa <- function(licitacoes_ganhas_df) {
     dplyr::ungroup()
 }
 
-merge_features <- function(licitacoes_features_df, 
+merge_features_licitacoes <- function(licitacoes_features_df, 
                            perc_licitacoes_associadas_df,
                            media_licitacoes_part_empresa_df, 
                            media_licitacoes_venceu_empresa_df) {

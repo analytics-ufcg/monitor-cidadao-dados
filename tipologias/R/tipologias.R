@@ -1,4 +1,5 @@
 source(here::here("R/process_licitacoes.R"))
+source(here::here("R/process_propostas.R"))
 
 gera_tipologia_licitacao <- function(licitacao_df,
                                      contratos_processados_df,
@@ -42,7 +43,7 @@ gera_tipologia_licitacao <- function(licitacao_df,
   media_licitacoes_venceu_empresa <- media_vitorias_by_empresa(licitacoes_empresa_ganhou) 
   
   print("Cruzando features das licitações...")
-  licitacoes_features_merge <- merge_features(licitacoes_features, 
+  licitacoes_features_merge <- merge_features_licitacoes(licitacoes_features, 
                                               perc_licitacoes_associadas,
                                               media_licitacoes_part_empresa, 
                                               media_licitacoes_venceu_empresa)
@@ -53,29 +54,17 @@ gera_tipologia_licitacao <- function(licitacao_df,
 
 gera_tipologia_proposta <- function(propostas_df, contratos_by_cnpj_df) {
   
-  propostas_filtradas_fornecedores <- contratos_by_cnpj_df %>% 
-    dplyr::left_join(propostas_df, by = "nu_cpfcnpj") %>% 
-    dplyr::mutate(dt_homologacao = as.Date(dt_homologacao, "%Y-%m-%d")) %>% 
-    dplyr::filter(dt_homologacao < data_inicio)
+  print("Filtrando propostas...")
+  propostas_filtradas_fornecedores <- filter_propostas(contratos_by_cnpj_df, propostas_df) 
   
-  propostas_group <- propostas_filtradas_fornecedores %>% 
-    dplyr::group_by(nu_cpfcnpj, data_inicio) %>% 
-    dplyr::summarise(n_propostas = dplyr::n_distinct(cd_u_gestora, nu_licitacao, tp_licitacao, cd_item, cd_sub_grupo_item, nu_cpfcnpj)) %>% 
-    dplyr::ungroup()
+  print("Agrupando propostas...")
+  propostas_group <- get_propostas_by_cnpj(propostas_filtradas_fornecedores) 
   
-  media_propostas_group <- propostas_filtradas_fornecedores %>% 
-    dplyr::group_by(nu_cpfcnpj, data_inicio, dt_ano) %>% 
-    dplyr::summarise(n_propostas = dplyr::n_distinct(cd_u_gestora, nu_licitacao, tp_licitacao, cd_item, cd_sub_grupo_item, nu_cpfcnpj)) %>% 
-    dplyr::ungroup() %>% 
-    dplyr::group_by(nu_cpfcnpj, data_inicio) %>% 
-    dplyr::summarise(media_n_propostas = mean(n_propostas)) %>% 
-    dplyr::ungroup()
+  print("Calculando média de propostas por cnpj...")
+  media_propostas_group <- media_propostas_by_cnpj(propostas_filtradas_fornecedores)
   
-  propostas_features <- contratos_by_cnpj_df %>%
-    dplyr::left_join(propostas_group, by = c("nu_cpfcnpj", "data_inicio")) %>% 
-    dplyr::left_join(media_propostas_group, by = c("nu_cpfcnpj", "data_inicio")) %>% 
-    dplyr::mutate_at(.funs = dplyr::funs(tidyr::replace_na(., 0)), 
-                     .vars = dplyr::vars(dplyr::starts_with("n_propostas"), dplyr::starts_with("media_n_propostas")))
+  print("Cruzando features das propostas...")
+  propostas_features <- merge_features_propostas(contratos_by_cnpj_df, propostas_group, media_propostas_group) 
   
   return(propostas_features)
 }
