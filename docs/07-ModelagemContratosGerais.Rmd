@@ -1,0 +1,171 @@
+---
+title: "Contratos Gerais"
+subtitle: "modelagem e avaliação"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    df_print: paged
+    code_folding: hide
+---
+
+--------
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  fig.retina = 2,
+  collapse = TRUE,
+  out.width = "100%",
+  out.height = "70%",
+  fig.asp = 0.618  # 1 / phi
+  # fig.show = "hold"
+)
+```
+
+```{r libs, include=FALSE}
+library(here)
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(tidymodels)
+library(kableExtra)
+# library(tidyr)
+
+theme_set(theme_minimal())
+options(scipen = 999)
+
+set.seed(123)
+Sys.setlocale(category = "LC_ALL", locale = "pt_PT.UTF-8")
+```
+
+```{r}
+source(here::here("../utils/medidas_avaliacao.R"))
+```
+
+
+## Visão Geral
+
+```{r, include=FALSE}
+# Leitura de tipologias
+tipologias_cgerais <- read_csv(here::here("../tipologias/tipologias_arquivos/tipologias_final_contratos_gerais20200718.csv"), 
+    col_types = cols(cd_u_gestora = col_character(), nu_licitacao = col_character(), 
+                     nu_contrato = col_character(), nu_cpfcnpj = col_character()))
+
+
+# Leitura gabarito (Contratos rescindidos)
+contratos_tramita <- read_csv(here::here("../dados/contratos_rescindidos_2018/contratos_tramita_tratado.csv"), 
+    col_types = cols(cd_Ugestora = col_character(), numero_contrato = col_character(), nu_CPFCNPJ = col_character()))
+```
+
+Impedimento, Rescisão e Sustação
+
+Temos um total de `r ` linhas com valores faltantes.
+
+
+```{r, include=FALSE}
+tipologias_cgerais <- tipologias_cgerais %>% 
+  drop_na()
+
+tipologias_cgerais$status_tramita <- as.factor(tipologias_cgerais$status_tramita)
+tipologias_cgerais$tp_licitacao <- as.factor(tipologias_cgerais$tp_licitacao)
+```
+
+
+```{r}
+tipologias_cgerais %>% 
+  filter(status_tramita == "1") %>% View()
+```
+
+<br>
+
+
+## Modelagem Floresta Aleatória
+
+```{r, include=FALSE}
+exc_features <- c("cd_u_gestora", "nu_licitacao", "nu_contrato", "dt_ano",
+                  "data_inicio", "nu_cpfcnpj")
+```
+
+```{r}
+# preprocess <- recipe(quality ~ ., data = treinamento) %>%
+#   step_zv(all_predictors())
+
+
+# Separação em treino e teste
+index <- initial_split(tipologias_cgerais, prop = 0.8, strata = status_tramita)
+
+treino <- tipologias_cgerais[index,]
+teste <- tipologias_cgerais[-index,]
+
+treino <- training(index)
+teste <- testing(index)
+```
+
+
+```{r}
+rf_fit <- rand_forest(trees = 100) %>% 
+  set_engine("randomForest") %>% 
+  set_mode("classification") %>% 
+  fit(status_tramita ~ ., treino %>% select(-exc_features))
+```
+
+```{r}
+teste <- rf_fit %>% 
+  predict(teste %>% select(-exc_features)) %>% 
+  bind_cols(teste)
+```
+
+
+```{r, message=FALSE, include=FALSE}
+av_rf <- avaliacao("Floresta Al.", teste, ".pred_class", "status_tramita")
+```
+
+
+```{r}
+# Visão geral da avaliação de modelos
+kable(av_rf, col.names = c("Modelo", "F1", "AUC", 
+                                  "Precisão", "Revocação", "MCC",
+                                  "VP", "VN", "FP", "FN")) %>% 
+  kable_styling()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+                           
+```{r}
+# código com boas práticas
+
+# random_forest <- rand_forest() %>% 
+#   set_engine("randomForest") %>% 
+#   set_mode("classification") 
+# 
+# wf_ranforest <- workflow() %>% 
+#   add_model(random_forest)
+# 
+# # wf_ranforest
+# 
+# nfolds <- vfold_cv(treino, v = 5, strata = status_tramita)
+```
+
+```{r}
+# params_preproc <- preProcess(contratos_gerais_filtro, method = c("nzv", "YeoJohnson", "corr"))
+# contratos_gerais_trans <- predict(params_preproc, contratos_gerais_filtro)
+
+# index <- createDataPartition(contratos_gerais_trans$status, p=0.8, list = FALSE)
+# 
+# treino <- contratos_gerais_trans[index,]
+# teste <- contratos_gerais_trans[-index,]
+```
+
