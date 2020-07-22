@@ -94,7 +94,7 @@ treino_exc <- treino %>% select(!exc_features)
 
 Neste relatório, a partir de características comportamentais das empresas que celebraram os contratos desejamos prever o risco de que novos contratos sejam rompidos. <br>
 
-Será utilizado um conjunto de 15 atributos de contratos que descrevem características comportamentais das empresas fornecedoras dos contratos. Associado a isso, temos um gabarito para esta tarefa de classificação que informará, dado um contrato, seu teor de risco. Assumiremos contratos de alto risco como contratos rompidos por ocasião de um *Impedimento, Sustação ou Rescisão*. Nosso conjunto de dados dispõe de `r nrow(tipologias_cgerais)` contratos administrativos.  <br>
+Será utilizado um conjunto de 15 atributos de contratos que descrevem características comportamentais das empresas fornecedoras dos contratos. Associado a isso, temos um gabarito para esta tarefa de classificação que informará, dado um contrato, seu teor de risco (baixo ou alto risco). Assumiremos contratos de alto risco como contratos rompidos por ocasião de um *Impedimento, Sustação ou Rescisão*. Nosso conjunto de dados dispõe de `r nrow(tipologias_cgerais)` contratos administrativos.  <br>
 
 
 Para modelagem serão utilizados os algoritmos: Floresta Aleatória e Regressão Logística. Os modelos serão treinados utilizando divisão de 80%/20% para conjuntos de treino e teste respectivamente, e avaliados utilizando a métrica AUC/ROC. <br><br>
@@ -116,7 +116,7 @@ Para modelagem serão utilizados os algoritmos: Floresta Aleatória e Regressão
 ##
 
 rl_receita <- recipe(status_tramita ~ ., data = treino_exc) %>% 
-  step_scale(all_numeric(), -all_outcomes()) %>% 
+  step_scale(all_numeric(), -all_outcomes()) %>%
   step_dummy(all_nominal(), -all_outcomes()) %>% 
   prep()
 
@@ -143,7 +143,8 @@ reglog_probs <- reglog_m %>% predict(new_data = test_baked, type = "prob") %>%
 
 
 teste <- teste %>% 
-  cbind(reglog_pred, reglog_probs)
+  cbind(reglog_pred, reglog_probs) %>% 
+  mutate(reglog_class_pred = as.character(reglog_class_pred))
 
 # Calcula as métricas avaliativas para a previsão
 av_reglog <- avaliacao("Reg Logística", teste, "reglog_class_pred", "status_tramita")
@@ -160,7 +161,7 @@ av_reglog
 
 ## Modelagem Floresta Aleatória
 
-```{r versaoTidySimples, include=FALSE}
+```{r, include=FALSE}
 ## 
 # ---- Definições gerais
 ##
@@ -169,8 +170,11 @@ av_reglog
 # Modelo que será utilizado e tipo de tarefa
 random_forest_m <- rand_forest() %>% 
   set_engine("randomForest") %>% 
-  set_mode("classification") 
+  set_mode("classification")
+```
 
+
+```{r, include=FALSE}
 # Conjunto de métricas para avaliação dos modelos
 # con_metrics <- metric_set(roc_auc)
 
@@ -279,9 +283,6 @@ av_rf_smote <- avaliacao("Floresta Al. Smote", teste, "rf_smote_pred", "status_t
 av_rf_smote
 ```
 <br>
-
-
-
 <br>
 
 
@@ -293,10 +294,14 @@ Abaixo temos uma visão geral da perfomance dos modelos. <br>
 
 
 ```{r, include=FALSE}
+reglog_roc <- teste %>% roc_curve(status_tramita, reglog_prob_1) %>% mutate(modelo = "RegLog")
 rf_roc <- teste %>% roc_curve(status_tramita, rf_prob_1) %>% mutate(modelo = "RF")
 rf_smote_roc <- teste %>% roc_curve(status_tramita, rf_smote_prob_1) %>% mutate(modelo = "RF+Smote")
+```
 
+```{r}
 rf_roc %>% 
+  bind_rows(reglog_roc) %>% 
   bind_rows(rf_smote_roc) %>% 
   group_by(modelo) %>% 
   ggplot(aes(y = 1 - specificity, x = sensitivity, color = modelo)) +
@@ -306,10 +311,12 @@ rf_roc %>%
   labs(title = "Curva ROC")
 ```
 
+
 <br>
 
 ```{r}
-avaliacao <- av_rf %>% 
+avaliacao <- av_reglog %>% 
+  rbind(av_rf) %>% 
   rbind(av_rf_smote)
 ```
 
@@ -326,14 +333,14 @@ kable(avaliacao, col.names = c("Modelo", "F1", "AUC",
 
 ```{r salvaArquivos, include=FALSE}
 # Escreve os arquivos da modelagem na pasta abaixo
-# output_path <- paste("../tipologias/tipologias_arquivos/outputs", Sys.Date(), sep = "")
-# 
-# dir.create(here::here(output_path))
-# 
-# # Salva arquivos da modelagem
-# write.csv(teste, file = paste(output_path, "/teste_predictions.csv", sep = ""), row.names = FALSE)
-# write.csv(treino_exc, file = paste(output_path, "/treino_exc.csv", sep = ""), row.names = FALSE)
-# write.csv(treino, file = paste(output_path, "/treino_original.csv", sep = ""), row.names = FALSE)
-# 
-# write.csv(treino_upsample, file = paste(output_path, "/treino_up.csv", sep = ""), row.names = FALSE)
+output_path <- paste("../tipologias/tipologias_arquivos/outputs-", Sys.Date(), sep = "")
+
+dir.create(here::here(output_path))
+
+# Salva arquivos da modelagem
+write.csv(teste, file = paste(output_path, "/teste_predictions.csv", sep = ""), row.names = FALSE)
+write.csv(treino_exc, file = paste(output_path, "/treino_exc.csv", sep = ""), row.names = FALSE)
+write.csv(treino, file = paste(output_path, "/treino_original.csv", sep = ""), row.names = FALSE)
+
+write.csv(treino_upsample, file = paste(output_path, "/treino_up.csv", sep = ""), row.names = FALSE)
 ```

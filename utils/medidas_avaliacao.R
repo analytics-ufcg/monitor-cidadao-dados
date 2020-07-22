@@ -6,18 +6,24 @@
 recall <- function(dados, col_predicao, col_status) {
     library(tidyverse)
     
-    predicao <- sym(col_predicao)
+    # dados <- teste
+    # col_predicao <- "rf_smote_pred"
+    # col_status <- "status_tramita"
+    # relevantes <- subset(dados, dados[[status]] == 1)
+    # verdadeiros_positivos <- subset(relevantes, relevantes[[col_predicao]] == 1)
+    
     status <- sym(col_status)
+    predicao <- sym(col_predicao)
     
-    relevantes <- teste %>%
-        filter(!!status_tramita == 1)
-    
+    relevantes <- dados %>%
+        dplyr::filter(dados[[status]] == 1)
+
     verdadeiros_positivos <- relevantes %>%
-        filter(!!predicao == 1)
+        dplyr::filter(relevantes[[predicao]] == 1)
     
-    if (nrow(relevantes) > 0)
+    if(nrow(relevantes) > 0)
         return(nrow(verdadeiros_positivos)/nrow(relevantes))
-    return(0)
+    return("fail")
 }
 
 #' @description Calcula a precisão para um conjunto de dados
@@ -32,10 +38,10 @@ precision <- function(dados, col_predicao, col_status) {
     status <- sym(col_status)
     
     selecionados <- dados %>%
-        filter(!!predicao == 1)
+        dplyr::filter(!!predicao == 1)
     
     verdadeiros_positivos <- dados %>%
-        filter(!!predicao == 1, !!status == 1)
+        dplyr::filter(!!predicao == 1, !!status == 1)
     
     if (nrow(selecionados) > 0)
         return(nrow(verdadeiros_positivos)/nrow(selecionados))
@@ -74,24 +80,6 @@ auc_metric <- function(dados, col_predicao, col_status) {
     auc_score <- pROC::auc(roc)
     
     return(auc_score)
-}
-
-#' @description Calcula a métrica NDCG para um conjunto de dados
-#' @param dados Data Frame com pelo menos duas colunas (posicao no ranking, status)
-#' @param col_id Nome da coluna (string) com a posição no ranking para cada observação  
-#' @param col_status Nome da coluna (string) com o valor real para a variável de interesse.  
-#' @return Valor da métrica NDCG
-ndcg <- function(dados, col_id, col_status) {
-    library(tidyverse)
-    library(StatRank)
-    
-    niveis_relevancia <- c(ifelse(dados[[col_status]] == "1", 1, 0))
-    
-    ranking <- dados[[col_id]]
-    
-    ndcg <- Evaluation.NDCG(ranking, niveis_relevancia)
-    
-    return(ndcg)
 }
 
 
