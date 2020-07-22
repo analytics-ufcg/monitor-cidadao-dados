@@ -5,6 +5,12 @@
 .env
 server/node_modules/
 
+fetcher/.DS_Store
+tipologias/.DS_Store
+transformador/.DS_Store
+dados/.DS_Store
+*/.DS_Store
+.DS_Store
 
 fetcher/credenciais/config
 fetcher/credenciais/id_rsa

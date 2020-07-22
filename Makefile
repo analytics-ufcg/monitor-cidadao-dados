@@ -18,6 +18,7 @@ help:
 	@echo "\tfeed-al-import\t\t\tImporta dados para as tabelas do \n\t\t\t\t\tBanco de Dados Analytics"
 	@echo "\tfeed-al-clean\t\t\tDropa as tabelas do Banco de Dados \n\t\t\t\t\tAnalytics"
 	@echo "\tfeed-al-shell\t\t\tAcessa terminal do Banco de Dados Analytics"
+	@echo "\tgera-tipologias \t\tGera as tipologias de contratos"
 
 .PHONY: help
 build:
@@ -59,3 +60,6 @@ feed-al-clean:
 feed-al-shell:
 	docker exec -it feed-al sh -c "Rscript feed-al/DAO.R -f shell"
 .PHONY: feed-al-shell
+gera-tipologias:
+	docker exec -it fetcher sh -c "Rscript tipologias/scripts/gera_tipologias.R"
+.PHONY: gera-tipologias

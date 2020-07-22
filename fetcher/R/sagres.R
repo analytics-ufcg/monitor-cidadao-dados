@@ -220,7 +220,7 @@ fetch_aditivos <- function(sagres_con) {
 fetch_pagamentos <- function(sagres_con) {
   pagamentos <- tibble::tibble()
   tryCatch({
-    pagamentos <- DBI::dbGetQuery(sagres_con, "SELECT TOP 10 * FROM Pagamentos;") %>%
+    pagamentos <- DBI::dbGetQuery(sagres_con, "SELECT TOP 1000 * FROM Pagamentos;") %>%
       assert_dataframe_completo(COLNAMES_PAGAMENTOS)
   },
   error = function(e) print(paste0("Erro ao buscar pagamentos no Banco Sagres (SQLServer): ", e))
@@ -295,4 +295,41 @@ fetch_fornecedores <- function(sagres_con) {
   )
 
   return(fornecedores)
+}
+
+
+#' @title Busca propostas cadastradas no banco SAGRES 2019
+#' @param sagres_con Conexão com o Banco de Dados
+#' @return Dataframe contendo informações sobre as propostas
+#' @rdname fetch_propostas
+#' @examples
+fetch_propostas <- function(sagres_con) {
+  propostas <- tibble::tibble()
+  tryCatch({
+    propostas <- DBI::dbGetQuery(sagres_con, "SELECT * FROM Propostas;") %>%
+      assert_dataframe_completo(COLNAMES_PROPOSTAS)
+  },
+  error = function(e) print(paste0("Erro ao buscar Propostas no Banco Sagres (SQLServer): ", e))
+  )
+
+  return(propostas)
+
+}
+
+
+#' @title Busca os Estornos de Pagamentos realizados no Banco do Sagres SQLServer
+#' @param sagres_con Conexão com o Banco de Dados
+#' @return Dataframe contendo informações sobre os estornos de pagamentos
+#' @rdname fetch_estorno_pagamento
+#' @examples
+fetch_estorno_pagamento <- function(sagres_con) {
+  estorno_pagamento <- tibble::tibble()
+  tryCatch({
+    estorno_pagamento <- DBI::dbGetQuery(sagres_con, "SELECT * FROM EstornoPagamento;") %>%
+       assert_dataframe_completo(COLNAMES_ESTORNO_PAGAMENTO)
+  },
+  error = function(e) print(paste0("Erro ao buscar estorno de pagamento no Banco Sagres (SQLServer): ", e))
+  )
+
+  return(estorno_pagamento)
 }
