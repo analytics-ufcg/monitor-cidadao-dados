@@ -72,13 +72,20 @@ gera_tipologia_proposta <- function(propostas_df, contratos_by_cnpj_df) {
 gera_tipologia_contrato <- function(tipologias_df, contratos_df, contratos_raw) {
   
   contratos <- tipologias_df %>% 
-    dplyr::select(cd_u_gestora, nu_contrato, nu_cpfcnpj, data_inicio, vl_total_contrato, total_ganho)
+    dplyr::left_join(contratos_raw %>% dplyr::select(id_contrato, 
+                                                     cd_u_gestora, 
+                                                     dt_ano, 
+                                                     nu_contrato, 
+                                                     nu_licitacao, 
+                                                     tp_licitacao)) %>% 
+    dplyr::select(id_contrato,cd_u_gestora, nu_contrato, nu_cpfcnpj, data_inicio, vl_total_contrato, total_ganho) #BAD SMELL - Refatorar
+
   
   ## Calcula a razão entre o valor do contrato e o total recebido pela empresa
   contratos_razao <- contratos %>% 
     dplyr::mutate(razao_contrato_por_vl_recebido = vl_total_contrato/ (vl_total_contrato + total_ganho)) %>% 
     dplyr::mutate(razao_contrato_por_vl_recebido = ifelse(is.infinite(razao_contrato_por_vl_recebido), NA, razao_contrato_por_vl_recebido)) %>% 
-    dplyr::select(cd_u_gestora, nu_contrato, nu_cpfcnpj, data_inicio, razao_contrato_por_vl_recebido)
+    dplyr::select(id_contrato, cd_u_gestora, nu_contrato, nu_cpfcnpj, data_inicio, razao_contrato_por_vl_recebido)
   
   cnpjs_contratos <- contratos %>% 
     dplyr::distinct(nu_cpfcnpj, data_inicio)

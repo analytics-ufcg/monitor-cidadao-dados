@@ -64,9 +64,10 @@ tipologias_contrato <- gera_tipologia_contrato(tipologias_merge, contratos_proce
 #Gera tipologias finais
 print("Gerando tipologias gerais...")
 tipologias_final_contratos_gerais <- tipologias_merge %>% 
-  dplyr::left_join(tipologias_contrato, by = c("cd_u_gestora", "nu_contrato", "nu_cpfcnpj", "data_inicio"))
+  dplyr::left_join(tipologias_contrato, by = c("cd_u_gestora", "nu_contrato", "nu_cpfcnpj", "data_inicio")) %>% 
+  dplyr::select(id_contrato, dplyr::everything())
 
-readr::write_csv(tipologias_final_contratos_gerais, "data/tipologias_final_contratos_gerais.csv")
+readr::write_csv(tipologias_final_contratos_gerais, paste("data/tipologias_contratos_gerais_", Sys.Date(), ".csv"))
 
 
 DBI::dbDisconnect(al_db_con)

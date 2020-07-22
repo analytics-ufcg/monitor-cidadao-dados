@@ -55,11 +55,12 @@ carrega_propostas_licitacao <- function(al_db_con, ano_inicial = 2011, ano_final
 #' @rdname fetch_contratos
 #' @examples
 #' contratos <- fetch_contratos(al_db_con)
-carrega_contratos <- function(al_db_con, ano_inicial = 2010, ano_final = 2019,  limite_inferior=140e3) {
+carrega_contratos <- function(al_db_con, ano_inicial = 2014, ano_final = 2020,  limite_inferior=140e3) {
   contratos <- tibble::tibble()
   template <- ('SELECT *
                 FROM contrato
-                WHERE dt_ano BETWEEN %d and %d')
+                WHERE dt_ano BETWEEN %d and %d'
+               )
   
   query <- template %>% 
     sprintf(ano_inicial, ano_final, limite_inferior) %>% 
@@ -80,14 +81,12 @@ carrega_participantes <- function(al_db_con, list_cnpjs) {
   template <- ('
                 SELECT * 
                 FROM participante
-                WHERE nu_cpfcnpj = ANY (\'{%s}\')
-                 ')
+                WHERE nu_cpfcnpj = ANY (\'{%s}\')')
   
   query <- template %>% 
     sprintf(paste(list_cnpjs, collapse = ", ")) %>% 
     dplyr::sql()
-  print (query)
-  
+
   tryCatch({
     participacoes <- dplyr::tbl(al_db_con, query) %>% dplyr::collect(n = Inf)
   },
