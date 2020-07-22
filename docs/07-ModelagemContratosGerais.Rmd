@@ -101,10 +101,66 @@ Para modelagem serão utilizados os algoritmos: Floresta Aleatória e Regressão
 
 
 
-## Modelagem Floresta Aleatória
+
+## Regressão Logística
 
 
 ```{r, include=FALSE}
+# recipe_reglog <- recipe(status_tramita ~ ., data = treino_exc) %>% 
+#   step_center(all_numeric()) %>%
+#   step_scale(all_numeric()) %>% 
+#   prep(data = treino_exc)
+
+## 
+# ---- Pré-processamento
+##
+
+rl_receita <- recipe(status_tramita ~ ., data = treino_exc) %>% 
+  step_scale(all_numeric(), -all_outcomes()) %>% 
+  step_dummy(all_nominal(), -all_outcomes()) %>% 
+  prep()
+
+train_baked <- juice(rl_receita)
+test_baked <- bake(rl_receita, new_data = teste)
+
+
+## 
+# ---- Modelo
+##
+
+reg_logistica <- logistic_reg() %>%
+  set_engine("glm") %>%
+  set_mode("classification")
+
+reglog_m <- reg_logistica %>%
+  fit(status_tramita ~ ., data = train_baked)
+ 
+reglog_pred <- reglog_m %>% predict(new_data = test_baked) %>% 
+  mutate(reglog_class_pred = .pred_class) %>% select(-.pred_class)
+
+reglog_probs <- reglog_m %>% predict(new_data = test_baked, type = "prob") %>% 
+  mutate(reglog_prob_0 = .pred_0, reglog_prob_1 = .pred_1) %>% select(-.pred_1, -.pred_0)
+
+
+teste <- teste %>% 
+  cbind(reglog_pred, reglog_probs)
+
+# Calcula as métricas avaliativas para a previsão
+av_reglog <- avaliacao("Reg Logística", teste, "reglog_class_pred", "status_tramita")
+```
+
+<br>
+
+```{r}
+av_reglog
+```
+
+<br>
+
+
+## Modelagem Floresta Aleatória
+
+```{r versaoTidySimples, include=FALSE}
 ## 
 # ---- Definições gerais
 ##
@@ -115,32 +171,34 @@ random_forest_m <- rand_forest() %>%
   set_engine("randomForest") %>% 
   set_mode("classification") 
 
-
 # Conjunto de métricas para avaliação dos modelos
-con_metrics <- metric_set(roc_auc)
-```
+# con_metrics <- metric_set(roc_auc)
 
 
-```{r versaoTidySimples, include=FALSE}
-
-# versão mais simples
-treino_part <- treino_exc %>% 
-  slice(1:20000)
-
+## 
+# ---- Definições específicas
+##
 
 rf_fit <- random_forest_m %>% 
-  fit(status_tramita ~ ., data = treino_part)
+  fit(status_tramita ~ ., data = treino_exc)
+
 
 rf_class_pred <- rf_fit %>% predict(teste %>% select(-exc_features)) %>% 
   mutate(rf_class_pred = .pred_class) %>% select(-.pred_class)
 
+rf_class_probs <- rf_fit %>% predict(teste %>% select(-exc_features), type = "prob") %>% 
+  mutate(rf_prob_0 = .pred_0, rf_prob_1 = .pred_1) %>% select(-.pred_1, -.pred_0)
+
+
 teste <- teste %>% 
-  cbind(rf_class_pred)
+  cbind(rf_class_pred, rf_class_probs)
 
 # Calcula as métricas avaliativas para a previsão
 av_rf <- avaliacao("Floresta Al.", teste, "rf_class_pred", "status_tramita")
 ```
+
 <br>
+
 ```{r}
 av_rf
 ```
@@ -150,7 +208,9 @@ av_rf
 
 A AUC (Área sob a curva ROC) é uma métrica frequentemente utilizada para avaliação e comparação de classificadores. Quanto mais próximo a 0.5 mais o classificador gerado teve dificuldades em reconhecer a separação entre as classes aprendidas. <br>
 
-Neste caso, vemos que o classificador gerado neste treinamento não é eficaz. A partir da Matriz de Confusão (TP, TN, FP, FN) vemos que o modelo acerta bastante observações da classe negativa (baixo risco), entretanto tem dificuldades em reconhecer observações da classe positiva (alto risco). Vejamos como está dividido o balanço de observações, no nosso conjunto de treinamento, então: <br>
+No caso da Regressão Logística acima, vê-se que o modelo não consegue fazer distinção entre ambas as classes. O modelo erra menos classificando todos os contratos como pertencentes a classe negativa (devido ao seu tamanho pequeno), do que tentanto classificar como da classe positiva e errando. <br>
+
+Já para a Floresta Aleatória, ainda que tenhamos um modelo um pouco mais eficaz e que faz alguma distinção entre as classes, não é um resultado satisfatório. A partir da Matriz de Confusão (TP, TN, FP, FN) vemos que o modelo acerta bastante observações da classe negativa (baixo risco), entretanto tem dificuldades em reconhecer observações da classe positiva (alto risco). Vejamos como está dividido o balanço de observações, no nosso conjunto de treinamento, então: <br>
 
 
 ```{r}
@@ -164,6 +224,7 @@ O desbalanceamento entre classes é um problema presente no conjunto de dados de
 Para mitigar esse desbalanço vamos utilizar algumas estratégias já conhecidas na literatura e amplamente difundidas (*upsampling*, *undersampling*, dentre outros). <br>
 
 <br>
+
 
 
 
@@ -194,30 +255,58 @@ kable(table(treino_upsample$status_tramita),
 ```
 <br>
 
-```{r, include=FALSE, message=FALSE}
+```{r, include=FALSE}
 rf_fit_smote <- random_forest_m %>% 
   fit(status_tramita ~ ., data = treino_upsample)
 
-rf_smote_class_pred <- rf_fit_smote %>% predict(teste %>% select(-exc_features)) %>% 
-  mutate(rf_smote = .pred_class) %>% select(-.pred_class)
+
+rf_smote_class_preds <- rf_fit_smote %>% predict(teste %>% select(-exc_features)) %>% 
+  mutate(rf_smote_pred = .pred_class) %>% select(-.pred_class)
+  
+
+rf_smote_class_probs <- rf_fit_smote %>% predict(teste %>% select(-exc_features), type = "prob") %>% 
+  mutate(rf_smote_prob_0 = .pred_0, rf_smote_prob_1 = .pred_1) %>% select(-.pred_1, -.pred_0)
 
 teste <- teste %>% 
-  cbind(rf_smote_class_pred)
+  cbind(rf_smote_class_preds, rf_smote_class_probs)
 
 # Calcula as métricas avaliativas para a previsão
-av_rf_smote <- avaliacao("Floresta Al. Smote", teste, "rf_smote", "status_tramita")
+av_rf_smote <- avaliacao("Floresta Al. Smote", teste, "rf_smote_pred", "status_tramita")
 ```
+
+
 ```{r}
 av_rf_smote
 ```
+<br>
+
+
 
 <br>
+
 
 
 
 ## Avaliando Modelos
 
 Abaixo temos uma visão geral da perfomance dos modelos. <br>
+
+
+```{r, include=FALSE}
+rf_roc <- teste %>% roc_curve(status_tramita, rf_prob_1) %>% mutate(modelo = "RF")
+rf_smote_roc <- teste %>% roc_curve(status_tramita, rf_smote_prob_1) %>% mutate(modelo = "RF+Smote")
+
+rf_roc %>% 
+  bind_rows(rf_smote_roc) %>% 
+  group_by(modelo) %>% 
+  ggplot(aes(y = 1 - specificity, x = sensitivity, color = modelo)) +
+  geom_line(size = 1) +
+  geom_abline(slope = 1, intercept = 0, size = 0.4) +
+  coord_fixed() +
+  labs(title = "Curva ROC")
+```
+
+<br>
 
 ```{r}
 avaliacao <- av_rf %>% 
@@ -235,20 +324,16 @@ kable(avaliacao, col.names = c("Modelo", "F1", "AUC",
 
 
 
-
-
-
-
-
 ```{r salvaArquivos, include=FALSE}
-output_path <- paste("../tipologias/tipologias_arquivos/outputs/", Sys.Date(), sep = "")
-
-dir.create(here::here(output_path))
-
-# Salva arquivos da modelagem
-write.csv(teste, file = paste(output_path, "/teste_predictions.csv", sep = ""), row.names = FALSE)
-write.csv(treino_exc, file = paste(output_path, "/treino_exc.csv", sep = ""), row.names = FALSE)
-write.csv(treino, file = paste(output_path, "/treino_original.csv", sep = ""), row.names = FALSE)
-
-write.csv(treino_upsample, file = paste(output_path, "/treino_up.csv", sep = ""), row.names = FALSE)
+# Escreve os arquivos da modelagem na pasta abaixo
+# output_path <- paste("../tipologias/tipologias_arquivos/outputs", Sys.Date(), sep = "")
+# 
+# dir.create(here::here(output_path))
+# 
+# # Salva arquivos da modelagem
+# write.csv(teste, file = paste(output_path, "/teste_predictions.csv", sep = ""), row.names = FALSE)
+# write.csv(treino_exc, file = paste(output_path, "/treino_exc.csv", sep = ""), row.names = FALSE)
+# write.csv(treino, file = paste(output_path, "/treino_original.csv", sep = ""), row.names = FALSE)
+# 
+# write.csv(treino_upsample, file = paste(output_path, "/treino_up.csv", sep = ""), row.names = FALSE)
 ```

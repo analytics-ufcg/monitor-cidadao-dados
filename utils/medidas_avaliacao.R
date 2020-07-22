@@ -9,8 +9,8 @@ recall <- function(dados, col_predicao, col_status) {
     predicao <- sym(col_predicao)
     status <- sym(col_status)
     
-    relevantes <- dados %>%
-        filter(!!status == 1)
+    relevantes <- teste %>%
+        filter(!!status_tramita == 1)
     
     verdadeiros_positivos <- relevantes %>%
         filter(!!predicao == 1)
@@ -68,10 +68,10 @@ auc_metric <- function(dados, col_predicao, col_status) {
     library(tidyverse)
     library(pROC)
     
-    roc <- roc(as.numeric(as.character(dados[[col_status]])), 
+    roc <- pROC::roc(as.numeric(as.character(dados[[col_status]])), 
                as.numeric(as.character(dados[[col_predicao]])))
     
-    auc_score <- auc(roc)
+    auc_score <- pROC::auc(roc)
     
     return(auc_score)
 }
