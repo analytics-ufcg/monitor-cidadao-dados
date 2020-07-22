@@ -50,7 +50,7 @@ source(here::here("../utils/medidas_avaliacao.R"))
 
 ```{r, include=FALSE}
 # Leitura de tipologias
-tipologias_cgerais <- read_csv(here::here("../tipologias/tipologias_arquivos/tipologias_final_contratos_gerais20200718.csv"), 
+tipologias_cgerais <- read_csv(here::here("../tipologias/data/tipologias_contratos_gerais_2020-07-22.csv"),
     col_types = cols(cd_u_gestora = col_character(), nu_licitacao = col_character(), 
                      nu_contrato = col_character(), nu_cpfcnpj = col_character()))
 
@@ -69,8 +69,8 @@ tipologias_cgerais$tp_licitacao <- as.factor(tipologias_cgerais$tp_licitacao)
 
 
 ```{r, include=FALSE}
-exc_features <- c("cd_u_gestora", "nu_licitacao", "nu_contrato", "dt_ano",
-                  "data_inicio", "nu_cpfcnpj")
+exc_features <- c("id_contrato", "cd_u_gestora", "nu_licitacao", "nu_contrato", 
+                  "dt_ano", "data_inicio", "nu_cpfcnpj")
 ```
 
 
@@ -135,6 +135,7 @@ reg_logistica <- logistic_reg() %>%
 reglog_m <- reg_logistica %>%
   fit(status_tramita ~ ., data = train_baked)
  
+
 reglog_pred <- reglog_m %>% predict(new_data = test_baked) %>% 
   mutate(reglog_class_pred = .pred_class) %>% select(-.pred_class)
 
@@ -328,9 +329,6 @@ kable(avaliacao, col.names = c("Modelo", "F1", "AUC",
   kable_styling()
 ```
 
-
-
-
 ```{r salvaArquivos, include=FALSE}
 # Escreve os arquivos da modelagem na pasta abaixo
 output_path <- paste("../tipologias/tipologias_arquivos/outputs-", Sys.Date(), sep = "")
@@ -344,3 +342,4 @@ write.csv(treino, file = paste(output_path, "/treino_original.csv", sep = ""), r
 
 write.csv(treino_upsample, file = paste(output_path, "/treino_up.csv", sep = ""), row.names = FALSE)
 ```
+
