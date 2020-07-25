@@ -45,8 +45,20 @@ readr::write_csv(codigo_subfuncao, here::here("./data/codigo_subfuncao.csv"))
 codigo_unidade_gestora <- fetch_codigo_unidade_gestora(sagres)
 readr::write_csv(codigo_unidade_gestora, here::here("./data/codigo_unidade_gestora.csv"))
 
-empenhos <- fetch_empenhos(sagres)
-readr::write_csv(empenhos, here::here("./data/empenhos.csv"))
+for (cd_municipio in codigo_municipio$cd_Municipio) {
+  print(sprintf('[%s] empenhos cd_municipio = %s', Sys.time(), cd_municipio))
+  
+  output_dir = 'data/empenhos/'
+  if (!dir.exists(output_dir)){
+    dir.create(output_dir)
+  }
+  
+  empenhos <- fetch_empenhos(sagres, cd_municipio)
+  readr::write_csv(empenhos, here::here(sprintf("./data/empenhos/empenhos_%s.csv", cd_municipio)))
+ 
+  rm(empenhos)  # remove o dataframe 'empenhos'
+  gc() # permite que o R retorne memória pro sistema operacional
+}
 
 estorno_pagamento <- fetch_estorno_pagamento(sagres)
 readr::write_csv(estorno_pagamento, here::here("./data/estorno_pagamento.csv"))
