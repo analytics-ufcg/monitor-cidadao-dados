@@ -154,12 +154,12 @@ read_codigo_subelemento <- function() {
 #' @rdname read_empenhos
 #' @examples
 #' empenhos_dt <- read_empenhos()
-read_empenhos <- function() {
-  empenhos_df <- readr::read_csv(here::here("../fetcher/data/empenhos.csv"),
+read_empenhos_by_municipio <- function(cd_municipio) {
+  empenhos_df <- readr::read_csv(here::here(sprintf("../fetcher/data/empenhos/empenhos_%s.csv", cd_municipio)),
                                  col_types = list(
                                    .default = readr::col_number(),
-                                   cd_UGestora = readr::col_character(),
-                                   dt_Ano = readr::col_character(),
+                                   cd_UGestora = readr::col_number(),
+                                   dt_Ano = readr::col_number(),
                                    cd_UnidOrcamentaria = readr::col_character(),
                                    cd_Funcao = readr::col_character(),
                                    cd_Subfuncao = readr::col_character(),
@@ -171,7 +171,7 @@ read_empenhos <- function() {
                                    cd_Modalidade = readr::col_character(),
                                    cd_Elemento = readr::col_character(),
                                    cd_SubElemento = readr::col_character(),
-                                   tp_Licitacao = readr::col_character(),
+                                   tp_Licitacao = readr::col_number(),
                                    nu_Licitacao = readr::col_character(),
                                    nu_Empenho = readr::col_character(),
                                    tp_Empenho = readr::col_character(),

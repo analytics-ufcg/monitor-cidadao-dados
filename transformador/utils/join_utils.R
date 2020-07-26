@@ -15,6 +15,23 @@ join_contratos_licitacao <- function(df_contratos, df_licitacoes) {
     dplyr::select(id_contrato, id_licitacao, cd_municipio, dplyr::everything())
 }
 
+
+#' @title Realiza o join dos empenhos com o dataframe das licitações
+#' @param empenhos_df dataframe com os empenhos
+#' @param licitacoes_df dataframe com as licitações
+#' @return Dataframe contendo informações dos empenhos com os ids das licitações
+#' @rdname join_empenhos_licitacao
+#' @examples
+#' join_empenhos_licitacao_dt <- join_empenhos_licitacao(df_empenhos, df_licitacoes)
+#'
+join_empenhos_licitacao <- function(df_empenhos, df_licitacoes) {
+  df_licitacoes %<>% dplyr::select(cd_u_gestora, dt_ano, nu_licitacao,
+                                   tp_licitacao, id_licitacao)
+
+  df_empenhos %<>% dplyr::left_join(df_licitacoes) %>%
+    dplyr::select(id_empenho, id_licitacao, cd_municipio, dplyr::everything())
+}
+
 #' @title Realiza o join dos contratos com os códigos das unidades gestoras
 #' @param df_contratos dataframe com os contratos
 #' @param df_codigo_unidade_gestora dataframe com os códigos das unidades gestoras
