@@ -110,7 +110,13 @@ process_contrato <- function(contratos_df) {
 #' @return Dataframe contendo informações dos empenhos processados
 process_empenho <- function(empenhos_df) {
   empenhos_df %<>% .extract_cd_municipio("cd_u_gestora") %>%
-    generate_empenho_id()
+    generate_empenho_id() %>%
+    dplyr::mutate(nu_empenho = iconv(nu_empenho, "UTF-8", "latin1", sub=''),
+                  de_historico = iconv(de_historico, "UTF-8", "latin1", sub=''),
+                  de_historico1 = iconv(de_historico1, "UTF-8", "latin1", sub=''),
+                  de_historico2 = iconv(de_historico2, "UTF-8", "latin1", sub=''),
+                  no_credor = iconv(no_credor, "UTF-8", "latin1", sub=''),
+                  )
 }
 
 #' @title Processa dataframe de licitações
