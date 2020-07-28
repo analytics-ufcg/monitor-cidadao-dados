@@ -1,0 +1,345 @@
+---
+title: "Contratos Gerais"
+subtitle: "modelagem e avaliação"
+output:
+  html_document:
+    df_print: paged
+    code_folding: hide
+---
+
+--------
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  fig.retina = 2,
+  collapse = TRUE,
+  out.width = "100%",
+  out.height = "70%",
+  fig.asp = 0.618  # 1 / phi
+  # fig.show = "hold"
+)
+```
+
+```{r libs, include=FALSE}
+library(here)
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(tidymodels)
+library(kableExtra)
+# library(tidyr)
+
+# library(themis) # Balanceamento de classes
+library(unbalanced)
+
+theme_set(theme_minimal())
+options(scipen = 999)
+
+set.seed(123)
+Sys.setlocale(category = "LC_ALL", locale = "pt_PT.UTF-8")
+```
+
+```{r, include=FALSE}
+source(here::here("../utils/medidas_avaliacao.R"))
+```
+
+
+## Visão Geral
+
+```{r, include=FALSE}
+# Leitura de tipologias
+tipologias_cgerais <- read_csv(here::here("../tipologias/data/tipologias_contratos_gerais_2020-07-22.csv"),
+    col_types = cols(cd_u_gestora = col_character(), nu_licitacao = col_character(), 
+                     nu_contrato = col_character(), nu_cpfcnpj = col_character()))
+
+
+# Leitura gabarito (Contratos rescindidos)
+# contratos_tramita <- read_csv(here::here("../dados/contratos_rescindidos_2018/contratos_tramita_tratado.csv"), 
+#     col_types = cols(cd_Ugestora = col_character(), numero_contrato = col_character(), nu_CPFCNPJ = col_character()))
+
+# Remove observações com valores faltantes
+tipologias_cgerais <- tipologias_cgerais %>% 
+  drop_na()
+
+tipologias_cgerais$status_tramita <- as.factor(tipologias_cgerais$status_tramita)
+tipologias_cgerais$tp_licitacao <- as.factor(tipologias_cgerais$tp_licitacao)
+```
+
+
+```{r, include=FALSE}
+exc_features <- c("id_contrato", "cd_u_gestora", "nu_licitacao", "nu_contrato", 
+                  "dt_ano", "data_inicio", "nu_cpfcnpj")
+```
+
+
+```{r, include=FALSE}
+# Geração do índice separação em treino e teste
+index <- initial_split(tipologias_cgerais, prop = 0.8, strata = status_tramita)
+
+
+# Separação dos dados em conjuntos de treino e teste
+treino <- training(index)
+teste <- testing(index)
+
+
+# Removendo as colunas não necessárias para o treinamento
+treino_exc <- treino %>% select(!exc_features)
+# teste_exc <- treino %>% select(!exc_features)
+```
+
+
+
+
+Neste relatório, a partir de características comportamentais das empresas que celebraram os contratos desejamos prever o risco de que novos contratos sejam rompidos. <br>
+
+Será utilizado um conjunto de 15 atributos de contratos que descrevem características comportamentais das empresas fornecedoras dos contratos. Associado a isso, temos um gabarito para esta tarefa de classificação que informará, dado um contrato, seu teor de risco (baixo ou alto risco). Assumiremos contratos de alto risco como contratos rompidos por ocasião de um *Impedimento, Sustação ou Rescisão*. Nosso conjunto de dados dispõe de `r nrow(tipologias_cgerais)` contratos administrativos.  <br>
+
+
+Para modelagem serão utilizados os algoritmos: Floresta Aleatória e Regressão Logística. Os modelos serão treinados utilizando divisão de 80%/20% para conjuntos de treino e teste respectivamente, e avaliados utilizando a métrica AUC/ROC. <br><br>
+
+
+
+
+## Regressão Logística
+
+
+```{r, include=FALSE}
+# recipe_reglog <- recipe(status_tramita ~ ., data = treino_exc) %>% 
+#   step_center(all_numeric()) %>%
+#   step_scale(all_numeric()) %>% 
+#   prep(data = treino_exc)
+
+## 
+# ---- Pré-processamento
+##
+
+rl_receita <- recipe(status_tramita ~ ., data = treino_exc) %>% 
+  step_scale(all_numeric(), -all_outcomes()) %>%
+  step_dummy(all_nominal(), -all_outcomes()) %>% 
+  prep()
+
+train_baked <- juice(rl_receita)
+test_baked <- bake(rl_receita, new_data = teste)
+
+
+## 
+# ---- Modelo
+##
+
+reg_logistica <- logistic_reg() %>%
+  set_engine("glm") %>%
+  set_mode("classification")
+
+reglog_m <- reg_logistica %>%
+  fit(status_tramita ~ ., data = train_baked)
+ 
+
+reglog_pred <- reglog_m %>% predict(new_data = test_baked) %>% 
+  mutate(reglog_class_pred = .pred_class) %>% select(-.pred_class)
+
+reglog_probs <- reglog_m %>% predict(new_data = test_baked, type = "prob") %>% 
+  mutate(reglog_prob_0 = .pred_0, reglog_prob_1 = .pred_1) %>% select(-.pred_1, -.pred_0)
+
+
+teste <- teste %>% 
+  cbind(reglog_pred, reglog_probs) %>% 
+  mutate(reglog_class_pred = as.character(reglog_class_pred))
+
+# Calcula as métricas avaliativas para a previsão
+av_reglog <- avaliacao("Reg Logística", teste, "reglog_class_pred", "status_tramita")
+```
+
+<br>
+
+```{r}
+av_reglog
+```
+
+<br>
+
+
+## Modelagem Floresta Aleatória
+
+```{r, include=FALSE}
+## 
+# ---- Definições gerais
+##
+
+
+# Modelo que será utilizado e tipo de tarefa
+random_forest_m <- rand_forest() %>% 
+  set_engine("randomForest") %>% 
+  set_mode("classification")
+```
+
+
+```{r, include=FALSE}
+# Conjunto de métricas para avaliação dos modelos
+# con_metrics <- metric_set(roc_auc)
+
+
+## 
+# ---- Definições específicas
+##
+
+rf_fit <- random_forest_m %>% 
+  fit(status_tramita ~ ., data = treino_exc)
+
+
+rf_class_pred <- rf_fit %>% predict(teste %>% select(-exc_features)) %>% 
+  mutate(rf_class_pred = .pred_class) %>% select(-.pred_class)
+
+rf_class_probs <- rf_fit %>% predict(teste %>% select(-exc_features), type = "prob") %>% 
+  mutate(rf_prob_0 = .pred_0, rf_prob_1 = .pred_1) %>% select(-.pred_1, -.pred_0)
+
+
+teste <- teste %>% 
+  cbind(rf_class_pred, rf_class_probs)
+
+# Calcula as métricas avaliativas para a previsão
+av_rf <- avaliacao("Floresta Al.", teste, "rf_class_pred", "status_tramita")
+```
+
+<br>
+
+```{r}
+av_rf
+```
+
+
+<br>
+
+A AUC (Área sob a curva ROC) é uma métrica frequentemente utilizada para avaliação e comparação de classificadores. Quanto mais próximo a 0.5 mais o classificador gerado teve dificuldades em reconhecer a separação entre as classes aprendidas. <br>
+
+No caso da Regressão Logística acima, vê-se que o modelo não consegue fazer distinção entre ambas as classes. O modelo erra menos classificando todos os contratos como pertencentes a classe negativa (devido ao seu tamanho pequeno), do que tentanto classificar como da classe positiva e errando. <br>
+
+Já para a Floresta Aleatória, ainda que tenhamos um modelo um pouco mais eficaz e que faz alguma distinção entre as classes, não é um resultado satisfatório. A partir da Matriz de Confusão (TP, TN, FP, FN) vemos que o modelo acerta bastante observações da classe negativa (baixo risco), entretanto tem dificuldades em reconhecer observações da classe positiva (alto risco). Vejamos como está dividido o balanço de observações, no nosso conjunto de treinamento, então: <br>
+
+
+```{r}
+kable(table(tipologias_cgerais$status_tramita),
+      col.names = c("Classe", "Frequência")) %>% 
+  kable_styling()
+```
+
+O desbalanceamento entre classes é um problema presente no conjunto de dados de treinamento e isso é refletido no resultado do modelo. Dadas as quantidades em cada classe, temos um modelo que aprende muitíssimo mais sobre as observações de baixo risco do que sobre observações de alto risco. <br>
+
+Para mitigar esse desbalanço vamos utilizar algumas estratégias já conhecidas na literatura e amplamente difundidas (*upsampling*, *undersampling*, dentre outros). <br>
+
+<br>
+
+
+
+
+## Balanceamentos artificiais
+
+Como vimos, há um severo desbalanço entre as classes de alto e baixo risco em nossos contratos e esse fator impacta diretamente na capacidade de aprendizagem do modelo - aprende-se muito mais sobre a classe de contratos denominada de baixo risco, e pouco sobre a classe alvo que chamamos de alto risco. <br>
+
+O balanceamento artificial de classes é realizado na experimentação científica quando não é possível retornar ao mundo real e coletar um maior número de observações da classe minoritária. No nosso caso, desejamos modelar um fenômeno atípico, a rescisão de contratos, então é natural que tenhamos um número muito maior de contratos que não foram rompidos (baixo risco) do que de contratos rompidos (alto risco). Por essa razão é preciso realizar o balanceamento artifial do conjunto de treinamento, neste experimento utilizaremos o [SMOTE](https://arxiv.org/pdf/1106.1813.pdf).<br><br>
+
+
+### SMOTE
+
+
+Utilizando o SMOTE a classe majoritária será reduzida e a minoritária acrescida. A nova quantidade de observações em cada classe então será: <br>
+
+
+```{r, include=FALSE}
+balance <- ubBalance(treino_exc, treino_exc$status_tramita, 
+                     type = "ubSMOTE", positive = 1, k = 5, percOver = 1000, verbose = TRUE)
+
+treino_upsample <- balance$X
+```
+
+```{r}
+kable(table(treino_upsample$status_tramita),
+      col.names = c("Classe", "Frequência")) %>% 
+  kable_styling()
+```
+<br>
+
+```{r, include=FALSE}
+rf_fit_smote <- random_forest_m %>% 
+  fit(status_tramita ~ ., data = treino_upsample)
+
+
+rf_smote_class_preds <- rf_fit_smote %>% predict(teste %>% select(-exc_features)) %>% 
+  mutate(rf_smote_pred = .pred_class) %>% select(-.pred_class)
+  
+
+rf_smote_class_probs <- rf_fit_smote %>% predict(teste %>% select(-exc_features), type = "prob") %>% 
+  mutate(rf_smote_prob_0 = .pred_0, rf_smote_prob_1 = .pred_1) %>% select(-.pred_1, -.pred_0)
+
+teste <- teste %>% 
+  cbind(rf_smote_class_preds, rf_smote_class_probs)
+
+# Calcula as métricas avaliativas para a previsão
+av_rf_smote <- avaliacao("Floresta Al. Smote", teste, "rf_smote_pred", "status_tramita")
+```
+
+
+```{r}
+av_rf_smote
+```
+<br>
+<br>
+
+
+
+
+## Avaliando Modelos
+
+Abaixo temos uma visão geral da perfomance dos modelos. <br>
+
+
+```{r, include=FALSE}
+reglog_roc <- teste %>% roc_curve(status_tramita, reglog_prob_1) %>% mutate(modelo = "RegLog")
+rf_roc <- teste %>% roc_curve(status_tramita, rf_prob_1) %>% mutate(modelo = "RF")
+rf_smote_roc <- teste %>% roc_curve(status_tramita, rf_smote_prob_1) %>% mutate(modelo = "RF+Smote")
+```
+
+```{r}
+rf_roc %>% 
+  bind_rows(reglog_roc) %>% 
+  bind_rows(rf_smote_roc) %>% 
+  group_by(modelo) %>% 
+  ggplot(aes(y = 1 - specificity, x = sensitivity, color = modelo)) +
+  geom_line(size = 1) +
+  geom_abline(slope = 1, intercept = 0, size = 0.4) +
+  coord_fixed() +
+  labs(title = "Curva ROC")
+```
+
+
+<br>
+
+```{r}
+avaliacao <- av_reglog %>% 
+  rbind(av_rf) %>% 
+  rbind(av_rf_smote)
+```
+
+```{r avaliacao}
+# Visão geral da avaliação de modelos
+kable(avaliacao, col.names = c("Modelo", "F1", "AUC", 
+                                  "Precisão", "Revocação", "MCC",
+                                  "VP", "VN", "FP", "FN")) %>% 
+  kable_styling()
+```
+
+```{r salvaArquivos, include=FALSE}
+# Escreve os arquivos da modelagem na pasta abaixo
+output_path <- paste("../tipologias/tipologias_arquivos/outputs-", Sys.Date(), sep = "")
+
+dir.create(here::here(output_path))
+
+# Salva arquivos da modelagem
+write.csv(teste, file = paste(output_path, "/teste_predictions.csv", sep = ""), row.names = FALSE)
+write.csv(treino_exc, file = paste(output_path, "/treino_exc.csv", sep = ""), row.names = FALSE)
+write.csv(treino, file = paste(output_path, "/treino_original.csv", sep = ""), row.names = FALSE)
+
+write.csv(treino_upsample, file = paste(output_path, "/treino_up.csv", sep = ""), row.names = FALSE)
+```
+
