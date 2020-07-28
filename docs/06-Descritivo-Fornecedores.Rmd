@@ -46,18 +46,18 @@ theme_set(theme_minimal())
 ```
 
 ```{r, include=FALSE}
-source(here::here("lib/utils-sagres.R"))
-source(here::here("lib/get-dados.R"))
+source(here::here("../lib/utils-sagres.R"))
+source(here::here("../lib/get-dados.R"))
 ```
 
 ```{r, include=FALSE, message=FALSE}
-contratos_rescindidos_2018 <- read_delim(here::here("dados/contratos_rescindidos_2018/contratos_mutacoes_tramita_08_11_2018_corrigido-original.csv"), ";", escape_double = FALSE, col_types = cols(cnpj_fornecedor = col_character(),
+contratos_rescindidos_2018 <- read_delim(here::here("../dados/contratos_rescindidos_2018/contratos_mutacoes_tramita_08_11_2018_corrigido-original.csv"), ";", escape_double = FALSE, col_types = cols(cnpj_fornecedor = col_character(),
         cpf_fornecedor = col_character(),
         data_ato_mutacao = col_character(),
         data_mutacao = col_character(), numero_contrato = col_character()),
     trim_ws = TRUE)
 
-contratos_tratados <- read_csv(here::here("dados/contratos_rescindidos_2018/contratos_tramita_tratado.csv"))
+contratos_tratados <- read_csv(here::here("../dados/contratos_rescindidos_2018/contratos_tramita_tratado.csv"))
 
 contratos_tratados$cd_Ugestora <- as.character(contratos_tratados$cd_Ugestora)
 ```
@@ -183,7 +183,7 @@ fornecedores_Municipios <- fornecedores %>%
 
 ```{r, include=FALSE}
 # Mapa Paraíba
-mapa_pb <- readOGR(here::here("dados/mapa_paraiba_ibge/Municipios.shp"))
+mapa_pb <- readOGR(here::here("../dados/mapa_paraiba_ibge/Municipios.shp"))
 
 # Corrigindo nomes de municípios que mudaram ao longo dos anos
 levels_mapa = levels(mapa_pb@data$Nome_Munic)
