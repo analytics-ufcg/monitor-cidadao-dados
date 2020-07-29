@@ -49,10 +49,17 @@ source(here::here("../lib_modelos/modelagem_medidas_avaliacao.R"))
 ## Visão Geral
 
 ```{r, include=FALSE}
-# Leitura de tipologias
+# Leitura de tipologias de contratos encerrados
 tipologias_cgerais <- read_csv(here::here("../tipologias/data/tipologias_contratos_gerais_2020-07-22.csv"),
     col_types = cols(cd_u_gestora = col_character(), nu_licitacao = col_character(), 
                      nu_contrato = col_character(), nu_cpfcnpj = col_character()))
+
+
+# Leitura de tipologias de contratos vigentes
+tipologias_contratos_vigentes <- read_csv(here::here("../tipologias/data/tipologias_contratos_vigentes_2020-07-28.csv"),
+                                          col_types = cols(cd_u_gestora = col_character(), 
+                                          nu_licitacao = col_character(), nu_contrato = col_character(), 
+                                          nu_cpfcnpj = col_character()))
 
 
 # Leitura gabarito (Contratos rescindidos)
@@ -290,6 +297,24 @@ av_rf_smote
 
 
 
+```{r, include=FALSE}
+# Realizando previsão no conjunto de contratos vigentes
+
+tipologias_contratos_vigentes$tp_licitacao <- as.factor(tipologias_contratos_vigentes$tp_licitacao)
+
+rf_smote_pred_vigentes <- rf_fit_smote %>% predict(tipologias_contratos_vigentes %>% select(-exc_features)) %>% 
+  mutate(vig_pred = .pred_class) %>% select(-.pred_class)
+
+rf_smote_prob_vigentes <- rf_fit_smote %>% predict(tipologias_contratos_vigentes %>% select(-exc_features), type = "prob") %>% 
+  mutate(vig_prob_0 = .pred_0, vig_prob_1 = .pred_1) %>% select(-.pred_0, -.pred_1)
+
+tipologias_contratos_vigentes %<>% 
+  bind_cols(rf_smote_pred_vigentes) %>% 
+  bind_cols(rf_smote_prob_vigentes)
+```
+
+
+
 
 ## Avaliando Modelos
 
@@ -343,5 +368,9 @@ write.csv(treino_exc, file = paste(output_path, "/treino_exc.csv", sep = ""), ro
 write.csv(treino, file = paste(output_path, "/treino_original.csv", sep = ""), row.names = FALSE)
 
 write.csv(treino_upsample, file = paste(output_path, "/treino_up.csv", sep = ""), row.names = FALSE)
+
+# Salva previsão para contratos vigentes
+# write.csv(tipologias_contratos_vigentes, 
+          # file = paste(output_path, "/TipologiasContratosVigentesPrevisoes.csv", sep = ""), row.names = FALSE)
 ```
 
