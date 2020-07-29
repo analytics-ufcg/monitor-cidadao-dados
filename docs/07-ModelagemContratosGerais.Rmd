@@ -42,7 +42,7 @@ Sys.setlocale(category = "LC_ALL", locale = "pt_PT.UTF-8")
 ```
 
 ```{r, include=FALSE}
-source(here::here("../utils/medidas_avaliacao.R"))
+source(here::here("../lib_modelos/modelagem_medidas_avaliacao.R"))
 ```
 
 
@@ -69,8 +69,10 @@ tipologias_cgerais$tp_licitacao <- as.factor(tipologias_cgerais$tp_licitacao)
 
 
 ```{r, include=FALSE}
-exc_features <- c("id_contrato", "cd_u_gestora", "nu_licitacao", "nu_contrato", 
-                  "dt_ano", "data_inicio", "nu_cpfcnpj")
+exc_features <- c("id_contrato", "cd_u_gestora", 
+                  "nu_licitacao", "nu_contrato", 
+                  "dt_ano", "data_inicio", 
+                  "nu_cpfcnpj")
 ```
 
 
@@ -305,7 +307,7 @@ rf_roc %>%
   bind_rows(reglog_roc) %>% 
   bind_rows(rf_smote_roc) %>% 
   group_by(modelo) %>% 
-  ggplot(aes(y = 1 - specificity, x = sensitivity, color = modelo)) +
+  ggplot(aes(x = 1 - specificity, y = sensitivity, color = modelo)) +
   geom_line(size = 1) +
   geom_abline(slope = 1, intercept = 0, size = 0.4) +
   coord_fixed() +
