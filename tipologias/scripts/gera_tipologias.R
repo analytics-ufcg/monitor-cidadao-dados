@@ -7,9 +7,33 @@ source(here::here("R/tipologias.R"))
 source(here::here("R/utils.R"))
 source(here::here("R/carrega_gabarito_contratos.R"))
 
+.HELP <- "Rscript gera_tipologias.R -v <vigentes>"
 
 
-.HELP <- "Rscript gera_tipologias.R"
+#-----------------------------------FUNÇÕES-----------------------------------#
+
+#' @title Obtém argumentos passados por linha de comando
+get_args <- function() {
+  args = commandArgs(trailingOnly=TRUE)
+  
+  option_list = list(
+    optparse::make_option(c("-v", "--vigentes"),
+                          type="logical",
+                          default="TRUE",
+                          help="Boleano que decide se gera tipologias apenas para contratos vigentes ou não",
+                          metavar="logical")
+  );
+  
+  opt_parser <- optparse::OptionParser(option_list = option_list, usage = .HELP)
+  
+  opt <- optparse::parse_args(opt_parser)
+  return(opt);
+}
+#-----------------------------------------------------------------------------#
+
+args <- get_args()
+
+vigentes <- args$vigentes
 
 al_db_con <- NULL
 
@@ -25,7 +49,7 @@ tryCatch({al_db_con <- DBI::dbConnect(RPostgres::Postgres(),
 print("Carregando licitações...")
 licitacoes <- carrega_licitacoes(al_db_con)
 print("Carregando contratos...")
-contratos <- carrega_contratos(al_db_con) 
+contratos <- carrega_contratos(al_db_con, vigentes) 
 print("Carregando propostas de licitações...")
 propostas <- carrega_propostas_licitacao(al_db_con)
 
@@ -67,7 +91,10 @@ tipologias_final_contratos_gerais <- tipologias_merge %>%
   dplyr::left_join(tipologias_contrato, by = c("cd_u_gestora", "nu_contrato", "nu_cpfcnpj", "data_inicio")) %>% 
   dplyr::select(id_contrato, dplyr::everything())
 
-readr::write_csv(tipologias_final_contratos_gerais, paste("data/tipologias_contratos_gerais_", Sys.Date(), ".csv", sep = ""))
+readr::write_csv(tipologias_final_contratos_gerais, 
+                 dplyr::if_else(vigentes,
+                                paste("data/tipologias_contratos_vigentes_", Sys.Date(), ".csv", sep = ""),
+                                paste("data/tipologias_contratos_gerais_", Sys.Date(), ".csv", sep = "")))
 
 
 DBI::dbDisconnect(al_db_con)
