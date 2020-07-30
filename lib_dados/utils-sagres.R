@@ -8,7 +8,7 @@ get_municipio <- function(cd_UGestora) {
   result <- data.frame(
     cd_Municipio = stri_sub(cd_UGestora, -3)) %>%
     join(municipios)
-  return(result$de_Municipio)
+  return(result$no_Municipio)
 }
 
 #' @title
