@@ -34,7 +34,7 @@ library(tidyr)
 
 library(stringi)
 library(kableExtra)
-# library(knitr) # tabelas bonitas
+library(knitr) # tabelas bonitas
 
 library(rgdal)
 library(leaflet)
@@ -177,7 +177,7 @@ fornecedores_Municipios <- fornecedores %>%
 
 ```{r, include=FALSE}
 # Mapa Paraíba
-mapa_pb <- readOGR(here::here("dados/mapa_paraiba_ibge/Municipios.shp"))
+mapa_pb <- readOGR(here::here("../dados/mapa_paraiba_ibge/Municipios.shp"))
 
 # Corrigindo nomes de municípios que mudaram ao longo dos anos
 levels_mapa = levels(mapa_pb@data$Nome_Munic)
@@ -562,7 +562,6 @@ kable_styling()
 
 <br>
 
-Destes, `r contratos_interrompidos %>% select(cnpj_fornecedor) %>% na.omit() %>% nrow()` foram firmados com Pessoas Jurídicas, e `r contratos_interrompidos %>% select(cpf_fornecedor) %>% na.omit() %>% nrow()` com Pessoas Físicas.
 
 <br>
 
