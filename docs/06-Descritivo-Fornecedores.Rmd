@@ -1,6 +1,5 @@
 ---
 title: "Fornecedores em Licitações Paraibanas"
-subtitle: "Fonte de dados: Sagres"
 author: "Monitor Cidadão - Laboratório Analytics"
 output:
   html_document:
@@ -51,10 +50,10 @@ source(here::here("../lib_dados/get-dados.R"))
 ```
 
 ```{r, include=FALSE, message=FALSE}
-contratos_mutados_2020 <- read_delim(here::here("../dados/contratos_mutados_2020/ContratosMutadosTramita_Julho2020.csv"), ";", escape_double = FALSE, col_types = cols(cpf_cnpj = col_character(),
-        data_alteracao = col_character(),
-        numero_contrato = col_character()),
-    trim_ws = TRUE)
+contratos_mutados_2020 <- read_csv(here::here("../dados/contratos_mutados_2020/ContratosMutadosTramita_Julho2020.csv"))
+
+
+contratos_mutados_2020$cd_Ugestora <- as.character(contratos_mutados_2020$cd_Ugestora)
 ```
 
 
@@ -75,7 +74,7 @@ No relatório anterior conhecemos mais sobre características das licitações p
 <br>
 <br>
 
-## O que há no SAGRES?
+## O que há no Sagres?
 
 
 ```{r, include=FALSE, message=FALSE}
@@ -540,12 +539,12 @@ kable(aplicado_ganho %>%
 
 
 ```{r, include=FALSE}
-contratos_mutados_2020$data_mutacao <- as.Date(contratos_mutados_2020$data_mutacao)
-contratos_mutados_2020$ano_rescisao <- as.numeric(format(contratos_mutados_2020$data_mutacao, "%Y"))
+contratos_mutados_2020$data_alteracao <- as.Date(contratos_mutados_2020$data_alteracao)
+contratos_mutados_2020$ano_alteracao <- as.numeric(format(contratos_mutados_2020$data_alteracao, "%Y"))
 
 contratos_interrompidos <- contratos_mutados_2020 %>%
-  filter(tipo_mutacao == "IMPEDIMENTO" | tipo_mutacao == "RESCISAO" | tipo_mutacao == "SUSPENSAO" | tipo_mutacao == "SUSTACAO") %>%
-  select(-protocolo_contrato_tce, -justificativa_mutacao)
+  filter(tipo_alteracao == "Impedimento" | tipo_alteracao == "Rescisão" | tipo_alteracao == "Suspensão" | tipo_alteracao == "Sustação") 
+# %>% select(-protocolo_contrato_tce, -justificativa_mutacao)
 ```
 
 Entre 2014 e 2018, segundo o [TRAMITA](https://tramita.tce.pb.gov.br/), tivemos aproximadamente `r nrow(contratos_mutados_2020)` contratos administrativos cuja situação foi mutada. Dentre estes, `r nrow(contratos_interrompidos)` foram interrompidos devido a *Impedimento*, *Rescisão*, *Suspensão* ou *Sustação*. De modo que estão assim distribuídos:
@@ -554,7 +553,7 @@ Entre 2014 e 2018, segundo o [TRAMITA](https://tramita.tce.pb.gov.br/), tivemos 
 
 ```{r}
 kable(contratos_interrompidos %>%
-        group_by(tipo_mutacao) %>%
+        group_by(tipo_alteracao) %>%
         dplyr::summarise(TotalTipo = n()) %>%
         arrange(-TotalTipo),
       col.names = c("Tipo da Mutação", "Nº Ocorrências")) %>%
@@ -569,34 +568,30 @@ Destes, `r contratos_interrompidos %>% select(cnpj_fornecedor) %>% na.omit() %>%
 
 
 ```{r, include=FALSE}
-contratos_tratados_info <- contratos_tratados %>%
+contratos_mutados_info <- contratos_mutados_2020 %>%
   left_join(contratos, by = c('cd_Ugestora' = 'cd_UGestora', 
                               'numero_contrato' = 'nu_Contrato',
-                              'nu_CPFCNPJ' = 'nu_CPFCNPJ'))
+                              'cpf_cnpj' = 'nu_CPFCNPJ'))
 
-contratos_tratados_info <- contratos_tratados_info %>% 
-  select(-c("ordemServico", "planilha", "foto", "dt_Recebimento",
-            "cd_SIAFI", "registroCGE", "dt_MesAno", "de_Obs"))
-
-contratos_tratados_info <- contratos_tratados_info %>%
+contratos_mutados_info <- contratos_mutados_info %>%
   left_join(tipos_modalidade, by = "tp_Licitacao")
 
-contratos_tratados_info <- contratos_tratados_info %>% 
+contratos_mutados_info <- contratos_mutados_info %>% 
   left_join(licitacoes, by = c('cd_Ugestora' = 'cd_UGestora',
                                'nu_Licitacao' = 'nu_Licitacao',
                                'tp_Licitacao' = 'tp_Licitacao'))
 
-contratos_tratados_info <- contratos_tratados_info %>%
+contratos_mutados_info <- contratos_mutados_info %>%
   left_join(tipo_objeto_licitacao, by = "tp_Objeto")
 ```
 
-Destes, apenas 294 contratos possuem, no SAGRES, dados de licitações associadas a si. Para esta parcela:
+Destes, apenas `r contratos_mutados_info %>% select(nu_Licitacao) %>% na.omit() %>% nrow()` contratos possuem, no SAGRES, dados de licitações associadas a si. Para esta parcela:
 
 <br>
 
 
 ```{r}
-contratos_tratados_info %>%
+contratos_mutados_info %>%
   group_by(de_TipoLicitacao) %>% 
   dplyr::summarise(Ocorrencias = n()) %>% 
   ggplot(aes(x = reorder(de_TipoLicitacao, -Ocorrencias), y = Ocorrencias)) +
@@ -612,15 +607,16 @@ contratos_tratados_info %>%
 # dev.off()
 ```
 
-
 <br>
 
-O *Pregão Presencial* é, conhecidamente, uma modalidade onde pode ocorrer conluio entre fornecedores, fornecedores e unidades gestoras, intimidação de participantes, e outras práticas ilegítimas. Esta pode ser uma das explicações de, à parte os contratos onde não temos dados, o maior número de contratos vetados é pertencente a categoria Pregão Presencial.
+*Tomada de Preços* é uma modalidade de licitação, entre fornecedores devidamente cadastrados, onde a escolha do fornecedor é mediante a oferta de preços.
+
+O *Pregão Presencial* é, conhecidamente, uma modalidade onde pode ocorrer conluio entre fornecedores, fornecedores e unidades gestoras, intimidação de participantes, e outras práticas ilegítimas. Esta pode ser uma das explicações de, à parte os contratos onde não temos dados, o segundo maior número de contratos vetados é pertencente a categoria Pregão Presencial.
 
 <br>
 
 ```{r}
-contratos_tratados_info %>%
+contratos_mutados_info %>%
   group_by(de_TipoObjeto) %>% 
   dplyr::summarise(Ocorrencias = n()) %>% 
   ggplot(aes(x = reorder(de_TipoObjeto, -Ocorrencias), y = Ocorrencias)) +
@@ -638,12 +634,12 @@ contratos_tratados_info %>%
 
 <br>
 
-Dada a complexidade, imaginamos que os contratos mais frequentemente rescindidos dados os motivos citados acima seriam os de obras. Entretanto vemos que, a partir dos dados disponíveis, a seara com maior número de cancelamentos é a de Compras e Serviços. Por fim, temos uma visão geral dos municípios com o maior número de rescisões.
+Dada a complexidade, imaginamos que os contratos mais frequentemente rescindidos dados os motivos citados acima seriam os de obras. Entretanto vemos que, a partir dos dados disponíveis, a seara com maior número de cancelamentos é a de Compras e Serviços. No entanto, a quantidade de contratos rescindidos de Obras e Serviços de engenharia é quase igual a quantidade de contratos rescindidos de Compras e Serviços. Por fim, temos uma visão geral dos municípios com o maior número de rescisões.
 
 <br>
 
 ```{r, include=FALSE}
-sumario_rescisoes <- contratos_tratados_info %>% 
+sumario_rescisoes <- contratos_mutados_info %>% 
   select(cd_Ugestora)
   
 sumario_rescisoes <- sumario_rescisoes %>%
@@ -714,7 +710,7 @@ leaflet(data = mapa_pb) %>%
 
 --------
 
-          Dados Extraídos do Sagres (até março de 2019).
+          Dados Extraídos do Sagres (até março de 2019) e do Tramita (até julho de 2020).
           Tabelas: Empenhos, Licitações, Contratos, Tipo da Modalidade da Licitação,
                    Fornecedores, Participantes.
           Dados Externos: Mapa da Paraíba, Código dos Municípios Paraibanos (IBGE), Rescisões Tramita.
