@@ -52,7 +52,7 @@ COLNAMES_CODIGO_UNIDADE_GESTORA <- c("cd_Ibge"="integer", "cd_Municipio"="charac
                                      "de_Ugestora"="character", "previdencia"="character"
 )
 
-COLNAMES_EMPENHOS <- c("cd_UGestora"="character", "dt_Ano"="integer", "cd_UnidOrcamentaria"="character",
+COLNAMES_EMPENHOS <- c("cd_UGestora"="integer", "dt_Ano"="integer", "cd_UnidOrcamentaria"="character",
                        "cd_Funcao"="character", "cd_Subfuncao"="character", "cd_Programa"="character",
                        "cd_Acao"="character", "cd_classificacao"="character", "cd_CatEconomica"="character",
                        "cd_NatDespesa"="character", "cd_Modalidade"="character", "cd_Elemento"="character",

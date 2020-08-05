@@ -41,6 +41,19 @@ generate_participante_id <- function(participantes_df) {
     dplyr::select(id_participante, dplyr::everything())
 }
 
+#' @title Gera um identificador único para cada empenho
+#' @param empenhos_df Dataframe contendo informações sobre os empenhos
+#' @return Dataframe contendo informações sobre os empenhos e seus ids
+#' @rdname generate_empenho_id
+#' @examples
+#' empenhos_dt <- generate_empenho_id(empenho_df)
+generate_empenho_id <- function(empenho_df) {
+  empenho_df %<>% .generate_hash_id(c("nu_empenho", "cd_unid_orcamentaria",
+                                      "dt_ano", "cd_u_gestora"),
+                                          "id_empenho") %>%
+    dplyr::select(id_empenho, dplyr::everything())
+}
+
 #' @title Gera um identificador único para cada proposta
 #' @param propostas_df Dataframe contendo informações sobre as propostas
 #' @return Dataframe contendo informações sobre as propostas e seus ids
@@ -89,6 +102,21 @@ process_contrato <- function(contratos_df) {
     dplyr::filter(cd_municipio != "612") %>%  #registro preenchido errado
     generate_contrato_id() %>%
     dplyr::mutate(language = 'portuguese')
+}
+
+#' @title Processa dataframe de empenhos
+#' @description Manipula tabela pra forma que será utilizada no banco
+#' @param empenhos_df Dataframe contendo informações dos empenhos
+#' @return Dataframe contendo informações dos empenhos processados
+process_empenho <- function(empenhos_df) {
+  empenhos_df %<>% .extract_cd_municipio("cd_u_gestora") %>%
+    generate_empenho_id() %>%
+    dplyr::mutate(nu_empenho = iconv(nu_empenho, "UTF-8", "latin1", sub=''),
+                  de_historico = iconv(de_historico, "UTF-8", "latin1", sub=''),
+                  de_historico1 = iconv(de_historico1, "UTF-8", "latin1", sub=''),
+                  de_historico2 = iconv(de_historico2, "UTF-8", "latin1", sub=''),
+                  no_credor = iconv(no_credor, "UTF-8", "latin1", sub=''),
+                  )
 }
 
 #' @title Processa dataframe de licitações

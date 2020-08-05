@@ -183,10 +183,10 @@ fetch_codigo_unidade_gestora <- function(sagres_con) {
 #' @return Dataframe contendo informações sobre os empenhos
 #' @rdname fetch_empenhos
 #' @examples
-fetch_empenhos <- function(sagres_con) {
+fetch_empenhos <- function(sagres_con, cd_municipio) {
   empenhos <- tibble::tibble()
   tryCatch({
-    empenhos <- DBI::dbGetQuery(sagres_con, "SELECT TOP 10 * FROM Empenhos;") %>%
+    empenhos <- DBI::dbGetQuery(sagres_con, sprintf("SELECT * FROM Empenhos WHERE RIGHT (cd_UGestora, 3) = %s;", cd_municipio)) %>%
       assert_dataframe_completo(COLNAMES_EMPENHOS)
   },
   error = function(e) print(paste0("Erro ao buscar empenhos no Banco Sagres (SQLServer): ", e))

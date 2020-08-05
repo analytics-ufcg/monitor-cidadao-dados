@@ -2,3 +2,4 @@
 *
 # exceto o .gitignore
 !.gitignore
+!previsoes.csv

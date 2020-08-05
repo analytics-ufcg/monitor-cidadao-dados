@@ -103,13 +103,13 @@ get_codigo_subelemento <- function() {
     translate_codigo_subelemento()
 }
 
-#' @title Obtem dados dos empenhos
+#' @title Obtem dados dos empenhos pelo codigo do municipio
 #' @return Dataframe contendo informações sobre empenhos
 #' @rdname get_empenhos
 #' @examples
-#' empenhos_dt <- get_empenhos()
-get_empenhos <- function() {
-  empenhos_dt <- read_empenhos() %>%
+#' empenhos_dt <- get_empenhos_by_municipio()
+get_empenhos_by_municipio <- function(cd_municipio) {
+  empenhos_dt <- read_empenhos_by_municipio(cd_municipio) %>%
     translate_empenhos()
 }
 
