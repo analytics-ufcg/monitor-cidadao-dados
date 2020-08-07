@@ -97,5 +97,55 @@ carrega_participantes <- function(al_db_con, list_cnpjs) {
 }
 
 
+generate_hash_al_db <- function(al_db_con) {
+  hash <- ""
+  
+  template_licitacao <- ('SELECT        
+                     md5(CAST((array_agg(f.* order by id_licitacao))AS text))
+                     FROM
+                     licitacao f')
+  
+  template_proposta <- ('SELECT        
+                     md5(CAST((array_agg(f.* order by id_proposta))AS text))
+                     FROM
+                     proposta f')
+  
+  template_contrato <- ('SELECT        
+                     md5(CAST((array_agg(f.* order by id_contrato))AS text))
+                     FROM
+                     contrato f')
+  
+  template_participante <- ('SELECT        
+                     md5(CAST((array_agg(f.* order by id_participante))AS text))
+                     FROM
+                     participante f')
+  
+  query_licitacao <- template_licitacao %>% 
+    dplyr::sql()
+    
+  query_proposta <- template_proposta %>% 
+    dplyr::sql()
+    
+  query_contrato <- template_contrato %>% 
+    dplyr::sql()   
+    
+  query_participante <- template_participante %>% 
+    dplyr::sql()
+  
+  tryCatch({
+    hash_licitacao <- dplyr::tbl(al_db_con, query_licitacao) %>% dplyr::collect(n = Inf)
+    hash_proposta <- dplyr::tbl(al_db_con, query_proposta) %>% dplyr::collect(n = Inf)
+    hash_contrato <- dplyr::tbl(al_db_con, query_contrato) %>% dplyr::collect(n = Inf)
+    hash_participante <- dplyr::tbl(al_db_con, query_participante) %>% dplyr::collect(n = Inf)
+    
+    hash <- digest::digest(paste(hash_licitacao, hash_proposta, hash_contrato, hash_participante), algo="md5", serialize=F)
+    
+  },
+  error = function(e) print(paste0("Erro ao gerar hash das tabelas no Banco AL_BD (Postgres): ", e))
+  )
+  
+  return(hash)
+}
+
 
 

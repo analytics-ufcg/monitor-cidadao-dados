@@ -91,7 +91,13 @@ tipologias_final_contratos_gerais <- tipologias_merge %>%
   dplyr::left_join(tipologias_contrato, by = c("cd_u_gestora", "nu_contrato", "nu_cpfcnpj", "data_inicio")) %>% 
   dplyr::select(id_contrato, dplyr::everything())
 
-readr::write_csv(tipologias_final_contratos_gerais, 
+features <- tipologias_final_contratos_gerais %>% tidyr::gather(key = "nome_feature", 
+                                         value = "valor_feature", 
+                                         -id_contrato) %>% 
+  dplyr::mutate(timestamp = Sys.time(),
+                hash_bases_geradoras = generate_hash_al_db(al_db_con))
+
+readr::write_csv(features, 
                  dplyr::if_else(vigentes,
                                 paste("data/tipologias_contratos_vigentes_", Sys.Date(), ".csv", sep = ""),
                                 paste("data/tipologias_contratos_gerais_", Sys.Date(), ".csv", sep = "")))
