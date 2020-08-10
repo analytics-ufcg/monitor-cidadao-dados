@@ -108,7 +108,13 @@ features <- tipologias_final_contratos_gerais %>% tidyr::gather(key = "nome_feat
                                          -id_contrato) %>% 
   dplyr::mutate(timestamp = Sys.time(),
                 hash_bases_geradoras = generate_hash_al_db(al_db_con),
-                hash_codigo_gerador_feature = hash_source_code)
+                hash_codigo_gerador_feature = hash_source_code) %>%
+  dplyr::rowwise() %>% 
+  dplyr::mutate(id_feature = digest::digest(paste(id_contrato,
+                                nome_feature,
+                                hash_bases_geradoras, 
+                                hash_codigo_gerador_feature), algo="md5", serialize=F)) %>% 
+  dplyr::select(id_feature, dplyr::everything())
 
 readr::write_csv(tipologias_final_contratos_gerais, 
                  dplyr::if_else(vigentes,
