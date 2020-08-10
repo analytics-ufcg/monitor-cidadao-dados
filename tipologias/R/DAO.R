@@ -96,7 +96,12 @@ carrega_participantes <- function(al_db_con, list_cnpjs) {
   return(participacoes)
 }
 
-
+#' @title Gera hashcode com estado atual das tabelas
+#' @param al_db_con Conexão com o Banco de Dados
+#' @return Hashcode referente ao estado atual das tabelas utilizadas para criação das tipologias
+#' @rdname generate_hash_al_db
+#' @examples
+#' hash <- generate_hash_al_db(al_db_con)
 generate_hash_al_db <- function(al_db_con) {
   hash <- ""
   
