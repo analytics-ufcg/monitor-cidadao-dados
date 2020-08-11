@@ -2,4 +2,4 @@
 *
 # exceto o .gitignore
 !.gitignore
-!.contratos_mutados.csv
+!contratos_mutados.csv
