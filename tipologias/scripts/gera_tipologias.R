@@ -91,10 +91,46 @@ tipologias_final_contratos_gerais <- tipologias_merge %>%
   dplyr::left_join(tipologias_contrato, by = c("cd_u_gestora", "nu_contrato", "nu_cpfcnpj", "data_inicio")) %>% 
   dplyr::select(id_contrato, dplyr::everything())
 
+source_code_string <- paste(readr::read_file(here::here("scripts/gera_tipologias.R")),
+                            readr::read_file(here::here("R/carrega_gabarito_contratos.R")),
+                            readr::read_file(here::here("R/DAO.R")),
+                            readr::read_file(here::here("R/process_contratos.R")),
+                            readr::read_file(here::here("R/process_licitacoes.R")),
+                            readr::read_file(here::here("R/process_propostas.R")),
+                            readr::read_file(here::here("R/tipologias.R")),
+                            readr::read_file(here::here("R/utils.R")))
+
+hash_source_code <- digest::digest(source_code_string, algo="md5", serialize=F)
+
+#Criando dataframe de features
+features <- tipologias_final_contratos_gerais %>% tidyr::gather(key = "nome_feature", 
+                                         value = "valor_feature", 
+                                         -id_contrato) %>% 
+  dplyr::mutate(timestamp = Sys.time(),
+                hash_bases_geradoras = generate_hash_al_db(al_db_con),
+                hash_codigo_gerador_feature = hash_source_code) %>%
+  dplyr::rowwise() %>% 
+  dplyr::mutate(id_feature = digest::digest(paste(id_contrato,
+                                nome_feature,
+                                hash_bases_geradoras, 
+                                hash_codigo_gerador_feature), algo="md5", serialize=F)) %>% 
+  dplyr::select(id_feature, dplyr::everything())
+
 readr::write_csv(tipologias_final_contratos_gerais, 
                  dplyr::if_else(vigentes,
-                                paste("data/tipologias_contratos_vigentes_", Sys.Date(), ".csv", sep = ""),
-                                paste("data/tipologias_contratos_gerais_", Sys.Date(), ".csv", sep = "")))
+                                paste("data/features/tipologias_contratos_vigentes_", 
+                                      gsub("[[:space:]]", "_", Sys.time()), ".csv", sep = ""),
+                                paste("data/features/tipologias_contratos_gerais_", 
+                                      gsub("[[:space:]]", "_", Sys.time()), ".csv", sep = "")))
 
+readr::write_csv(features, 
+                 dplyr::if_else(vigentes,
+                                paste("data/features/features_vigentes_", 
+                                      gsub("[[:space:]]", "_", Sys.time()), ".csv", sep = ""),
+                                paste("data/features/features_gerais_", 
+                                      gsub("[[:space:]]", "_", Sys.time()), ".csv", sep = "")))
+
+#Compactando código gerador 
+zip(paste("data/source_code/",hash_source_code, ".zip", sep = ""), c("R", "scripts"))
 
 DBI::dbDisconnect(al_db_con)
