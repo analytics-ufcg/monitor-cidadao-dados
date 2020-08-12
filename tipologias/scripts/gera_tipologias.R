@@ -30,29 +30,42 @@ get_args <- function() {
   return(opt);
 }
 
+#' @title Escreve dataframes das tipologias
 write_features <- function(tipologias_final_contratos_gerais, features, VIGENCIA) {
   readr::write_csv(tipologias_final_contratos_gerais, 
-                   paste("data/features/tipologias_contratos_",
+                   paste("data/features/features_wide_",
                          VIGENCIA,
                          "_",
                          gsub(":", "", gsub("[[:space:]]", "_", Sys.time())), ".csv", sep = ""))
   readr::write_csv(features, 
-                   paste("data/features/features_",
+                   paste("data/features/features_gather_",
                          VIGENCIA,
                          "_",
                          gsub(":", "", gsub("[[:space:]]", "_", Sys.time())), ".csv", sep = ""))
   
 }
 
+#' @title Gera hashcode do código fonte
+generate_hash_source_code <- function() {
+  source_code_string <- paste(readr::read_file(here::here("scripts/gera_tipologias.R")),
+                              readr::read_file(here::here("R/carrega_gabarito_contratos.R")),
+                              readr::read_file(here::here("R/DAO.R")),
+                              readr::read_file(here::here("R/process_contratos.R")),
+                              readr::read_file(here::here("R/process_licitacoes.R")),
+                              readr::read_file(here::here("R/process_propostas.R")),
+                              readr::read_file(here::here("R/tipologias.R")),
+                              readr::read_file(here::here("R/utils.R")))
+  
+  hash_source_code <- digest::digest(source_code_string, algo="md5", serialize=F)
+}
+
 #-----------------------------------------------------------------------------#
 
 #-----------------------------------CONFIG-----------------------------------#
 
-POSTGRES_HOST="150.165.15.35"
-POSTGRES_DB="al_db"
-POSTGRES_USER="postgres"
-POSTGRES_PASSWORD="secret"
-POSTGRES_PORT=32023
+ENCERRADOS <- "encerrados"
+VIGENTES <- "vigentes"
+GERAIS <- "gerais"
 
 args <- get_args()
 
@@ -68,9 +81,8 @@ tryCatch({al_db_con <- DBI::dbConnect(RPostgres::Postgres(),
                                          password = POSTGRES_PASSWORD)
 }, error = function(e) print(paste0("Erro ao tentar se conectar ao Banco ALDB (Postgres): ", e)))
 
-ENCERRADOS <- "encerrados"
-VIGENTES <- "vigentes"
-GERAIS <- "gerais"
+hash_source_code <- generate_hash_source_code()
+
 #-----------------------------------------------------------------------------#
 
 #-----------------------------------EXECUÇÃO-----------------------------------#
@@ -130,17 +142,6 @@ print("Gerando tipologias gerais...")
 tipologias_final_contratos_gerais <- tipologias_merge %>% 
   dplyr::left_join(tipologias_contrato, by = c("cd_u_gestora", "nu_contrato", "nu_cpfcnpj", "data_inicio")) %>% 
   dplyr::select(id_contrato, dplyr::everything())
-
-source_code_string <- paste(readr::read_file(here::here("scripts/gera_tipologias.R")),
-                            readr::read_file(here::here("R/carrega_gabarito_contratos.R")),
-                            readr::read_file(here::here("R/DAO.R")),
-                            readr::read_file(here::here("R/process_contratos.R")),
-                            readr::read_file(here::here("R/process_licitacoes.R")),
-                            readr::read_file(here::here("R/process_propostas.R")),
-                            readr::read_file(here::here("R/tipologias.R")),
-                            readr::read_file(here::here("R/utils.R")))
-
-hash_source_code <- digest::digest(source_code_string, algo="md5", serialize=F)
 
 #Criando dataframe de features
 features <- tipologias_final_contratos_gerais %>% tidyr::gather(key = "nome_feature", 
