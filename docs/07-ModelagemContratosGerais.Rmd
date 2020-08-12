@@ -293,8 +293,11 @@ av_rf_smote <- avaliacao("Floresta Al. Smote", teste, "rf_smote_pred", "status_t
 av_rf_smote
 ```
 <br>
-<br>
 
+Vemos que a utilização de uma técnica de balanceamento artificial aumentou a capacidade de aprendizado do modelo. 
+
+<br>
+<br>
 
 
 ```{r, include=FALSE}
@@ -328,15 +331,15 @@ rf_smote_roc <- teste %>% roc_curve(status_tramita, rf_smote_prob_1) %>% mutate(
 ```
 
 ```{r}
-rf_roc %>% 
-  bind_rows(reglog_roc) %>% 
-  bind_rows(rf_smote_roc) %>% 
-  group_by(modelo) %>% 
-  ggplot(aes(x = 1 - specificity, y = sensitivity, color = modelo)) +
-  geom_line(size = 1) +
-  geom_abline(slope = 1, intercept = 0, size = 0.4) +
-  coord_fixed() +
-  labs(title = "Curva ROC")
+# rf_roc %>% 
+#   bind_rows(reglog_roc) %>% 
+#   bind_rows(rf_smote_roc) %>% 
+#   group_by(modelo) %>% 
+#   ggplot(aes(x = 1 - specificity, y = sensitivity, color = modelo)) +
+#   geom_line(size = 1) +
+#   geom_abline(slope = 1, intercept = 0, size = 0.4) +
+#   coord_fixed() +
+#   labs(title = "Curva ROC")
 ```
 
 
@@ -355,6 +358,13 @@ kable(avaliacao, col.names = c("Modelo", "F1", "AUC",
                                   "VP", "VN", "FP", "FN")) %>% 
   kable_styling()
 ```
+
+<br>
+
+O modelo eleito para utilização no Monitor Cidadão será aquele com maior valor para a AUC.
+
+<br>
+<br>
 
 ```{r salvaArquivos, include=FALSE}
 # Escreve os arquivos da modelagem na pasta abaixo
