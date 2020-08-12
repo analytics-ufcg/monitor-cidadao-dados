@@ -18,10 +18,10 @@ get_args <- function() {
   
   option_list = list(
     optparse::make_option(c("-v", "--vigentes"),
-                          type="logical",
-                          default="TRUE",
-                          help="Boleano que decide se gera tipologias apenas para contratos vigentes ou não",
-                          metavar="logical")
+                          type="character",
+                          default="all",
+                          help="String que decide se gera tipologias apenas para contratos vigentes, encerrados ou gerais",
+                          metavar="character")
   );
   
   opt_parser <- optparse::OptionParser(option_list = option_list, usage = .HELP)
@@ -29,7 +29,30 @@ get_args <- function() {
   opt <- optparse::parse_args(opt_parser)
   return(opt);
 }
+
+write_features <- function(tipologias_final_contratos_gerais, features, VIGENCIA) {
+  readr::write_csv(tipologias_final_contratos_gerais, 
+                   paste("data/features/tipologias_contratos_",
+                         VIGENCIA,
+                         "_",
+                         gsub(":", "", gsub("[[:space:]]", "_", Sys.time())), ".csv", sep = ""))
+  readr::write_csv(features, 
+                   paste("data/features/features_",
+                         VIGENCIA,
+                         "_",
+                         gsub(":", "", gsub("[[:space:]]", "_", Sys.time())), ".csv", sep = ""))
+  
+}
+
 #-----------------------------------------------------------------------------#
+
+#-----------------------------------CONFIG-----------------------------------#
+
+POSTGRES_HOST="150.165.15.35"
+POSTGRES_DB="al_db"
+POSTGRES_USER="postgres"
+POSTGRES_PASSWORD="secret"
+POSTGRES_PORT=32023
 
 args <- get_args()
 
@@ -45,11 +68,29 @@ tryCatch({al_db_con <- DBI::dbConnect(RPostgres::Postgres(),
                                          password = POSTGRES_PASSWORD)
 }, error = function(e) print(paste0("Erro ao tentar se conectar ao Banco ALDB (Postgres): ", e)))
 
+ENCERRADOS <- "encerrados"
+VIGENTES <- "vigentes"
+GERAIS <- "gerais"
+#-----------------------------------------------------------------------------#
+
+#-----------------------------------EXECUÇÃO-----------------------------------#
 #Carrega dados
 print("Carregando licitações...")
 licitacoes <- carrega_licitacoes(al_db_con)
+
 print("Carregando contratos...")
-contratos <- carrega_contratos(al_db_con, vigentes) 
+
+contratos <- tibble::tibble()
+
+if (vigentes == "yes") {
+  contratos = carrega_contratos(al_db_con, vigentes = TRUE) %>% dplyr::mutate(vigente = TRUE)
+} else if (vigentes == "no") {
+  contratos = carrega_contratos(al_db_con, vigentes = FALSE) %>% dplyr::mutate(vigente = FALSE)
+} else {
+  contratos = dplyr::bind_rows(carrega_contratos(al_db_con, vigentes = TRUE) %>% dplyr::mutate(vigente = TRUE),
+                               carrega_contratos(al_db_con, vigentes = FALSE) %>% dplyr::mutate(vigente = FALSE))
+}
+
 print("Carregando propostas de licitações...")
 propostas <- carrega_propostas_licitacao(al_db_con)
 
@@ -67,7 +108,6 @@ propostas_licitacoes <- propostas %>% dplyr::inner_join(licitacoes)
 #Carrega dados dependentes
 print("Carregando participantes...")
 participantes <- carrega_participantes(al_db_con, contratos_by_cnpj$nu_cpfcnpj)
-
 
 #Gera tipologias
 print("Gerando tipologias de licitações...")
@@ -116,19 +156,14 @@ features <- tipologias_final_contratos_gerais %>% tidyr::gather(key = "nome_feat
                                 hash_codigo_gerador_feature), algo="md5", serialize=F)) %>% 
   dplyr::select(id_feature, dplyr::everything())
 
-readr::write_csv(tipologias_final_contratos_gerais, 
-                 dplyr::if_else(vigentes,
-                                paste("data/features/tipologias_contratos_vigentes_", 
-                                      gsub("[[:space:]]", "_", Sys.time()), ".csv", sep = ""),
-                                paste("data/features/tipologias_contratos_gerais_", 
-                                      gsub("[[:space:]]", "_", Sys.time()), ".csv", sep = "")))
-
-readr::write_csv(features, 
-                 dplyr::if_else(vigentes,
-                                paste("data/features/features_vigentes_", 
-                                      gsub("[[:space:]]", "_", Sys.time()), ".csv", sep = ""),
-                                paste("data/features/features_gerais_", 
-                                      gsub("[[:space:]]", "_", Sys.time()), ".csv", sep = "")))
+#Escrevendo arquivos
+if (vigentes == "yes") {
+  write_features(tipologias_final_contratos_gerais, features, VIGENTES)
+} else if (vigentes == "no") {
+  write_features(tipologias_final_contratos_gerais, features, ENCERRADOS)
+} else {
+  write_features(tipologias_final_contratos_gerais, features, GERAIS)
+}
 
 #Compactando código gerador 
 zip(paste("data/source_code/",hash_source_code, ".zip", sep = ""), c("R", "scripts"))
