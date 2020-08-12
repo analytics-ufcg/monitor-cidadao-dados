@@ -14,10 +14,17 @@ help:
 	@echo "\tenter-transformer-container \tAbre cli do container transformador"
 	@echo "\ttransform-data\t\t\tTraduz e transforma os dados colhidos"
 	@echo "\tenter-feed-al-container\t\tAbre cli do container feed-al"
+	@echo ""
 	@echo "\tfeed-al-create\t\t\tCria as tabelas do Banco de Dados Analytics"
-	@echo "\tfeed-al-import\t\t\tImporta dados para as tabelas do \n\t\t\t\t\tBanco de Dados Analytics"
-	@echo "\tfeed-al-clean\t\t\tDropa as tabelas do Banco de Dados \n\t\t\t\t\tAnalytics"
+	@echo "\tfeed-al-import\t\t\tImporta dados para as tabelas do Banco de Dados Analytics"
+	@echo "\tfeed-al-clean\t\t\tDropa as tabelas do Banco de Dados Analytics"
 	@echo "\tfeed-al-shell\t\t\tAcessa terminal do Banco de Dados Analytics"
+	@echo ""
+	@echo "\tfeed-mc-create\t\t\tCria as tabelas do banco de dados Monitor Cidadão"
+	@echo "\tfeed-mc-import\t\t\tImporta dados para as tabelas do Banco de dados Monitor Cidadão"
+	@echo "\tfeed-mc-clean\t\t\tDropa as tabelas do banco de dados Monitor Cidadão"
+	@echo "\tfeed-mc-shell\t\t\tAcessa terminal do banco de dados Monitor Cidadão"
+	@echo ""
 	@echo "\tgera-tipologias \t\tGera as tipologias de contratos"
 
 .PHONY: help
@@ -63,3 +70,18 @@ feed-al-shell:
 gera-tipologias:
 	docker exec -it fetcher sh -c "Rscript tipologias/scripts/gera_tipologias.R"
 .PHONY: gera-tipologias
+enter-feed-mc-container:
+	sudo docker exec -it feed-mc sh
+.PHONY: enter-feed-mc-container
+feed-mc-create:
+	docker exec -it feed-mc sh -c "Rscript feed-mc/DAO.R -f create"
+.PHONY: feed-mc-create
+feed-mc-import:
+	docker exec -it feed-mc sh -c "Rscript feed-mc/DAO.R -f import"
+.PHONY: feed-mc-import
+feed-mc-clean:
+	docker exec -it feed-mc sh -c "Rscript feed-mc/DAO.R -f clean"
+.PHONY: feed-mc-clean
+feed-mc-shell:
+	docker exec -it feed-mc sh -c "Rscript feed-mc/DAO.R -f shell"
+.PHONY: feed-mc-shell
