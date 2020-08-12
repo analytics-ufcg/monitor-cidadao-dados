@@ -115,3 +115,20 @@ join_participantes_fornecedores <- function(df_participantes, df_fornecedores) {
   df_participantes %<>% dplyr::left_join(df_fornecedores) %>%
     dplyr::select(id_participante, dplyr::everything())
 }
+
+#' @title Realiza o join dos contratos mutados com os contratos
+#' @param df_contratos dataframe com os contratos
+#' @param df_contratos_mutados dataframe com os contratos mutados
+#' @return Dataframe contendo informações dos contratos mutados com o id do contrato
+#' @rdname join_contratos_mutados_contratos
+#' @examples
+#' join_contratos_mutados_contratos_dt <- join_contratos_mutados_contratos(
+#'          df_contratos, df_contratos_mutados)
+#'
+join_contratos_mutados_contratos <- function(df_contratos_mutados,df_contratos ) {
+ df_contratos %<>% dplyr::select(cd_u_gestora, nu_contrato, nu_licitacao, nu_cpfcnpj)
+
+  df_contratos_mutados %<>% dplyr::left_join(df_contratos) %>%
+    dplyr::select(id_contrato, dplyr::everything())
+}
+

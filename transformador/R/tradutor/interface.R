@@ -172,3 +172,13 @@ get_fornecedores <- function() {
   fornecedores_dt <- read_fornecedores() %>%
     translate_fornecedores()
 }
+
+#' @title Obtem dados dos contratos mutados
+#' @return Dataframe contendo informações sobre os contratos mutados
+#' @rdname get_contratos_mutados
+#' @examples
+#' contratos_mutados_dt <- get_contratos_mutados()
+get_contratos_mutados <-function(){
+  contratos_mutados_dt <- read_contratos_mutados() %>%
+    translate_contratos_mutados()
+}
