@@ -5,3 +5,4 @@
 \copy empenho FROM PROGRAM 'awk FNR-1 /data/empenhos/*.csv | cat' WITH NULL AS 'NA' DELIMITER ',' CSV;
 \copy participante FROM '/data/participantes.csv' WITH NULL AS 'NA' DELIMITER ',' CSV HEADER;
 \copy pagamento FROM '/data/pagamentos.csv' WITH NULL AS 'NA' DELIMITER ',' CSV HEADER;
+\copy contrato_mutado FROM '/data/contratos_mutados.csv' WITH NULL AS 'NA' DELIMITER ',' CSV HEADER;

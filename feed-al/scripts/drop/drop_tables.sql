@@ -5,3 +5,4 @@ DROP TABLE IF EXISTS "contrato";
 DROP TABLE IF EXISTS "empenho";
 DROP TABLE IF EXISTS "licitacao";
 DROP TABLE IF EXISTS "municipio";
+DROP TABLE IF EXISTS "contrato_mutado";
