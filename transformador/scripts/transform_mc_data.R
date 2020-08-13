@@ -46,8 +46,9 @@ participantes_transformados <- participantes_df %>% mcTransformador::process_par
 pagamentos_transformados <- pagamentos_df %>% mcTransformador::process_pagamento()
 
 contratos_mutados_transformados <- contratos_mutados_df %>% mcTransformador::process_contrato_mutado() %>%
-  join_contratos_mutados_contratos(contratos_transformados)
-  
+  join_contratos_mutados_contratos(contratos_transformados) %>%
+  join_contratos_mutados_licitacoes(licitacoes_transformadas)
+
 
 #Salva tabelas localmente
 readr::write_csv(licitacoes_transformadas, here::here("data/licitacoes.csv"))

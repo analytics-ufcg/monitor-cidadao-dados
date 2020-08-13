@@ -131,3 +131,10 @@ join_contratos_mutados_contratos <- function(df_contratos_mutados, df_contratos)
   df_contratos_mutados %<>% dplyr::left_join(df_contratos) %>%
     dplyr::select(id_contrato, dplyr::everything())
 }
+
+join_contratos_mutados_licitacoes <- function(df_contratos_mutados, df_licitacoes) {
+ df_licitacoes %<>% dplyr::select(cd_u_gestora, nu_licitacao, tp_licitacao)
+
+  df_contratos_mutados %<>% dplyr::left_join(df_licitacoes) %>%
+    dplyr::select(nu_licitacao, dplyr::everything())
+}
