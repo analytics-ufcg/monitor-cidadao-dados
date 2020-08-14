@@ -6,7 +6,6 @@ CREATE TABLE IF NOT EXISTS "feature" (
     "nome_feature" VARCHAR(30),	
     "valor_feature" VARCHAR(30),			
     "timestamp" TIMESTAMP,	
-    "vigencia" DATE,
     "hash_bases_geradoras" VARCHAR(50),
     "hash_codigo_gerador_feature" VARCHAR(50),
     PRIMARY KEY("id_feature"),

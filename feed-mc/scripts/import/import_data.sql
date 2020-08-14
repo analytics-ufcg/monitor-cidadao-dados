@@ -25,5 +25,6 @@ SET    timestamp = excluded.timestamp;
 -- REMOVE A TABELA TEMPORARIA
 DROP TABLE tmp_feature;
 
-
+-- COPIA DADOS DO FEATURE_SET.CSV
+\copy feature_set FROM '/data/feature_set.csv' WITH NULL AS 'NA' DELIMITER ',' CSV HEADER;
  
