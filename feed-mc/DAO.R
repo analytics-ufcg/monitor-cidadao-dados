@@ -32,6 +32,8 @@ get_args <- function() {
 create <- function() {
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-mc/scripts/create/create_feature.sql"))
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-mc/scripts/create/create_feature_set.sql"))
+  system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-mc/scripts/create/create_indice_part.sql"))
+  system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-mc/scripts/create/create_experimento.sql"))
 }
 
 #' @title Importa dados para as tabelas do Banco de dados

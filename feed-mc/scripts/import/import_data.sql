@@ -27,4 +27,7 @@ DROP TABLE tmp_feature;
 
 -- COPIA DADOS DO FEATURE_SET.CSV
 \copy feature_set FROM '/data/feature_set.csv' WITH NULL AS 'NA' DELIMITER ',' CSV HEADER;
- 
+-- COPIA DADOS DO INDICE_PART.CSV
+\copy indice_part FROM '/data/indice_part.csv' WITH NULL AS 'NA' DELIMITER ',' CSV HEADER;
+-- COPIA DADOS DO EXPERIMENTO.CSV
+\copy indice_part FROM '/data/experimento.csv' WITH NULL AS 'NA' DELIMITER ',' CSV HEADER;
