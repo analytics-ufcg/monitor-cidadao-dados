@@ -10,11 +10,11 @@ CREATE TABLE IF NOT EXISTS "contrato_mutado" (
     "nu_licitacao" VARCHAR(10),
     "nu_cpfcnpj" VARCHAR(14),
     "tipo_alteracao" VARCHAR(10),
-    "data_alteracao" DATE,
+    "data_alteracao" VARCHAR(10),
     "cd_municipio" VARCHAR(3),
     "no_municipio" VARCHAR(30),
     "de_u_gestora" VARCHAR(100),
-    "data_atualizacao" DATE,
+    "data_atualizacao" VARCHAR(10),
     PRIMARY KEY("id_contrato"),
     CONSTRAINT contrato_mutado_key UNIQUE (cd_u_gestora, nu_licitacao, nu_contrato)
 );
