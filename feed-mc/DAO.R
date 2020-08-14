@@ -31,6 +31,7 @@ get_args <- function() {
 #' @title Cria as tabelas do Banco de dados
 create <- function() {
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-mc/scripts/create/create_feature.sql"))
+  system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-mc/scripts/create/create_feature_set.sql"))
 }
 
 #' @title Importa dados para as tabelas do Banco de dados
