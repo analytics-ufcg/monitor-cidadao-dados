@@ -65,12 +65,6 @@ COLNAMES_EMPENHOS <- c("cd_UGestora"="integer", "dt_Ano"="integer", "cd_UnidOrca
                        "nu_CPF"="character"
 )
 
-COLNAMES_ESTORNO_PAGAMENTO <- c("cd_UGestora"="character", "dt_Ano"="integer", "cd_UnidOrcamentaria"="character",
-                                "nu_EmpenhoEstorno"="character", "nu_ParcelaEstorno"="character",
-                                "tp_Lancamento"="integer","dt_Estorno"="character","de_MotivoEstorno"="character",
-                                "st_DespLiquidada"="character", "vl_Estorno"="numeric","dt_MesAno"="character"
-)
-
 COLNAMES_FORNECEDORES <-c("cd_UGestora"="integer","dt_Ano"="integer",
                       			"nu_CPFCNPJ"="character","tp_Credor"="integer",
                       			"no_Fornecedor"="character","nu_IncEstadual"="character",
@@ -102,14 +96,6 @@ COLNAMES_PARTICIPANTES <- c("cd_UGestora"="integer","dt_Ano"="integer",
                         			"nu_Licitacao"="character","tp_Licitacao"="integer",
                         			"nu_CPFCNPJ"="character","dt_MesAno"="character"
 )
-
-
-COLNAMES_PROPOSTAS <- c("cd_UGestora"="integer", "dt_Ano"="integer", "nu_Licitacao"="character",
-                        "tp_Licitacao"="integer", "cd_Item"="character", "cd_SubGrupoItem"="character",
-                        "nu_CPFCNPJ"="character", "cd_UGestoraItem"="integer", "nu_Contrato"="character",
-                        "qt_Ofertada"="numeric", "vl_Ofertado"="numeric", "st_Proposta"="integer", 
-                        "dt_MesAno"="character"
-                        )
 
 COLNAMES_REGIME_EXECUCAO <- c("tp_regimeExecucao"="integer",
                               "de_regimeExecucao"="character"

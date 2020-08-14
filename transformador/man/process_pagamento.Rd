@@ -10,7 +10,7 @@ process_pagamento(pagamentos_df)
 \item{pagamentos_df}{Dataframe contendo informações dos pagamentos}
 }
 \value{
-Dataframe contendo informações dos pagamentos processados
+Dataframe contendo informações os pagamentos processados
 }
 \description{
 Manipula tabela que será utilizada no banco
