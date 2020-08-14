@@ -175,12 +175,13 @@ translate_fornecedores <- function(fornecedores_raw) {
 #' @examples
 #' contratos_mutados_dt <- translate_contratos_mutados(contratos_mutados_raw)
 translate_contratos_mutados <- function(contratos_mutados_raw){
-  contratos_mutados_raw %<>% janitor::clean_names() %>%  
-    dplyr::mutate(data_atualização = "24-07-2020") %>% 
+  contratos_mutados_raw %<>% janitor::clean_names() %>%
+    dplyr::mutate(data_atualização = "24-07-2020") %>%
     dplyr::rename(cd_u_gestora = cd_ugestora) %>%
     dplyr::rename(de_u_gestora = de_ugestora) %>%
     dplyr::rename(nu_licitacao = numero_licitacao) %>%
     dplyr::rename(nu_cpfcnpj = cpf_cnpj) %>%
     dplyr::rename(nu_contrato = numero_contrato) %>%
-    dplyr::select(-id_contrato)
+    dplyr::select(-id_contrato) %>%
+    dplyr::mutate(nu_licitacao = gsub("/", "", nu_licitacao))
 }

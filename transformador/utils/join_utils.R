@@ -126,15 +126,9 @@ join_participantes_fornecedores <- function(df_participantes, df_fornecedores) {
 #'          df_contratos, df_contratos_mutados)
 #'
 join_contratos_mutados_contratos <- function(df_contratos_mutados, df_contratos) {
- df_contratos %<>% dplyr::select(id_contrato, nu_contrato)
+ df_contratos %<>% dplyr::select(id_contrato, nu_contrato, cd_u_gestora, nu_licitacao, nu_cpfcnpj)
 
   df_contratos_mutados %<>% dplyr::left_join(df_contratos) %>%
     dplyr::select(id_contrato, dplyr::everything())
 }
 
-join_contratos_mutados_licitacoes <- function(df_contratos_mutados, df_licitacoes) {
- df_licitacoes %<>% dplyr::select(cd_u_gestora, nu_licitacao, tp_licitacao)
-
-  df_contratos_mutados %<>% dplyr::left_join(df_licitacoes) %>%
-    dplyr::select(nu_licitacao, dplyr::everything())
-}
