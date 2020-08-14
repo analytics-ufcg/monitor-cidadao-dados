@@ -92,9 +92,9 @@ services:
     container_name: postgres-monitor-cidadao
     restart: always
     environment:
-      - POSTGRES_DB=${POSTGRES_DB:-mc_db}
-      - POSTGRES_USER=${POSTGRES_USER:-postgres}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-secret}
+      - POSTGRES_DB=${POSTGRES_MC_DB:-mc_db}
+      - POSTGRES_USER=${POSTGRES_MC_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_MC_PASSWORD:-secret}
       - TZ=GMT
     volumes:
       - postgres_mcdb_data:/var/lib/postgresql/data/

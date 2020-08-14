@@ -8,16 +8,16 @@ CREATE TEMPORARY TABLE tmp_feature
     timestamp TIMESTAMP, 
     vigencia DATE,
     hash_bases_geradoras VARCHAR(50), 
-    hash_codigo_gerador_feature VARCHAR(50),
-    PRIMARY KEY("id_feature")
+    hash_codigo_gerador_feature VARCHAR(50)
 );
 
 -- COPIA DADOS DO FEATURES.CSV PARA A TABELA TEMPORARIA
-\copy tmp_feature FROM '/data/features.csv' WITH NULL AS 'NA' DELIMITER ',' CSV HEADER;
+\copy tmp_feature FROM PROGRAM 'awk FNR-1 /data/features/*.csv | cat' WITH NULL AS 'NA' DELIMITER ',' CSV;
+
 
 -- ATUALIZA CADA FEATURE
 INSERT INTO feature (id_feature, id_contrato, nome_feature, valor_feature, timestamp, vigencia, hash_bases_geradoras, hash_codigo_gerador_feature) 
-SELECT *
+SELECT DISTINCT *
 FROM   tmp_feature 
 ON     CONFLICT (id_feature) DO UPDATE  
 SET    timestamp = excluded.timestamp;
