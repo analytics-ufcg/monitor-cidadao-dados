@@ -45,13 +45,11 @@ participantes_transformados <- participantes_df %>% mcTransformador::process_par
 
 pagamentos_transformados <- pagamentos_df %>% mcTransformador::process_pagamento()
 
+
 contratos_mutados_transformados <- contratos_mutados_df %>% mcTransformador::process_contrato_mutado() %>%
   join_contratos_mutados_contratos(contratos_transformados) %>% 
-  dplyr::filter(!is.na(id_contrato)) %>%
-  dplyr::filter(!duplicated(id_contrato,data_alteracao))
-
-  
-
+  dplyr::filter(!is.na(id_contrato)) %>% #Remove as linhas que contém o id_contrato=NA.
+  dplyr::filter(!duplicated(id_contrato,data_alteracao)) #Remove as linhas que são repetidas.
 
 #Salva tabelas localmente
 readr::write_csv(licitacoes_transformadas, here::here("data/licitacoes.csv"))
