@@ -46,7 +46,10 @@ participantes_transformados <- participantes_df %>% mcTransformador::process_par
 pagamentos_transformados <- pagamentos_df %>% mcTransformador::process_pagamento()
 
 contratos_mutados_transformados <- contratos_mutados_df %>% mcTransformador::process_contrato_mutado() %>%
-  join_contratos_mutados_contratos(contratos_transformados) %>%
+  join_contratos_mutados_contratos(contratos_transformados) %>% 
+  dplyr::filter(!is.na(id_contrato)) %>%
+  dplyr::filter(!duplicated(id_contrato,data_alteracao))
+
   
 
 
