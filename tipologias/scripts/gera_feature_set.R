@@ -19,7 +19,7 @@ tryCatch({mc_db_con <- DBI::dbConnect(RPostgres::Postgres(),
 
 feature <- tibble::tibble()
 
-template <- ('SELECT *
+template <- ('SELECT id_feature, nome_feature 
               FROM feature')
 
 query <- template %>% 
@@ -31,9 +31,16 @@ tryCatch({
 error = function(e) print(paste0("Erro ao buscar features no Banco MC_DB (Postgres): ", e))
 )
 
+#Criando feature_set
+features_descricao <- feature %>% dplyr::select(nome_feature) %>% dplyr::distinct() %>% list()
+id_feature_set <- digest::digest(features_descricao[[1]]$nome_feature, algo="md5", serialize=F)
+feature_set <- data.frame(id_feature_set, 'timestamp' = Sys.time()) %>% 
+  dplyr::mutate(features_descricao = features_descricao[[1]]$nome_feature %>% toJSON())
 
-feautre_compress <- compress.data.frame(feature)
+#Criando relação
+feature_set_has_feature <- data.frame('id_feature' = feature$id_feature, id_feature_set)
 
-json <- toJSON(feautre_compress)
+readr::write_csv(feature_set, "data/feature_set.csv")
+readr::write_csv(feature_set_has_feature, "data/feature_set_has_feature.csv")
 
   
