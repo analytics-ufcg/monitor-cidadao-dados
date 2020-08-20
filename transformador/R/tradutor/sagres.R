@@ -63,7 +63,6 @@ translate_codigo_funcao <- function(codigo_funcao_raw) {
   codigo_funcao_raw %<>% janitor::clean_names()
 }
 
-
 #' @title Traduz dado recebido para dataset
 #' @param contratos_raw Dados brutos dos contratos
 #' @return Dataframe contendo informações sobre os contratos
@@ -105,7 +104,6 @@ translate_codigo_elemento_despesa <- function(codigo_elemento_despesa_raw) {
 translate_codigo_subelemento <- function(codigo_subelemento_raw) {
   codigo_subelemento_raw %<>% janitor::clean_names()
 }
-
 
 #' @param empenhos_raw Dados brutos dos empenhos
 #' @return Dataframe contendo informações sobre empenhos
@@ -169,4 +167,21 @@ translate_participantes <- function(participantes_raw) {
 #' fornecedores_dt <- translate_fornecedores(translate_fornecedores_raw)
 translate_fornecedores <- function(fornecedores_raw) {
   fornecedores_raw %<>% janitor::clean_names()
+}
+
+#' @param contratos_mutados_raw Dados brutos dos contratos mutados
+#' @return Dataframe contendo informações sobre os fornecedores
+#' @rdname translate_contratos_mutados
+#' @examples
+#' contratos_mutados_dt <- translate_contratos_mutados(contratos_mutados_raw)
+translate_contratos_mutados <- function(contratos_mutados_raw){
+  contratos_mutados_raw %<>% janitor::clean_names() %>%
+    dplyr::mutate(data_atualização = "24-07-2020") %>%
+    dplyr::rename(cd_u_gestora = cd_ugestora) %>%
+    dplyr::rename(de_u_gestora = de_ugestora) %>%
+    dplyr::rename(nu_licitacao = numero_licitacao) %>%
+    dplyr::rename(nu_cpfcnpj = cpf_cnpj) %>%
+    dplyr::rename(nu_contrato = numero_contrato) %>%
+    dplyr::select(-id_contrato) %>%
+    dplyr::mutate(nu_licitacao = gsub("/", "", nu_licitacao))
 }

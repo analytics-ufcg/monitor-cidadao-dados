@@ -20,17 +20,17 @@ codigo_subfuncao_df <- get_codigo_subfuncao()
 codigo_elemento_despesa_df <- get_codigo_elemento_despesa()
 codigo_subelemento_df <- get_codigo_subelemento()
 municipios_df <- get_codigo_municipio()
-empenhos_df <- get_empenhos()
 aditivos_df <- get_aditivos()
+empenhos_df <- get_empenhos()
 pagamentos_df <- get_pagamentos()
 convenios_df <- get_convenios()
 fornecedores_df <- get_fornecedores()
 participantes_df <- get_participantes()
-
+contratos_mutados_df <- get_contratos_mutados()
 
 #Transforma tabelas
 licitacoes_transformadas <- licitacoes_df %>% mcTransformador::process_licitacao() %>%
-  join_licitacoes_codigo_unidade_gestora(codigo_unidade_gestora_df) %>%
+ join_licitacoes_codigo_unidade_gestora(codigo_unidade_gestora_df) %>%
   join_licitacoes_tipo_modalidade_licitacao(tipo_modalidade_licitacao_df)
 
 contratos_transformados <- contratos_df %>% mcTransformador::process_contrato() %>%
@@ -41,10 +41,16 @@ contratos_transformados <- contratos_df %>% mcTransformador::process_contrato() 
 municipios_transformados <- municipios_df %>% mcTransformador::process_municipio()
 
 participantes_transformados <- participantes_df %>% mcTransformador::process_participante() %>%
-  join_participantes_licitacao(licitacoes_transformadas) %>%
+ join_participantes_licitacao(licitacoes_transformadas) %>%
   join_participantes_fornecedores (fornecedores_df)
 
 pagamentos_transformados <- pagamentos_df %>% mcTransformador::process_pagamento()
+
+
+contratos_mutados_transformados <- contratos_mutados_df %>% mcTransformador::process_contrato_mutado() %>%
+  join_contratos_mutados_contratos(contratos_transformados) %>% 
+  dplyr::filter(!is.na(id_contrato)) %>% #Remove as linhas que contém o id_contrato=NA.
+  dplyr::filter(!duplicated(id_contrato,data_alteracao)) #Remove as linhas que são repetidas.
 
 #Salva tabelas localmente
 readr::write_csv(licitacoes_transformadas, here::here("data/licitacoes.csv"))
@@ -64,3 +70,4 @@ readr::write_csv(convenios_df, here::here("data/convenios.csv"))
 readr::write_csv(municipios_transformados, here::here("data/municipios.csv"))
 readr::write_csv(fornecedores_df, here::here("data/fornecedores.csv"))
 readr::write_csv(participantes_transformados, here::here("data/participantes.csv"))
+readr::write_csv(contratos_mutados_transformados, here::here("data/contratos_mutados.csv"))

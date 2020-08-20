@@ -321,3 +321,28 @@ read_fornecedores <- function() {
                                              dt_MesAnoReferencia = readr::col_character()
                                            ))
 }
+
+#' @title Lê dataframe contendo informações dos contrados mutados
+#' @return Dataframe contendo informações sobre os contrados mutados
+#' @rdname read_contratos_mutados
+#' @examples
+#' contrados_mutados_df <- read_contrados_mutados()
+read_contratos_mutados <- function(){
+  contrados_mutados_df <-readr::read_csv(here::here("../fetcher/data/contratos_mutados.csv"),
+                                           col_types = list(
+                                             .default = readr::col_character(),
+                                              jurisdicionado = readr::col_character(),
+                                              cod_jurisdicionado = readr::col_number(),
+                                              cd_Ugestora = readr::col_number(),
+                                              numero_contrato = readr::col_character(),
+                                              id_contrato = readr::col_number(),
+                                              modalidade_licitacao = readr::col_character(),
+                                              numero_licitacao = readr::col_character(),
+                                              cpf_cnpj = readr::col_character(),
+                                              tipo_alteracao = readr::col_character(),
+                                              data_alteracao = readr::col_character(),
+                                              cd_Municipio = readr::col_character(),
+                                              no_Municipio = readr::col_character(),
+                                              de_Ugestora = readr::col_character()
+                                              ))
+}

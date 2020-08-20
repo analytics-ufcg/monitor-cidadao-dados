@@ -97,3 +97,11 @@ process_municipio <- function(municipios_df) {
 process_pagamento <- function(pagamentos_df) {
   pagamentos_df %<>% generate_pagamento_id()
 }
+
+#' @title Processa dataframe de contratos mutados
+#' @description Manipula tabela pra forma que será utilizada no banco
+#' @param contratos_mutados_df Dataframe contendo informações dos contratos mutados
+#' @return Dataframe contendo informações dos contratos mutados  processados
+process_contrato_mutado <- function(contratos_mutados_df) {
+  contratos_mutados_df %<>% dplyr::select(nu_contrato, dplyr::everything())
+}
