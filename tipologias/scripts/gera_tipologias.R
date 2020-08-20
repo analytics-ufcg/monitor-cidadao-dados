@@ -1,7 +1,7 @@
 library(magrittr)
 
 source(here::here("R/setup/constants.R"))
-source(here::here("R/AL_DB_DAO.R"))
+source(here::here("R/DAO.R"))
 source(here::here("R/process_contratos.R"))
 source(here::here("R/tipologias.R"))
 source(here::here("R/utils.R"))
@@ -18,10 +18,10 @@ get_args <- function() {
   
   option_list = list(
     optparse::make_option(c("-v", "--vigentes"),
-                          type="character",
-                          default="all",
-                          help="String que decide se gera tipologias apenas para contratos vigentes, encerrados ou gerais",
-                          metavar="character")
+                          type="logical",
+                          default="TRUE",
+                          help="Boleano que decide se gera tipologias apenas para contratos vigentes ou não",
+                          metavar="logical")
   );
   
   opt_parser <- optparse::OptionParser(option_list = option_list, usage = .HELP)
@@ -29,43 +29,7 @@ get_args <- function() {
   opt <- optparse::parse_args(opt_parser)
   return(opt);
 }
-
-#' @title Escreve dataframes das tipologias
-write_features <- function(tipologias_final_contratos_gerais, features, VIGENCIA) {
-  readr::write_csv(tipologias_final_contratos_gerais, 
-                   paste("data/features/features_wide_",
-                         VIGENCIA,
-                         "_",
-                         gsub(":", "", gsub("[[:space:]]", "_", Sys.time())), ".csv", sep = ""))
-  readr::write_csv(features, 
-                   paste("data/features/features_gather_",
-                         VIGENCIA,
-                         "_",
-                         gsub(":", "", gsub("[[:space:]]", "_", Sys.time())), ".csv", sep = ""))
-  
-}
-
-#' @title Gera hashcode do código fonte
-generate_hash_source_code <- function() {
-  source_code_string <- paste(readr::read_file(here::here("scripts/gera_tipologias.R")),
-                              readr::read_file(here::here("R/carrega_gabarito_contratos.R")),
-                              readr::read_file(here::here("R/DAO.R")),
-                              readr::read_file(here::here("R/process_contratos.R")),
-                              readr::read_file(here::here("R/process_licitacoes.R")),
-                              readr::read_file(here::here("R/process_propostas.R")),
-                              readr::read_file(here::here("R/tipologias.R")),
-                              readr::read_file(here::here("R/utils.R")))
-  
-  hash_source_code <- digest::digest(source_code_string, algo="md5", serialize=F)
-}
-
 #-----------------------------------------------------------------------------#
-
-#-----------------------------------CONFIG-----------------------------------#
-
-ENCERRADOS <- "encerrados"
-VIGENTES <- "vigentes"
-GERAIS <- "gerais"
 
 args <- get_args()
 
@@ -81,28 +45,11 @@ tryCatch({al_db_con <- DBI::dbConnect(RPostgres::Postgres(),
                                          password = POSTGRES_PASSWORD)
 }, error = function(e) print(paste0("Erro ao tentar se conectar ao Banco ALDB (Postgres): ", e)))
 
-hash_source_code <- generate_hash_source_code()
-
-#-----------------------------------------------------------------------------#
-
-#-----------------------------------EXECUÇÃO-----------------------------------#
 #Carrega dados
 print("Carregando licitações...")
 licitacoes <- carrega_licitacoes(al_db_con)
-
 print("Carregando contratos...")
-
-contratos <- tibble::tibble()
-
-if (vigentes == "yes") {
-  contratos = carrega_contratos(al_db_con, vigentes = TRUE) %>% dplyr::mutate(vigente = TRUE)
-} else if (vigentes == "no") {
-  contratos = carrega_contratos(al_db_con, vigentes = FALSE) %>% dplyr::mutate(vigente = FALSE)
-} else {
-  contratos = dplyr::bind_rows(carrega_contratos(al_db_con, vigentes = TRUE) %>% dplyr::mutate(vigente = TRUE),
-                               carrega_contratos(al_db_con, vigentes = FALSE) %>% dplyr::mutate(vigente = FALSE))
-}
-
+contratos <- carrega_contratos(al_db_con, vigentes) 
 print("Carregando propostas de licitações...")
 propostas <- carrega_propostas_licitacao(al_db_con)
 
@@ -120,6 +67,7 @@ propostas_licitacoes <- propostas %>% dplyr::inner_join(licitacoes)
 #Carrega dados dependentes
 print("Carregando participantes...")
 participantes <- carrega_participantes(al_db_con, contratos_by_cnpj$nu_cpfcnpj)
+
 
 #Gera tipologias
 print("Gerando tipologias de licitações...")
@@ -143,30 +91,19 @@ tipologias_final_contratos_gerais <- tipologias_merge %>%
   dplyr::left_join(tipologias_contrato, by = c("cd_u_gestora", "nu_contrato", "nu_cpfcnpj", "data_inicio")) %>% 
   dplyr::select(id_contrato, dplyr::everything())
 
-#Criando dataframe de features
-features <- tipologias_final_contratos_gerais %>% tidyr::gather(key = "nome_feature", 
-                                         value = "valor_feature", 
-                                         -id_contrato) %>% 
-  dplyr::mutate(timestamp = Sys.time(),
-                hash_bases_geradoras = generate_hash_al_db(al_db_con),
-                hash_codigo_gerador_feature = hash_source_code) %>%
-  dplyr::rowwise() %>% 
-  dplyr::mutate(id_feature = digest::digest(paste(id_contrato,
-                                nome_feature,
-                                hash_bases_geradoras, 
-                                hash_codigo_gerador_feature), algo="md5", serialize=F)) %>% 
-  dplyr::select(id_feature, dplyr::everything())
+ readr::write_csv(tipologias_final_contratos_gerais, 
+                  dplyr::if_else(vigentes,
+                                 paste("data/tipologias_contratos_vigentes_", Sys.Date(), ".csv", sep = ""),
+                                 paste("data/tipologias_contratos_gerais_", Sys.Date(), ".csv", sep = "")))
 
-#Escrevendo arquivos
-if (vigentes == "yes") {
-  write_features(tipologias_final_contratos_gerais, features, VIGENTES)
-} else if (vigentes == "no") {
-  write_features(tipologias_final_contratos_gerais, features, ENCERRADOS)
-} else {
-  write_features(tipologias_final_contratos_gerais, features, GERAIS)
-}
+#library(readr)
+#contratos_mutados_2020 <- read_csv(here::here("../../dados/contratos_mutados_2020/ContratosMutadosTramita_Julho2020.csv"))
+#contratos_mutados_2020 %>% left_join()
+ 
+mutacao_contrato <- tramita_mutados %>% tidyr::gather(key = "id_contrato",
+                                                                value = "data_recebimento",
+                                                                id_contrato) 
 
-#Compactando código gerador 
-zip(paste("data/source_code/",hash_source_code, ".zip", sep = ""), c("R", "scripts"))
+readr::write_csv(mutacao_contrato, "data/contratos_mutados.csv")
 
 DBI::dbDisconnect(al_db_con)
