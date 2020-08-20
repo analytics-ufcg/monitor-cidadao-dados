@@ -46,6 +46,7 @@ suppressMessages(library(kableExtra))
 suppressMessages(library(tidymodels))
 suppressMessages(library(caret))
 suppressMessages(library(unbalanced))
+suppressMessages(library(yaml))
 
 set.seed(123)
 options(scipen = 999)
@@ -53,13 +54,13 @@ invisible(Sys.setlocale(category = "LC_ALL", locale = "pt_PT.UTF-8"))
 
 source(here::here("../lib_modelos/modelagem_medidas_avaliacao.R"))
 
-mygc <- function() invisible(gc())
-
 
 
 # ---------------------------
 # Funções
 # ---------------------------
+
+mygc <- function() invisible(gc())
 
 #' @title Gera hashcode do código fonte do treinamento
 generate_hash_sourcecode <- function() {
@@ -83,8 +84,8 @@ generate_id_experimento <- function(momentum) {
 data_hora <- gsub(":", "", gsub("[[:space:]]", "_", Sys.time()))
 id_experimento <- generate_id_experimento(data_hora)
 
-
-
+algoritmo <- c("Regressão Logístia",
+               "Floresta Aleatória")
 
 # ---------------------------
 # Parte I:
@@ -98,7 +99,6 @@ tipologias_cgerais <- read_csv(here::here("data/tipologias_contratos_gerais_2020
                                                 nu_contrato = col_character(), 
                                                 nu_cpfcnpj = col_character()))
 
-# aqui seria a leitura de contratos vigentes
 
 tipologias_cgerais <- tipologias_cgerais %>% filter_all(all_vars(!is.na(.)))
 
@@ -122,26 +122,26 @@ features_exc <- c("id_contrato",
                   "nu_cpfcnpj")
 
 
-index <- createDataPartition(tipologias_cgerais$status_tramita, p = .8, list = FALSE, times = 1)
+index <- createDataPartition(tipologias_cgerais$status_tramita, 
+                             p = .8, list = FALSE, times = 1)
 
 treino <- tipologias_cgerais[index,]
 teste  <- tipologias_cgerais[-index,]
 
-treino_feat <- treino %>% select(!features_exc)
+  # remove previamente as features que não serão utilizadas no treinamento
+treino_exc <- treino %>% select(features_exc)
+treino_fil <- treino %>% select(!features_exc)
 
 
-testinho <- data.frame(id_experimento = c(id_experimento),
-                       index_treino = as.list(index))
+index <- paste(index, collapse = ',')
+indice_particionamento <- data.frame(id_experimento = c(id_experimento),
+                       index_treino = index)
 
-index_treino_df <- as.data.frame(index) %>% mutate(indice_treino = Resample1) %>% select(-Resample1)
-
-
-readr::write_csv(index_treino_df, 
+readr::write_csv(indice_particionamento, 
                  paste("data/indice_part/indices_exp", "_",
-                       gsub(":", "", gsub("[[:space:]]", "_", Sys.Date())), ".csv", sep = ""))
+                       gsub(":", "", gsub("[[:space:]]", "_", data_hora)), ".csv", sep = ""))
 
-
-rm(index_treino_df)
+rm(index, indice_particionamento, treino)
 mygc()
 
 
@@ -153,7 +153,7 @@ mygc()
 # ---------------------------
 
 # Dados escalados e conversão factor-dummy manual
-rl_receita <- recipe(status_tramita ~ ., data = treino_feat) %>% 
+rl_receita <- recipe(status_tramita ~ ., data = treino_fil) %>% 
   step_scale(all_numeric(), -all_outcomes()) %>%
   step_dummy(all_nominal(), -all_outcomes()) %>% 
   prep()
@@ -210,7 +210,14 @@ reglog_fit <-
   fit_resamples(cv_folds,
                 metrics = metric_set(roc_auc, accuracy))
 
-reglog_resmetrics <- collect_metrics(reglog_fit) %>% mutate(model = "Reg Logistica", balance = "none") 
+reglog_resmetrics <- collect_metrics(reglog_fit) 
+
+reglog_resmetrics <- reglog_resmetrics %>% 
+  tidyr::gather(key = "nome_metrica",
+                value = "valor_metrica") %>% 
+  mutate(modelo = algoritmo[1],
+         tipo_metrica = "cv",
+         balanceamento = "-")
 
 
   # Floresta Aleatória
@@ -219,18 +226,28 @@ rf_fit <-
   fit_resamples(cv_folds,
                 metrics = metric_set(roc_auc, accuracy))
 
-rf_resmetrics <- collect_metrics(rf_fit) %>% mutate(model = "Flo Aleatoria", balance = "none") 
+rf_resmetrics <- collect_metrics(rf_fit) 
+
+rf_resmetrics <- rf_resmetrics %>% 
+  tidyr::gather(key = "nome_metrica",
+                value = "valor_metrica") %>% 
+  mutate(modelo = algoritmo[2], 
+         tipo_metrica = "cv",
+         balanceamento = "-")
 
 
 
+  # Salva em formato gather
 resample_metrics <- bind_rows(reglog_resmetrics, 
                               rf_resmetrics)
 
+resample_metrics <- resample_metrics %>% 
+  dplyr::mutate(id_experimento = id_experimento) %>% 
+  dplyr::select(id_experimento, dplyr::everything())
 
-readr::write_csv(resample_metrics, 
-                 paste("data/metricas/resamples/cv_exp", "_",
-                       gsub(":", "", gsub("[[:space:]]", "_", Sys.Date())), ".csv", sep = ""))
 
+# rm(reglog_resmetrics, rf_resmetrics)
+mygc()
 
 
 # ---------------------------
@@ -240,11 +257,11 @@ readr::write_csv(resample_metrics,
 
 
   # Regressão Logística
-reglog_fit <- reglog_wf %>% fit(treino_assado)
+reglog_fit_model <- reglog_wf %>% fit(treino_assado)
 
 
   # Floresta Aleatória
-rf_fit <- rf_wf %>% fit(treino_assado)
+rf_fit_model <- rf_wf %>% fit(treino_assado)
 
 
 
@@ -261,19 +278,19 @@ colnames(ground_truth) <- c("ground_truth")
 
 
   # Regressão Logística
-reglog_pred <- reglog_fit %>% predict(new_data = teste_assado) %>% 
+reglog_pred <- reglog_fit_model %>% predict(new_data = teste_assado) %>% 
   mutate(reglog_class_pred = .pred_class) %>% select(-.pred_class)
 
-reglog_probs <- reglog_fit %>% predict(new_data = teste_assado, type = "prob") %>% 
+reglog_probs <- reglog_fit_model %>% predict(new_data = teste_assado, type = "prob") %>% 
   mutate(reglog_prob_0 = .pred_0, reglog_prob_1 = .pred_1) %>% select(-.pred_1, -.pred_0)
 
 
 
   # Floresta Aleatória
-rf_class_pred <- rf_fit %>% predict(teste_assado) %>% 
+rf_class_pred <- rf_fit_model %>% predict(teste_assado) %>% 
   mutate(rf_class_pred = .pred_class) %>% select(-.pred_class)
 
-rf_class_probs <- rf_fit %>% predict(teste_assado, type = "prob") %>% 
+rf_class_probs <- rf_fit_model %>% predict(teste_assado, type = "prob") %>% 
   mutate(rf_prob_0 = .pred_0, rf_prob_1 = .pred_1) %>% select(-.pred_1, -.pred_0)
 
 
@@ -284,7 +301,14 @@ previsoes <- bind_cols(ground_truth,
                        rf_class_probs)
 
 
-rm(reglog_pred, reglog_probs, rf_class_pred, rf_class_probs)
+previsoes$id_experimento <- id_experimento
+
+previsoes <- previsoes %>% 
+  dplyr::select(id_experimento, dplyr::everything())
+
+
+
+# rm(reglog_pred, reglog_probs, rf_class_pred, rf_class_probs)
 mygc()
 
 
@@ -293,24 +317,54 @@ mygc()
 # ---------------------------
 # Parte V:
 #   Calcula as métricas avaliativas para a previsão
+#   Formato: gather
 # ---------------------------
 
 
-av_reglog <- avaliacao("Reg Logistica", previsoes, "reglog_class_pred", "ground_truth")
-
-av_rf <- avaliacao("Flo Aleatoria", previsoes, "rf_class_pred", "ground_truth")
 
 
+av_reglog <- avaliacao(algoritmo[1], previsoes, 
+                       "reglog_class_pred", "ground_truth") %>%
+  select(!modelo)
+
+av_reglog <- av_reglog %>% 
+  tidyr::gather(key = "nome_metrica",
+                value = "valor_metrica") %>% 
+  mutate(modelo = algoritmo[1], 
+         tipo_metrica = "oob",
+         balanceamento = "-")
 
 
-avaliacao <- bind_rows(av_reglog,
+
+av_rf <- avaliacao(algoritmo[2], previsoes, 
+                   "rf_class_pred", "ground_truth") %>% 
+  select(!modelo)
+
+av_rf <- av_rf %>% 
+  tidyr::gather(key = "nome_metrica",
+                value = "valor_metrica") %>% 
+  mutate(modelo = algoritmo[2],
+         tipo_metrica = "oob",
+         balanceamento = "-")
+
+
+avaliacao_modelos <- bind_rows(av_reglog,
                        av_rf)
 
+avaliacao_modelos <- avaliacao_modelos %>%
+  dplyr::mutate(id_experimento = id_experimento) %>% 
+  dplyr::select(id_experimento, dplyr::everything()) %>% 
+  dplyr::mutate(valor_metrica = as.character(valor_metrica)) 
 
-readr::write_csv(avaliacao, 
+
+
+  # Junção das métricas de cv com oob
+metricas <- bind_rows(resample_metrics,
+                      avaliacao_modelos)
+
+readr::write_csv(metricas, 
                  paste("data/metricas/metricas", "_",
-                       gsub(":", "", gsub("[[:space:]]", "_", Sys.Date())), ".csv", sep = ""))
-
+                       gsub(":", "", gsub("[[:space:]]", "_", data_hora)), ".csv", sep = ""))
 
 
 
@@ -319,8 +373,51 @@ readr::write_csv(avaliacao,
 #   Salva experimento
 # ---------------------------
 
+experimento_reglog <- data.frame(id_experimento = c(id_experimento),
+                          data_hora = c(data_hora),
+                          algoritmo = c("Regressão Logística"),
+                          modelo = c("objeto_modelo"),
+                          hiperparametros = c("crossvalidation 5 folds"),
+                          tipo_balanceamento = c("-"),
+                          fk_indice_part = c(id_experimento),
+                          fk_feature_set = c("feature_set"),
+                          hash_codigo_gerador = c(generate_hash_sourcecode()))
+
+experimento_rf <- data.frame(id_experimento = c(id_experimento),
+                             data_hora = c(data_hora),
+                             algoritmo = c("Floresta Aleatória"),
+                             modelo = c("objeto_modelo"),
+                             hiperparametros = c("crossvalidation 5 folds"),
+                             tipo_balanceamento = c("-"),
+                             fk_indice_part = c(id_experimento),
+                             fk_feature_set = c("feature_set"),
+                             hash_codigo_gerador = c(generate_hash_sourcecode()))
 
 
+experimento <- bind_rows(experimento_reglog,
+                         experimento_rf)
+
+readr::write_csv(experimento, 
+                 paste("data/experimento/experimento", "_",
+                       gsub(":", "", gsub("[[:space:]]", "_", data_hora)), ".csv", sep = ""))
 
 
+# ---------------------------
+# Outputs desejados:
+#   experimento.csv ok
+#     objeto_modelo?
+# ---------------------------
+
+# saídas:
+#   experimento
+#       id_experimento ok
+#       data ok
+#       objeto_modelo
+#       tipo_modelo ok
+#       modelo_hiperparams ok
+#       tipo_balanceamento ok
+#       fk_indice_part ok
+#       fk_feature_set
+#       previsoes_teste
+#       hash_codigo_gerador_modelo ok
 

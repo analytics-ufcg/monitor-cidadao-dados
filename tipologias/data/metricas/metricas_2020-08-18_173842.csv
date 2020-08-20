@@ -1,0 +1,19 @@
+id_experimento,nome_metrica,valor_metrica,modelo,tipo_metrica
+f4bad0295c272b0df52852cb8c40b2bb,F1,0,Reg Logistica,teste
+f4bad0295c272b0df52852cb8c40b2bb,AUC,0.5,Reg Logistica,teste
+f4bad0295c272b0df52852cb8c40b2bb,precision,0,Reg Logistica,teste
+f4bad0295c272b0df52852cb8c40b2bb,recall,0,Reg Logistica,teste
+f4bad0295c272b0df52852cb8c40b2bb,mcc,-0,Reg Logistica,teste
+f4bad0295c272b0df52852cb8c40b2bb,TP,0,Reg Logistica,teste
+f4bad0295c272b0df52852cb8c40b2bb,TN,23079,Reg Logistica,teste
+f4bad0295c272b0df52852cb8c40b2bb,FP,1,Reg Logistica,teste
+f4bad0295c272b0df52852cb8c40b2bb,FN,101,Reg Logistica,teste
+f4bad0295c272b0df52852cb8c40b2bb,F1,0.019,Flo Aleatoria,teste
+f4bad0295c272b0df52852cb8c40b2bb,AUC,0.505,Flo Aleatoria,teste
+f4bad0295c272b0df52852cb8c40b2bb,precision,0.333,Flo Aleatoria,teste
+f4bad0295c272b0df52852cb8c40b2bb,recall,0.01,Flo Aleatoria,teste
+f4bad0295c272b0df52852cb8c40b2bb,mcc,0.057,Flo Aleatoria,teste
+f4bad0295c272b0df52852cb8c40b2bb,TP,1,Flo Aleatoria,teste
+f4bad0295c272b0df52852cb8c40b2bb,TN,23078,Flo Aleatoria,teste
+f4bad0295c272b0df52852cb8c40b2bb,FP,2,Flo Aleatoria,teste
+f4bad0295c272b0df52852cb8c40b2bb,FN,100,Flo Aleatoria,teste
