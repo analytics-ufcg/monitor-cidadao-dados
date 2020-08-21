@@ -117,6 +117,11 @@ services:
       - POSTGRES_PORT=${POSTGRES_PORT:-7655}
       - POSTGRES_USER=${POSTGRES_USER:-user}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-secret}
+      - POSTGRES_MCDB_HOST=${POSTGRES_MCDB_HOST:-host}
+      - POSTGRES_MCDB_DB=${POSTGRES_MCDB_DB:-mc_db}
+      - POSTGRES_MCDB_PORT=${POSTGRES_MCDB_PORT:-5432}
+      - POSTGRES_MCDB_USER=${POSTGRES_MCDB_USER:-postgres}
+      - POSTGRES_MCDB_PASSWORD=${POSTGRES_MCDB_PASSWORD:-secret}
     volumes:
       - ./tipologias:/app/tipologias
     ports:
