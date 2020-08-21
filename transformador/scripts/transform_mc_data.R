@@ -21,11 +21,12 @@ codigo_elemento_despesa_df <- get_codigo_elemento_despesa()
 codigo_subelemento_df <- get_codigo_subelemento()
 municipios_df <- get_codigo_municipio()
 aditivos_df <- get_aditivos()
-empenhos_df <- get_empenhos()
 pagamentos_df <- get_pagamentos()
 convenios_df <- get_convenios()
 fornecedores_df <- get_fornecedores()
 participantes_df <- get_participantes()
+estorno_pagamento_df <- get_estorno_pagamento()
+propostas_df <- get_propostas()
 contratos_mutados_df <- get_contratos_mutados()
 
 #Transforma tabelas
@@ -44,8 +45,32 @@ participantes_transformados <- participantes_df %>% mcTransformador::process_par
  join_participantes_licitacao(licitacoes_transformadas) %>%
   join_participantes_fornecedores (fornecedores_df)
 
+propostas_transformadas <- propostas_df %>% mcTransformador::process_proposta() %>%
+  join_propostas_licitacao(licitacoes_transformadas)  %>%
+  join_propostas_participantes(participantes_transformados)
+
 pagamentos_transformados <- pagamentos_df %>% mcTransformador::process_pagamento()
 
+estorno_pagamento_transformado <- estorno_pagamento_df %>% mcTransformador::process_estorno_pagamento()
+
+for (cd_municipio in municipios_df$cd_municipio) {
+  print(sprintf('[%s] empenhos cd_municipio = %s', Sys.time(), cd_municipio))
+
+  empenhos_df <- get_empenhos_by_municipio(cd_municipio)
+  empenhos_transformados <- empenhos_df %>% mcTransformador::process_empenho() %>%
+    join_empenhos_licitacao(licitacoes_transformadas)
+
+  output_dir = 'data/empenhos/'
+  if (!dir.exists(output_dir)){
+    dir.create(output_dir)
+  }
+
+  readr::write_csv(empenhos_transformados, here::here(sprintf("./data/empenhos/empenhos_%s.csv", cd_municipio)))
+
+  rm(empenhos_df) # remove o dataframe 'empenhos'
+  rm(empenhos_transformados)
+  gc() # permite que o R retorne memória pro sistema operacional
+}
 
 contratos_mutados_transformados <- contratos_mutados_df %>% mcTransformador::process_contrato_mutado() %>%
   join_contratos_mutados_contratos(contratos_transformados) %>% 
@@ -63,11 +88,12 @@ readr::write_csv(contratos_transformados, here::here("data/contratos.csv"))
 readr::write_csv(codigo_subfuncao_df, here::here("data/codigo_subfuncao.csv"))
 readr::write_csv(codigo_elemento_despesa_df, here::here("data/codigo_elemento_despesa.csv"))
 readr::write_csv(codigo_subelemento_df, here::here("data/codigo_subelemento.csv"))
-readr::write_csv(empenhos_df, here::here("data/empenhos.csv"))
 readr::write_csv(aditivos_df, here::here("data/aditivos.csv"))
 readr::write_csv(pagamentos_transformados, here::here("data/pagamentos.csv"))
+readr::write_csv(estorno_pagamento_transformado, here::here("data/estorno_pagamento.csv"))
 readr::write_csv(convenios_df, here::here("data/convenios.csv"))
 readr::write_csv(municipios_transformados, here::here("data/municipios.csv"))
 readr::write_csv(fornecedores_df, here::here("data/fornecedores.csv"))
 readr::write_csv(participantes_transformados, here::here("data/participantes.csv"))
 readr::write_csv(contratos_mutados_transformados, here::here("data/contratos_mutados.csv"))
+readr::write_csv(propostas_transformadas, here::here("data/propostas.csv"))
