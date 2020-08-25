@@ -185,3 +185,23 @@ translate_contratos_mutados <- function(contratos_mutados_raw){
     dplyr::select(-id_contrato) %>%
     dplyr::mutate(nu_licitacao = gsub("/", "", nu_licitacao))
 }
+
+#' @param propostas_raw Dados brutos das propostas
+#' @return Dataframe contendo informações sobre as propostas
+#' @rdname translate_propostas
+#' @examples
+#' propostas_dt <- translate_propostas(propostas_raw)
+translate_propostas <- function(propostas_raw) {
+  propostas_raw %<>% janitor::clean_names()
+}
+
+#' @title Traduz dado recebido para dataset
+#' @param estorno_pagamento_raw Dados brutos dos estornos de pagamentos
+#' @return Dataframe contendo informações sobre os estornos de pagamentos
+#' @rdname translate_estorno_pagamento
+#' @examples
+#' estorno_pagamento_dt <- translate_estorno_pagamento(estorno_pagamento_raw)
+translate_estorno_pagamento <- function(estorno_pagamento_raw) {
+  estorno_pagamento_raw %<>% janitor::clean_names() %>%
+    dplyr::mutate(de_motivo_estorno = gsub("[^[:alnum:][:blank:]?&/\\-]", "", de_motivo_estorno))
+}
