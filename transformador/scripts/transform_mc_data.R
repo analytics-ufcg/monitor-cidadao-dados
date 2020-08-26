@@ -21,7 +21,6 @@ codigo_elemento_despesa_df <- get_codigo_elemento_despesa()
 codigo_subelemento_df <- get_codigo_subelemento()
 municipios_df <- get_codigo_municipio()
 aditivos_df <- get_aditivos()
-pagamentos_df <- get_pagamentos()
 convenios_df <- get_convenios()
 fornecedores_df <- get_fornecedores()
 participantes_df <- get_participantes()
@@ -53,24 +52,53 @@ pagamentos_transformados <- pagamentos_df %>% mcTransformador::process_pagamento
 
 estorno_pagamento_transformado <- estorno_pagamento_df %>% mcTransformador::process_estorno_pagamento()
 
-for (cd_municipio in municipios_df$cd_municipio) {
-  print(sprintf('[%s] empenhos cd_municipio = %s', Sys.time(), cd_municipio))
 
-  empenhos_df <- get_empenhos_by_municipio(cd_municipio)
+#Recupera dados de empenhos e pagamentos pelo codigo da unidade gestora
+for (cd_u_gestora in codigo_unidade_gestora_df$cd_u_gestora) {
+  print(sprintf('[%s] empenhos da unidade gestora = %s', Sys.time(), cd_u_gestora))
+
+  # Verificar se o arquivo existe
+  input_dir_emp = sprintf("../fetcher/data/empenhos/empenhos_%s.csv", cd_u_gestora)
+  if (!file.exists(input_dir_emp) || file.size(input_dir_emp) == 0){next}
+
+  empenhos_df <- get_empenhos_by_unidade_gestora(cd_u_gestora)
+
   empenhos_transformados <- empenhos_df %>% mcTransformador::process_empenho() %>%
     join_empenhos_licitacao(licitacoes_transformadas)
 
-  output_dir = 'data/empenhos/'
-  if (!dir.exists(output_dir)){
-    dir.create(output_dir)
+  # Cria a pasta de saída caso ela não exista
+  output_dir_emp = 'data/empenhos/'
+  if (!dir.exists(output_dir_emp)){
+    dir.create(output_dir_emp)
   }
 
-  readr::write_csv(empenhos_transformados, here::here(sprintf("./data/empenhos/empenhos_%s.csv", cd_municipio)))
+  readr::write_csv(empenhos_transformados, here::here(sprintf("./data/empenhos/empenhos_%s.csv", cd_u_gestora)))
+
+  print(sprintf('[%s] pagamentos da unidade gestora = %s', Sys.time(), cd_u_gestora))
+
+  # Verificar se o arquivo existe
+  input_dir_pag = sprintf("../fetcher/data/pagamentos/pagamentos_%s.csv", cd_u_gestora)
+  if (!file.exists(input_dir_pag) || file.size(input_dir_pag) == 0){next}
+
+  pagamentos_df <- get_pagamentos_by_unidade_gestora(cd_u_gestora)
+  pagamentos_transformados <- pagamentos_df %>% mcTransformador::process_pagamento() %>%
+    join_pagamentos_empenhos(empenhos_transformados)
+
+  # Cria a pasta de saída caso ela não exista
+  output_dir_pag = 'data/pagamentos/'
+  if (!dir.exists(output_dir_pag)){
+    dir.create(output_dir_pag)
+  }
+
+  readr::write_csv(pagamentos_transformados, here::here(sprintf("./data/pagamentos/pagamentos_%s.csv", cd_u_gestora)))
 
   rm(empenhos_df) # remove o dataframe 'empenhos'
   rm(empenhos_transformados)
+  rm(pagamentos_df) # remove o dataframe 'pagamentos'
+  rm(pagamentos_transformados)
   gc() # permite que o R retorne memória pro sistema operacional
 }
+
 
 contratos_mutados_transformados <- contratos_mutados_df %>% mcTransformador::process_contrato_mutado() %>%
   join_contratos_mutados_contratos(contratos_transformados) %>% 
@@ -89,7 +117,6 @@ readr::write_csv(codigo_subfuncao_df, here::here("data/codigo_subfuncao.csv"))
 readr::write_csv(codigo_elemento_despesa_df, here::here("data/codigo_elemento_despesa.csv"))
 readr::write_csv(codigo_subelemento_df, here::here("data/codigo_subelemento.csv"))
 readr::write_csv(aditivos_df, here::here("data/aditivos.csv"))
-readr::write_csv(pagamentos_transformados, here::here("data/pagamentos.csv"))
 readr::write_csv(estorno_pagamento_transformado, here::here("data/estorno_pagamento.csv"))
 readr::write_csv(convenios_df, here::here("data/convenios.csv"))
 readr::write_csv(municipios_transformados, here::here("data/municipios.csv"))

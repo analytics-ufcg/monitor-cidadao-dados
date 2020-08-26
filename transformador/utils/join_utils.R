@@ -181,3 +181,20 @@ join_propostas_participantes <- function(df_propostas, df_participantes) {
     dplyr::select(id_proposta, id_licitacao, id_participante, dplyr::everything())
 }
 
+#' @title Realiza o join dos pagamentos com os dataframes dos empenhos
+#' @param pagamentos_df dataframe com os pagamentos
+#' @param empenhos_df dataframe com os empenhos
+#' @return Dataframe contendo informações dos pagamentos com os ids dos empenhos
+#' @rdname join_pagamentos_empenhos
+#' @examples
+#' join_pagamentos_empenhos_dt <- join_pagamentos_empenhos(df_pagamentos, df_empenhos)
+#'
+join_pagamentos_empenhos <- function(df_pagamentos, df_empenhos) {
+  df_empenhos %<>% dplyr::select(nu_empenho, cd_unid_orcamentaria, 
+                                 dt_ano, cd_u_gestora, id_empenho, 
+                                 nu_licitacao, tp_licitacao)
+
+  df_pagamentos %<>% dplyr::left_join(df_empenhos) %>%
+    dplyr::select(id_pagamento, id_empenho, dplyr::everything())
+} 
+
