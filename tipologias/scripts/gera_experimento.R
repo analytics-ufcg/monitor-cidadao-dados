@@ -1,7 +1,8 @@
 library(magrittr)
 
-source(here::here("../lib_modelos/modelagem_medidas_avaliacao.R"))
+source(here::here("lib_modelos/modelagem_medidas_avaliacao.R"))
 source(here::here("R/MC_DB_DAO.R"))
+source(here::here("R/setup/constants.R"))
 
 
 .HELP <- "
@@ -12,12 +13,6 @@ source(here::here("R/MC_DB_DAO.R"))
 \t   metricas_<data_geracao>.csv
 \t   experimento_<data_geracao>.csv
 "
-
-POSTGRES_MCDB_HOST="localhost"
-POSTGRES_MCDB_DB="mc_db"
-POSTGRES_MCDB_USER="postgres"
-POSTGRES_MCDB_PASSWORD="secret"
-POSTGRES_MCDB_PORT=7656
 
 #-----------------------------------FUNÇÕES-----------------------------------#
 
@@ -91,39 +86,17 @@ algoritmo <- c("Regressão Logístia",
 #   Obtenção dos dados
 # ---------------------------
 
-feature_set <- tibble::tibble()
+feature_set <- carrega_feature_set(mc_db_con)
 
-template <- ('SELECT * FROM feature_set')
-
-query <- template %>%
-  dplyr::sql()
-
-tryCatch({
-  feature_set <- dplyr::tbl(mc_db_con, query) %>% dplyr::collect(n = Inf)
-},
-error = function(e) print(paste0("Erro ao buscar feature_set no Banco MC_DB (Postgres): ", e)))
+#codigo temporário para recuperar as descricoes da feature
+entrada <- feature_set$features_descricao
 
 feature_set %<>% dplyr::mutate(match = all(entrada %>% purrr::map(~.x%in% jsonlite::fromJSON(features_descricao)))
                                        & length(entrada) == length(jsonlite::fromJSON(features_descricao)))
 
 matched_set <- (feature_set %>% dplyr::filter(match == TRUE) %>% tail(1))$id_feature_set
 
-features <- tibble::tibble()
-
-template <- ('SELECT * 
-              FROM feature
-              INNER JOIN feature_set_has_feature
-              ON feature_set_has_feature.id_feature_set = \'f8eac683daeabd41217776cd5cc0f6b9\' 
-              AND feature.id_feature = feature_set_has_feature.id_feature
-             ')
-
-query <- template %>%
-  dplyr::sql()
-
-tryCatch({
-  features <- dplyr::tbl(mc_db_con, query) %>% dplyr::collect(n = Inf)
-},
-error = function(e) print(paste0("Erro ao buscar featuresno Banco MC_DB (Postgres): ", e)))
+features <- carrega_features(mc_db_con, 'f8eac683daeabd41217776cd5cc0f6b9')
 
 tipologias_cgerais <- features %>% 
   dplyr::select(id_contrato, nome_feature, valor_feature) %>% 
@@ -149,7 +122,6 @@ features_exc <- c("id_contrato",
                   "dt_ano", 
                   "data_inicio", 
                   "nu_cpfcnpj")
-
 
 index <- caret::createDataPartition(tipologias_cgerais$status_tramita, 
                              p = .8, list = FALSE, times = 1)
@@ -432,6 +404,11 @@ experimento_rf <- data.frame(id_experimento = c(id_experimento),
 
 experimento <- dplyr::bind_rows(experimento_reglog,
                          experimento_rf)
+
+output_dir = 'data/experimento'
+if (!dir.exists(output_dir)){
+  dir.create(output_dir)
+}
 
 readr::write_csv(experimento, 
                  paste("data/experimento/experimento", "_",
