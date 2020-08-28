@@ -33,12 +33,12 @@ licitacoes_transformadas <- licitacoes_df %>% mcTransformador::process_licitacao
   join_licitacoes_codigo_unidade_gestora(codigo_unidade_gestora_df) %>%
   join_licitacoes_tipo_modalidade_licitacao(tipo_modalidade_licitacao_df)
 
-#contratos_transformados <- contratos_df %>% mcTransformador::process_contrato() %>%
+contratos_transformados <- contratos_df %>% mcTransformador::process_contrato() %>%
   join_contratos_licitacao(licitacoes_transformadas) %>%
   join_contratos_codigo_unidade_gestora(codigo_unidade_gestora_df) %>%
   join_contratos_fornecedores(fornecedores_df)
 
-#municipios_transformados <- municipios_df %>% mcTransformador::process_municipio()
+municipios_transformados <- municipios_df %>% mcTransformador::process_municipio()
 
 participantes_transformados <- participantes_df %>% mcTransformador::process_participante() %>%
   join_participantes_licitacao(licitacoes_transformadas) %>%
@@ -98,7 +98,7 @@ for (cd_u_gestora in codigo_unidade_gestora_df$cd_u_gestora) {
 }
 
 
-#contratos_mutados_transformados <- contratos_mutados_df %>% mcTransformador::process_contrato_mutado() %>%
+contratos_mutados_transformados <- contratos_mutados_df %>% mcTransformador::process_contrato_mutado() %>%
   join_contratos_mutados_contratos(contratos_transformados) %>%
   dplyr::filter(!is.na(id_contrato)) %>% #Remove as linhas que contém o id_contrato=NA.
   dplyr::filter(!duplicated(id_contrato,data_alteracao)) #Remove as linhas que são repetidas.
