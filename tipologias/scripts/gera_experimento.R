@@ -5,14 +5,12 @@ source(here::here("R/MC_DB_DAO.R"))
 source(here::here("R/setup/constants.R"))
 
 
-.HELP <- "
-\t   Rscript gera_experimento.R
-\t   Modelos treinados: Floresta Aleatória e Regressão Logística.
-\t   Outputs desejados:
-\t   indice_exp_<data_geracao>.csv
-\t   metricas_<data_geracao>.csv
-\t   experimento_<data_geracao>.csv
-"
+POSTGRES_MCDB_HOST="localhost"
+POSTGRES_MCDB_DB="mc_db"
+POSTGRES_MCDB_USER="postgres"
+POSTGRES_MCDB_PASSWORD="secret"
+POSTGRES_MCDB_PORT=7656
+
 
 #-----------------------------------FUNÇÕES-----------------------------------#
 
@@ -21,11 +19,11 @@ get_args <- function() {
   args = commandArgs(trailingOnly=TRUE)
   
   option_list = list(
-    optparse::make_option(c("-v", "--vigentes"),
-                          type="logical",
-                          default="TRUE",
-                          help=.HELP,
-                          metavar="logical")
+    optparse::make_option(c("-v", "--tipo_contrucao_feature_set"),
+                          type="character",
+                          default="recentes",
+                          help="Tipo de construções possíveis: recentes (as features mais atuais)",
+                          metavar="character")
   );
   
   opt_parser <- optparse::OptionParser(option_list = option_list, usage = .HELP)
@@ -86,7 +84,29 @@ algoritmo <- c("Regressão Logístia",
 #   Obtenção dos dados
 # ---------------------------
 
-feature_set <- carrega_feature_set(mc_db_con)
+# Parâmetros/Argumentos
+RECENTES <- "recentes"
+args <- get_args()
+tipo_contrucao_feature_set <- args$tipo_contrucao_feature_set
+
+# Verifica se o feature set contém as features mais atuais
+is_feature_set_atualizado = as.logical(is_features_sets_atualizados(mc_db_con)$case)
+
+# recupera o feature set de acordo com os argumentos de entrada
+if(tipo_contrucao_feature_set == RECENTES) {
+  if (!is_feature_set_atualizado) {
+    print ("Atualizando feature_set com as features mais recentes...")
+    system("Rscript scripts/gera_feature_set.R --tipo_construcao_features recentes")
+    print ("O feature_set foi atualizado.")
+  } else {
+    print ("Já existe um feature_set com o conjunto de features atuais.")
+  }
+} else {
+  stop("Tipo de construção inválida.")
+}
+
+# pega o ultimo feature_set cadastrado no banco
+feature_set <- get_ultimo_feature_set(mc_db_con)
 
 #codigo temporário para recuperar as descricoes da feature
 entrada <- feature_set$features_descricao
@@ -96,7 +116,7 @@ feature_set %<>% dplyr::mutate(match = all(entrada %>% purrr::map(~.x%in% jsonli
 
 matched_set <- (feature_set %>% dplyr::filter(match == TRUE) %>% tail(1))$id_feature_set
 
-features <- carrega_features(mc_db_con, 'f8eac683daeabd41217776cd5cc0f6b9')
+features <- carrega_features_by_id_feature_set(mc_db_con, feature_set$id_feature_set)
 
 tipologias_cgerais <- features %>% 
   dplyr::select(id_contrato, nome_feature, valor_feature) %>% 

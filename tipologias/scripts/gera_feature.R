@@ -5,10 +5,9 @@ source(here::here("R/AL_DB_DAO.R"))
 source(here::here("R/process_contratos.R"))
 source(here::here("R/tipologias.R"))
 source(here::here("R/utils.R"))
-source(here::here("R/carrega_gabarito_contratos.R"))
+source(here::here("R/process_gabarito_contratos.R"))
 
-.HELP <- "Rscript gera_tipologias.R -v <vigentes>"
-
+.HELP <- "Rscript gera_feature.R --vigencia <encerrados, vigentes e todos> --data_range_inicio <2012-01-01> --data_range_fim <2012_01_01>"
 
 #-----------------------------------FUNÇÕES-----------------------------------#
 
@@ -17,29 +16,47 @@ get_args <- function() {
   args = commandArgs(trailingOnly=TRUE)
   
   option_list = list(
-    optparse::make_option(c("-v", "--vigentes"),
+    optparse::make_option(c("--vigencia"), 
                           type="character",
-                          default="all",
-                          help="String que decide se gera tipologias apenas para contratos vigentes, encerrados ou gerais",
+                          default="todos",
+                          help="Situações disponíveis: 'encerrados', 'vigentes' e 'todos'",
+                          metavar="character"),
+    optparse::make_option(c("--data_range_inicio"), 
+                         type="character",
+                         default="2012-01-01",
+                         help="Data inicial da seleção (utiliza a data da assinatura do contrato).",
+                         metavar="character"),
+    optparse::make_option(c("--data_range_fim"),
+                          type="character",
+                          default="2019-01-01",
+                          help="Data final da seleção (utiliza a data da assinatura do contrato).",
                           metavar="character")
   );
   
   opt_parser <- optparse::OptionParser(option_list = option_list, usage = .HELP)
   
   opt <- optparse::parse_args(opt_parser)
-  return(opt);
+  return(opt)
 }
 
 #' @title Escreve dataframes das tipologias
-write_features <- function(tipologias_final_contratos_gerais, features, VIGENCIA) {
+write_features <- function(tipologias_final_contratos_gerais, features, VIGENCIA, data_range_inicio, data_range_fim) {
   readr::write_csv(tipologias_final_contratos_gerais, 
                    paste("data/features/features_wide_",
                          VIGENCIA,
+                         "_",
+                         data_range_inicio,
+                         "-",
+                         data_range_fim,
                          "_",
                          gsub(":", "", gsub("[[:space:]]", "_", Sys.time())), ".csv", sep = ""))
   readr::write_csv(features, 
                    paste("data/features/features_gather_",
                          VIGENCIA,
+                         "_",
+                         data_range_inicio,
+                         "-",
+                         data_range_fim,
                          "_",
                          gsub(":", "", gsub("[[:space:]]", "_", Sys.time())), ".csv", sep = ""))
   
@@ -48,7 +65,7 @@ write_features <- function(tipologias_final_contratos_gerais, features, VIGENCIA
 #' @title Gera hashcode do código fonte
 generate_hash_source_code <- function() {
   source_code_string <- paste(readr::read_file(here::here("scripts/gera_feature.R")),
-                              readr::read_file(here::here("R/carrega_gabarito_contratos.R")),
+                              readr::read_file(here::here("R/process_gabarito_contratos.R")),
                               readr::read_file(here::here("R/AL_DB_DAO.R")),
                               readr::read_file(here::here("R/process_contratos.R")),
                               readr::read_file(here::here("R/process_licitacoes.R")),
@@ -65,11 +82,13 @@ generate_hash_source_code <- function() {
 
 ENCERRADOS <- "encerrados"
 VIGENTES <- "vigentes"
-GERAIS <- "gerais"
+GERAIS <- "todos"
 
 args <- get_args()
 
-vigentes <- args$vigentes
+vigentes <- args$vigencia
+data_range_inicio <- args$data_range_inicio
+data_range_fim <- args$data_range_fim
 
 al_db_con <- NULL
 
@@ -94,10 +113,10 @@ print("Carregando contratos...")
 
 contratos <- tibble::tibble()
 
-if (vigentes == "yes") {
-  contratos = carrega_contratos(al_db_con, vigentes = TRUE) %>% dplyr::mutate(vigente = TRUE)
-} else if (vigentes == "no") {
-  contratos = carrega_contratos(al_db_con, vigentes = FALSE) %>% dplyr::mutate(vigente = FALSE)
+if (vigentes == "vigentes") {
+  contratos = carrega_contratos(al_db_con, vigentes = TRUE, data_range_inicio, data_range_fim) %>% dplyr::mutate(vigente = TRUE)
+} else if (vigentes == "encerrados") {
+  contratos = carrega_contratos(al_db_con, vigentes = FALSE, data_range_inicio, data_range_fim) %>% dplyr::mutate(vigente = FALSE)
 } else {
   contratos = dplyr::bind_rows(carrega_contratos(al_db_con, vigentes = TRUE) %>% dplyr::mutate(vigente = TRUE),
                                carrega_contratos(al_db_con, vigentes = FALSE) %>% dplyr::mutate(vigente = FALSE))
@@ -129,8 +148,10 @@ tipologias_proposta <- gera_tipologia_proposta(propostas_licitacoes, contratos_b
 
 #Merge tipologias e adiciona gabarito
 print("Cruzando tipologias...")
+contratos_tramita <- carrega_contratos_mutados(al_db_con)
+
 tipologias_merge <- merge_tipologias(contratos_processados, tipologias_licitacao, tipologias_proposta) %>% 
-  carrega_gabarito_tramita() %>% 
+  processa_gabarito_tramita(contratos_tramita) %>% 
   replace_nas()
 
 #Gera tipologias contratos
@@ -158,15 +179,15 @@ features <- tipologias_final_contratos_gerais %>% tidyr::gather(key = "nome_feat
   dplyr::select(id_feature, dplyr::everything())
 
 #Escrevendo arquivos
-if (vigentes == "yes") {
-  write_features(tipologias_final_contratos_gerais, features, VIGENTES)
-} else if (vigentes == "no") {
-  write_features(tipologias_final_contratos_gerais, features, ENCERRADOS)
+if (vigentes == "vigentes") {
+  write_features(tipologias_final_contratos_gerais, features, VIGENTES, data_range_inicio, data_range_fim)
+} else if (vigentes == "encerrados") {
+  write_features(tipologias_final_contratos_gerais, features, ENCERRADOS, data_range_inicio, data_range_fim)
 } else {
-  write_features(tipologias_final_contratos_gerais, features, GERAIS)
+  write_features(tipologias_final_contratos_gerais, features, GERAIS, data_range_inicio, data_range_fim)
 }
 
 #Compactando código gerador 
-zip(paste("data/source_code/",hash_source_code, ".zip", sep = ""), c("R", "scripts"))
+#zip(paste("data/source_code/",hash_source_code, ".zip", sep = ""), c("R", "scripts"))
 
 DBI::dbDisconnect(al_db_con)

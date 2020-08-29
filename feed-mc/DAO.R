@@ -37,9 +37,19 @@ create <- function() {
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-mc/scripts/create/create_previsao_prod.sql"))
 }
 
-#' @title Importa dados para as tabelas do Banco de dados
-import <- function() {
-  system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-mc/scripts/import/import_data.sql"))
+#' @title Importa dados das features para o MCDB
+import_feature <- function() {
+  system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-mc/scripts/import/import_data_feature.sql"))
+}
+
+#' @title Importa dados do feature set para o MCDB
+import_feature_set <- function() {
+  system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-mc/scripts/import/import_data_feature_set.sql"))
+}
+
+#' @title Importa dados do experimento para o MCDB
+import_experimento <- function() {
+  system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-mc/scripts/import/import_data_experimento.sql"))
 }
 
 #' @title "Dropa as tabelas do Banco de Dados"
@@ -67,8 +77,12 @@ Sys.setenv(PGPASSWORD = password)
 
 if (funct == "create") {
   create()
-} else if (funct == "import") {
-  import()
+} else if (funct == "import_feature") {
+  import_feature()
+} else if (funct == "import_feature_set") {
+  import_feature_set()
+} else if (funct == "import_experimento") {
+  import_experimento()
 } else if ( funct == "shell") {
   shell()
 } else if ( funct == "clean"){
