@@ -130,7 +130,8 @@ translate_aditivos <- function(aditivos_raw) {
 #' pagamentos_dt <- translate_pagamentos(translate_pagamentos_raw)
 translate_pagamentos <- function(pagamentos_raw) {
   pagamentos_raw %<>% janitor::clean_names() %>%
-    dplyr::mutate(nu_empenho = gsub("[^[:alnum:][:blank:]?&/\\-]", "", nu_empenho))
+    dplyr::mutate(nu_empenho = gsub("[^[:alnum:][:blank:]?&/\\-]", "", nu_empenho)) %>%
+      dplyr::mutate(nu_cheque_pag = gsub("[^[:alnum:][:blank:]?&/\\-]", "", nu_cheque_pag))
 }
 
 #' @param convenios_raw Dados brutos dos Convênios
