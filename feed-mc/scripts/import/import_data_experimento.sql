@@ -1,9 +1,9 @@
 
-
 -- COPIA DADOS DO INDICE_PART.CSV
-\copy indice_part FROM '/data/indice_part.csv' WITH NULL AS 'NA' DELIMITER ',' CSV HEADER;
--- COPIA DADOS DO EXPERIMENTO.CSV
-\copy experimento FROM '/data/experimento.csv' WITH NULL AS 'NA' DELIMITER ',' CSV HEADER;
+\copy indice_part FROM PROGRAM 'awk FNR-1 /data/indice_part/indices_exp*.csv | cat' WITH NULL AS 'NA' DELIMITER ',' CSV;
 
--- -- COPIA DADOS DO PREVISAO_PROD.CSV
--- \copy previsao_prod FROM '/data/previsao_prod.csv' WITH NULL AS 'NA' DELIMITER ',' CSV HEADER;
+-- COPIA DADOS DO EXPERIMENTO.CSV
+\copy experimento FROM PROGRAM 'awk FNR-1 /data/experimento/experimento*.csv | cat' WITH NULL AS 'NA' DELIMITER ',' CSV;
+
+-- COPIA DADOS DO EXPERIMENTO.CSV
+\copy metrica FROM PROGRAM 'awk FNR-1 /data/metricas/metricas*.csv | cat' WITH NULL AS 'NA' DELIMITER ',' CSV;

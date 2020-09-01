@@ -80,49 +80,7 @@ is_features_sets_atualizados<- function(mc_db_con) {
   
   is_fs_atualizados <- tibble::tibble()
   
-  template <- ('WITH 
-    ultimo_feature_set AS ( 
-      SELECT 
-      * 
-      FROM 
-      feature_set 
-      WHERE 
-      timestamp >= (SELECT MAX(timestamp) FROM feature) 
-      LIMIT 1), 
-    ultima_feature AS ( 
-      SELECT 
-      DATE(MAX(timestamp)), 
-      hash_bases_geradoras, 
-      hash_codigo_gerador_feature 
-      FROM 
-      feature 
-      GROUP BY 
-      hash_bases_geradoras, hash_codigo_gerador_feature 
-      LIMIT 1
-    ) SELECT CASE WHEN EXISTS (
-        SELECT 
-        * 
-        FROM (
-          SELECT 
-          *, 
-          (SELECT hash_bases_geradoras FROM ultima_feature) as hash_base_atual,
-          (SELECT hash_codigo_gerador_feature FROM ultima_feature) as hash_codigo_atual 
-          FROM 
-          feature_set_has_feature as fshf 
-          LEFT JOIN feature as f 
-          ON 
-          fshf.id_feature = f.id_feature 
-          AND 
-          fshf.id_feature_set = (SELECT id_feature_set FROM ultimo_feature_set)
-        ) as ultima_feature_infos_update 
-        WHERE 
-        hash_base_atual = hash_bases_geradoras 
-        AND 
-        hash_codigo_atual = hash_codigo_atual 
-        LIMIT 10
-      ) THEN \'TRUE\' ELSE \'FALSE\' 
-      END;
-    '
+  template <- ('WITH ultimo_feature_set AS ( SELECT * FROM feature_set WHERE timestamp >= (SELECT MAX(timestamp) FROM feature) LIMIT 1), ultima_feature AS ( SELECT DATE(MAX(timestamp)), hash_bases_geradoras, hash_codigo_gerador_feature FROM feature GROUP BY hash_bases_geradoras, hash_codigo_gerador_feature LIMIT 1 ) SELECT CASE WHEN EXISTS ( SELECT * FROM ( SELECT *, (SELECT hash_bases_geradoras FROM ultima_feature) as hash_base_atual, (SELECT hash_codigo_gerador_feature FROM ultima_feature) as hash_codigo_atual FROM feature_set_has_feature as fshf LEFT JOIN feature as f ON fshf.id_feature = f.id_feature AND fshf.id_feature_set = (SELECT id_feature_set FROM ultimo_feature_set) ) as ultima_feature_infos_update WHERE hash_base_atual = hash_bases_geradoras AND hash_codigo_atual = hash_codigo_atual LIMIT 10 ) THEN \'TRUE\' ELSE \'FALSE\' END'
   )
   
   query <- template  %>%

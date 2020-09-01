@@ -118,8 +118,8 @@ if (vigentes == "vigentes") {
 } else if (vigentes == "encerrados") {
   contratos = carrega_contratos(al_db_con, vigentes = FALSE, data_range_inicio, data_range_fim) %>% dplyr::mutate(vigente = FALSE)
 } else {
-  contratos = dplyr::bind_rows(carrega_contratos(al_db_con, vigentes = TRUE) %>% dplyr::mutate(vigente = TRUE),
-                               carrega_contratos(al_db_con, vigentes = FALSE) %>% dplyr::mutate(vigente = FALSE))
+  contratos = dplyr::bind_rows(carrega_contratos(al_db_con, vigentes = TRUE, data_range_inicio, data_range_fim) %>% dplyr::mutate(vigente = TRUE),
+                               carrega_contratos(al_db_con, vigentes = FALSE, data_range_inicio, data_range_fim) %>% dplyr::mutate(vigente = FALSE))
 }
 
 print("Carregando propostas de licitações...")

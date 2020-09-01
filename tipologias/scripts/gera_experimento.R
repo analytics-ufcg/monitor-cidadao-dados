@@ -4,13 +4,13 @@ source(here::here("lib_modelos/modelagem_medidas_avaliacao.R"))
 source(here::here("R/MC_DB_DAO.R"))
 source(here::here("R/setup/constants.R"))
 
-
 POSTGRES_MCDB_HOST="localhost"
 POSTGRES_MCDB_DB="mc_db"
 POSTGRES_MCDB_USER="postgres"
 POSTGRES_MCDB_PASSWORD="secret"
 POSTGRES_MCDB_PORT=7656
 
+.HELP <- "Rscript script/gera_experimento.R --tipo_contrucao_feature_set vigentes"
 
 #-----------------------------------FUNÇÕES-----------------------------------#
 
@@ -19,7 +19,7 @@ get_args <- function() {
   args = commandArgs(trailingOnly=TRUE)
   
   option_list = list(
-    optparse::make_option(c("-v", "--tipo_contrucao_feature_set"),
+    optparse::make_option(c("--tipo_contrucao_feature_set"),
                           type="character",
                           default="recentes",
                           help="Tipo de construções possíveis: recentes (as features mais atuais)",
@@ -293,8 +293,6 @@ rf_fit_model <- rf_wf %>% parsnip::fit(treino_assado)
 
 
 
-
-
 # ---------------------------
 # Parte VI:
 #   Previsão do risco
@@ -349,8 +347,6 @@ mygc()
 # ---------------------------
 
 
-
-
 av_reglog <- avaliacao(algoritmo[1], previsoes, 
                        "reglog_class_pred", "ground_truth") %>%
   dplyr::select(!modelo)
@@ -388,7 +384,8 @@ avaliacao_modelos <- avaliacao_modelos %>%
 
 # Junção das métricas de cv com oob
 metricas <- dplyr::bind_rows(resample_metrics,
-                      avaliacao_modelos)
+                      avaliacao_modelos) %>%
+                      dplyr::distinct ()
 
 readr::write_csv(metricas, 
                  paste("data/metricas/metricas", "_",
@@ -400,6 +397,19 @@ readr::write_csv(metricas,
 # Parte VI:
 #   Salva experimento
 # ---------------------------
+# test1 = as.raw(serialize(rf_fit_model, connection=NULL))
+# test2 = unserialize(test1)
+
+s <- serialize(rf_fit_model, NULL)
+s2 <- paste0(s, collapse = "")
+butcher::weigh(rf_fit_model)
+
+s3 <- substring(s2, seq(1,nchar(s2),2), seq(2,nchar(s2),2))
+s4 = as.raw(as.integer(paste0('0x', s3)))
+s5 <- unserialize(s4)
+
+all.equal(rf_fit_model,s5)
+
 
 experimento_reglog <- data.frame(id_experimento = c(id_experimento),
                                  data_hora = c(data_hora),
@@ -423,7 +433,7 @@ experimento_rf <- data.frame(id_experimento = c(id_experimento),
 
 
 experimento <- dplyr::bind_rows(experimento_reglog,
-                         experimento_rf)
+                         experimento_rf) 
 
 output_dir = 'data/experimento'
 if (!dir.exists(output_dir)){
@@ -433,3 +443,5 @@ if (!dir.exists(output_dir)){
 readr::write_csv(experimento, 
                  paste("data/experimento/experimento", "_",
                        gsub(":", "", gsub("[[:space:]]", "_", data_hora)), ".csv", sep = ""))
+
+

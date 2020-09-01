@@ -73,6 +73,8 @@ carrega_contratos_mutados <- function(al_db_con) {
 #' @examples
 #' contratos <- fetch_contratos(al_db_con)
 carrega_contratos <- function(al_db_con, vigentes = TRUE, data_range_inicio = "2014-01-01", data_range_fim = "2020-01-01", limite_inferior=140e3) {
+  print (data_range_inicio)
+  print (data_range_fim)
   contratos <- tibble::tibble()
   template <- (paste0('SELECT *
                 FROM contrato
