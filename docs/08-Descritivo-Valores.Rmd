@@ -1,0 +1,156 @@
+---
+title: "Valores"
+subtitle: "Fonte de dados: Sagres"
+author: "Monitor Cidadão - Laboratório Analytics"
+output:
+  html_document:
+    df_print: paged
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+    # toc: true
+    # toc_float: true
+
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  fig.retina = 2,
+  collapse = TRUE,
+  out.width = "100%",
+  fig.asp = 0.618  # 1 / phi
+  # fig.show = "hold"
+)
+
+options(scipen = 999)
+Sys.setlocale(category = "LC_ALL", locale = "pt_PT.UTF-8")
+```
+
+
+```{r libraries, message=FALSE, warning=FALSE, include=FALSE}
+library(readr)
+library(dplyr)
+library(here) 
+library(hrbrthemes)
+library(GGally)
+library(ggplot2)
+library(reshape2)
+```
+
+
+## Mergulhando nos dados
+
+```{r licitacoes, include=FALSE}
+licitacoes <- read_csv(here::here("../fetcher/data/licitacoes.csv"), 
+    col_types = cols(cd_UGestora = col_character(), 
+        nu_Licitacao = col_character(), 
+        tp_Licitacao = col_character()))
+
+licitacoes <- licitacoes %>% 
+  mutate(ano_Homologacao = as.numeric(format(dt_Homologacao, "%Y")))
+
+range_ano <- licitacoes$ano_Homologacao
+range_ano <- range_ano %>% na.omit()
+```
+
+
+```{r, include=FALSE}
+contratos <- read_csv(here::here("../fetcher/data/contratos.csv"), 
+    col_types = cols(cd_UGestora = col_character(),
+                     dt_Ano = col_factor(levels = c()),
+                    nu_Contrato = col_character(), tp_Licitacao = col_character()))
+
+
+
+contratos$registroCGE <- NULL
+contratos$dt_Recebimento <- NULL
+contratos$foto <- NULL
+contratos$planilha <- NULL
+contratos$ordemServico <- NULL
+contratos$cd_SIAFI <- NULL
+
+#Filtra os contratos que são provenientes de licitações
+contratos_lic <- contratos %>% 
+  semi_join(licitacoes, by = c('cd_UGestora', 'nu_Licitacao', 'tp_Licitacao')) %>% 
+  left_join(licitacoes, by = c('cd_UGestora', 'nu_Licitacao', 'tp_Licitacao'))
+
+contratos_lic <- contratos_lic %>% 
+  mutate(ano_Assinatura = as.numeric(format(dt_Assinatura, "%Y")))
+
+contratos_lic_agrupadas <- contratos_lic %>% 
+  group_by(cd_UGestora, nu_Licitacao, tp_Licitacao, vl_Licitacao, nu_Contrato) %>% # Agrupa os contratos por licitação
+  dplyr::summarise( totalContrato = sum(vl_TotalContrato)) 
+# range_ano_contratos <- contratos_lic$ano_Assinatura
+# range_ano_contratos <- range_ano_contratos %>% na.omit()
+```
+```{r}
+contratos_lic_agrupadas[,'tp_Licitacao'] <- as.factor(contratos_lic_agrupadas[,'tp_Licitacao'])
+```
+
+```{r}
+ggparcoord(contratos_lic_agrupadas,
+    columns = 4:5, groupColumn = 3
+    ) 
+
+```
+
+```{r}
+contratos_licitacoes_melted <- melt(contratos_lic_agrupadas, id.vars = c("cd_UGestora", "nu_Licitacao", "tp_Licitacao", "nu_Contrato"), measure.vars = c("vl_Licitacao",  "totalContrato"))
+```
+
+```{r}
+ggplot(data = contratos_licitacoes_melted, aes(x=variable, y=value)) +
+  geom_boxplot(aes(fill=variable)) +
+  scale_x_discrete(labels= c("valor_licitacao", "valor_contrato"))
+```
+
+```{r}
+# Carrega aditivos
+aditivos <- read_csv("../fetcher/data/aditivos.csv", 
+    col_types = cols(cd_UGestora = col_character()))
+
+# Tabela com os contratos que possuem licitaçoes, acrescida dos aditivos
+contratos_licitacoes_aditivados <- contratos_lic_agrupadas %>% 
+  left_join(aditivos, by = c("cd_UGestora", "nu_Contrato"))
+
+contratos_licitacoes_aditivados <- contratos_licitacoes_aditivados %>% 
+  rowwise() %>% 
+  mutate(valor_contrato_pago = sum(vl_Aditivo, totalContrato, na.rm =TRUE))
+  
+contratos_licitacoes_aditivados <- contratos_licitacoes_aditivados %>% select(cd_UGestora, nu_Licitacao, tp_Licitacao, nu_Contrato, vl_Licitacao, valor_contrato_pago)
+```
+
+```{r}
+ggparcoord(contratos_licitacoes_aditivados,
+    columns = 5:6, groupColumn = 3
+    ) 
+
+```
+
+
+```{r}
+ggparcoord(contratos_valores_gerais,
+    columns = 2:3, groupColumn = 4, order = "anyClass") 
+```
+```{r}
+# Carrega dataframe com as propostas
+propostas <- read_csv("~/analytcs/monitor-cidadao-dados/fetcher/data/propostas.csv", 
+    col_types = cols(cd_UGestora = col_character(),
+                     tp_Licitacao = col_character()))
+```
+ 
+```{r}
+propostas_filtradas <- propostas %>% 
+  filter(st_Proposta == "1") %>%  # Filtra as propostas que venceram licitações 
+  group_by(cd_UGestora, nu_Licitacao, tp_Licitacao) %>% # Agrupa as propostas por licitação
+  dplyr::summarise(totalPorLicitacao = sum(vl_Ofertado))
+```
+
+```{r}
+propostas_licitacoes <- contratos_lic_agrupadas %>% 
+  left_join(propostas_filtradas, by = c("cd_UGestora", "nu_Licitacao", "tp_Licitacao"))
+```
+
+
+
+

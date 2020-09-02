@@ -92,7 +92,7 @@ Abaixo, iremos conferir um panorama sobre as licitações que tiveram início no
 ## Mergulhando nos dados
 
 ```{r licitacoes, include=FALSE}
-licitacoes <- read_csv(here::here("fetcher/data/licitacoes.csv"), 
+licitacoes <- read_csv(here::here("../fetcher/data/licitacoes.csv"), 
     col_types = cols(cd_UGestora = col_character(), 
         nu_Licitacao = col_character(), tp_Licitacao = col_character(),
         tp_Licitacao = col_character()))
