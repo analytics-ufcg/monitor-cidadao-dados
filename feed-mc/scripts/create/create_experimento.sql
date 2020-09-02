@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS "experimento" (
     "id_experimento" VARCHAR(50),
     "data_hora" TEXT,
     "algoritmo" VARCHAR(50),
-    "modelo" VARCHAR(50),
+    "modelo" TEXT,
     "hiperparametros" VARCHAR(50),
     "tipo_balanceamento" VARCHAR(50),
     "fk_indice_part" VARCHAR(50),

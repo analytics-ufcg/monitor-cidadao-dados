@@ -4,11 +4,13 @@ source(here::here("lib_modelos/modelagem_medidas_avaliacao.R"))
 source(here::here("R/MC_DB_DAO.R"))
 source(here::here("R/setup/constants.R"))
 
-POSTGRES_MCDB_HOST="localhost"
-POSTGRES_MCDB_DB="mc_db"
-POSTGRES_MCDB_USER="postgres"
-POSTGRES_MCDB_PASSWORD="secret"
-POSTGRES_MCDB_PORT=7656
+
+#----Variáveis de acesso ao banco MCDB caso esteja rodando o script localmente----#
+# POSTGRES_MCDB_HOST="localhost"
+# POSTGRES_MCDB_DB="mc_db"
+# POSTGRES_MCDB_USER="postgres"
+# POSTGRES_MCDB_PASSWORD="secret"
+# POSTGRES_MCDB_PORT=7656
 
 .HELP <- "Rscript script/gera_experimento.R --tipo_contrucao_feature_set vigentes"
 
@@ -67,8 +69,6 @@ set.seed(123)
 options(scipen = 999)
 invisible(Sys.setlocale(category = "LC_ALL", locale = "pt_PT.UTF-8"))
 
-args <- get_args()
-
 data_hora <- gsub(":", "", gsub("[[:space:]]", "_", Sys.time()))
 id_experimento <- generate_id_experimento(data_hora)
 
@@ -108,8 +108,7 @@ if(tipo_contrucao_feature_set == RECENTES) {
 # pega o ultimo feature_set cadastrado no banco
 feature_set <- get_ultimo_feature_set(mc_db_con)
 
-#codigo temporário para recuperar as descricoes da feature
-entrada <- feature_set$features_descricao
+entrada <- read.table("data/input_features.txt")$V1
 
 feature_set %<>% dplyr::mutate(match = all(entrada %>% purrr::map(~.x%in% jsonlite::fromJSON(features_descricao)))
                                        & length(entrada) == length(jsonlite::fromJSON(features_descricao)))
@@ -128,6 +127,7 @@ tipologias_cgerais <- tipologias_cgerais %>%
 
 tipologias_cgerais$status_tramita <- as.factor(tipologias_cgerais$status_tramita)
 tipologias_cgerais$tp_licitacao <- as.factor(tipologias_cgerais$tp_licitacao)
+
 
 
 # ---------------------------
@@ -400,31 +400,31 @@ readr::write_csv(metricas,
 # test1 = as.raw(serialize(rf_fit_model, connection=NULL))
 # test2 = unserialize(test1)
 
-s <- serialize(rf_fit_model, NULL)
-s2 <- paste0(s, collapse = "")
-butcher::weigh(rf_fit_model)
 
-s3 <- substring(s2, seq(1,nchar(s2),2), seq(2,nchar(s2),2))
-s4 = as.raw(as.integer(paste0('0x', s3)))
-s5 <- unserialize(s4)
-
-all.equal(rf_fit_model,s5)
+# s <- serialize(rf_fit_model, NULL)
+# s2 <- paste0(s, collapse = "")
+# butcher::weigh(reglog_fit_model)
+# 
+# s3 <- substring(s2, seq(1,nchar(s2),2), seq(2,nchar(s2),2))
+# s4 = as.raw(as.integer(paste0('0x', s3)))
+# s5 <- unserialize(s4)
+# 
+# all.equal(rf_fit_model,s5)
 
 
 experimento_reglog <- data.frame(id_experimento = c(id_experimento),
                                  data_hora = c(data_hora),
                                  algoritmo = c("Regressão Logística"),
-                                 modelo = c("objeto_modelo"),
+                                 modelo = c(paste0(serialize(reglog_fit_model, NULL), collapse = "")),
                                  hiperparametros = c("crossvalidation 5 folds"),
                                  tipo_balanceamento = c("-"),
                                  fk_indice_part = c(id_experimento),
                                  fk_feature_set = c("feature_set"),
                                  hash_codigo_gerador = c(generate_hash_sourcecode()))
-
 experimento_rf <- data.frame(id_experimento = c(id_experimento),
                              data_hora = c(data_hora),
                              algoritmo = c("Floresta Aleatória"),
-                             modelo = c("objeto_modelo"),
+                             modelo = c(paste0(serialize(rf_fit_model, NULL), collapse = "")),
                              hiperparametros = c("crossvalidation 5 folds"),
                              tipo_balanceamento = c("-"),
                              fk_indice_part = c(id_experimento),
