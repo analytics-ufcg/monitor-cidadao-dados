@@ -87,22 +87,30 @@ contratos_lic_agrupadas <- contratos_lic %>%
 contratos_lic_agrupadas[,'tp_Licitacao'] <- as.factor(contratos_lic_agrupadas[,'tp_Licitacao'])
 ```
 
+Neste relatório, queremos investigar a relação entre o valor de cada licitação e o(s) custo(s) de seu(s) contrato(s). <br>
+
+Uma licitação pode gerar vários contratos. Assim, o custo dos contratos de cada licitação será dado pela soma dos custos de cada contrato gerado daquela licitação.
+
+## Custo da licitação *versus* custo do(s) contratos(s) sem aditivos 
+
 ```{r}
 ggparcoord(contratos_lic_agrupadas,
-    columns = 4:5, groupColumn = 3
+    columns = c(4,6), groupColumn = 3
     ) 
 
 ```
 
 ```{r}
 contratos_licitacoes_melted <- melt(contratos_lic_agrupadas, id.vars = c("cd_UGestora", "nu_Licitacao", "tp_Licitacao", "nu_Contrato"), measure.vars = c("vl_Licitacao",  "totalContrato"))
+contratos_licitacoes_melted <-  na.omit(contratos_licitacoes_melted)
 ```
 
 ```{r}
 ggplot(data = contratos_licitacoes_melted, aes(x=variable, y=value)) +
-  geom_boxplot(aes(fill=variable)) +
-  scale_x_discrete(labels= c("valor_licitacao", "valor_contrato"))
+  geom_boxplot() #+
+  #scale_x_discrete(labels= c("valor_licitacao", "valor_contrato"))
 ```
+## Custo da licitação *versus* custo do(s) contratos(s) com aditivos 
 
 ```{r}
 # Carrega aditivos
@@ -132,9 +140,10 @@ ggparcoord(contratos_licitacoes_aditivados,
 ggparcoord(contratos_valores_gerais,
     columns = 2:3, groupColumn = 4, order = "anyClass") 
 ```
+
 ```{r}
 # Carrega dataframe com as propostas
-propostas <- read_csv("~/analytcs/monitor-cidadao-dados/fetcher/data/propostas.csv", 
+propostas <- read_csv(here::here("../fetcher/data/propostas.csv"), 
     col_types = cols(cd_UGestora = col_character(),
                      tp_Licitacao = col_character()))
 ```
@@ -149,6 +158,19 @@ propostas_filtradas <- propostas %>%
 ```{r}
 propostas_licitacoes <- contratos_lic_agrupadas %>% 
   left_join(propostas_filtradas, by = c("cd_UGestora", "nu_Licitacao", "tp_Licitacao"))
+```
+
+```{r}
+# Carrega dataframe com alguns empenhos de Campina Grande
+empenhos_CG <- read_csv(here::here("../fetcher/data/empenhos/empenhos_201050.csv"), 
+    col_types = cols(cd_UGestora = col_character(),
+                     nu_Licitacao = col_character(),
+                     tp_Licitacao = col_character()))
+```
+
+```{r}
+propostas_licitacoes_empenhos <- propostas_licitacoes %>%
+  left_join(empenhos_CG, by = c("cd_UGestora", "nu_Licitacao", "tp_Licitacao"))
 ```
 
 
