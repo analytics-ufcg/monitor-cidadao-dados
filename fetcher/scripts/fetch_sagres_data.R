@@ -70,38 +70,28 @@ tipo_modalidade_licitacao <- fetch_tipo_modalidade_licitacao(sagres)
 readr::write_csv(tipo_modalidade_licitacao, here::here("./data/tipo_modalidade_licitacao.csv"))
 
 #
-# Recupera os dados por unidade gestora para empenhos
+# Recupera os dados por unidade gestora para empenhos e pagamentos
 #
 output_dir_empenhos = 'data/empenhos/'
 if (!dir.exists(output_dir_empenhos)){
     dir.create(output_dir_empenhos)
 }
-
+output_dir_pagamentos = 'data/pagamentos/'
+if (!dir.exists(output_dir_pagamentos)){
+    dir.create(output_dir_pagamentos)
+}
 for (cd_Ugestora in codigo_unidade_gestora$cd_Ugestora) {
     print(sprintf('[%s] empenhos da unidade gestora = %s', Sys.time(), cd_Ugestora))
     empenhos <- fetch_empenhos(sagres, cd_Ugestora)
     readr::write_csv(empenhos, here::here(sprintf("./data/empenhos/empenhos_%s.csv", cd_Ugestora)))
 
-    rm(empenhos)  # remove o dataframe 'empenhos'
-    gc() # permite que o R retorne memória pro sistema operacional
-}
-
-#
-# Recupera os dados por unidade gestora para pagamentos
-#
-output_dir_pagamentos = 'data/pagamentos/'
-if (!dir.exists(output_dir_pagamentos)){
-    dir.create(output_dir_pagamentos)
-}
-
-for (cd_Ugestora in codigo_unidade_gestora$cd_Ugestora) {
     print(sprintf('[%s] pagamentos da unidade gestora = %s', Sys.time(), cd_Ugestora))
     pagamentos <- fetch_pagamentos(sagres, cd_Ugestora)
     readr::write_csv(pagamentos, here::here(sprintf("./data/pagamentos/pagamentos_%s.csv", cd_Ugestora)))
-
+    
+    rm(empenhos)  # remove o dataframe 'empenhos'
     rm(pagamentos)  # remove o dataframe 'pagamentos'
     gc() # permite que o R retorne memória pro sistema operacional
 }
-
 
 DBI::dbDisconnect(sagres)
