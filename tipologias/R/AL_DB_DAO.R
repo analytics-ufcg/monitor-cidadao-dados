@@ -45,8 +45,25 @@ carrega_propostas_licitacao <- function(al_db_con, ano_inicial = 2011, ano_final
   )
   
   return(propostas_licitacao)
-  
+}
 
+#' @description Carrega os contratos mutados provindos do tramita
+#' @return Data frame com as informações das mutações do contrato (contém infos. sobre a rescisão contratual). 
+carrega_contratos_mutados <- function(al_db_con) {
+  contratos_mutados <- tibble::tibble()
+  
+  template <- ('SELECT * FROM contrato_mutado')
+  
+  query <- template %>% 
+    dplyr::sql()
+  
+  tryCatch({
+    contratos_mutados <- dplyr::tbl(al_db_con, query) %>% dplyr::collect(n = Inf)
+  },
+  error = function(e) print(paste0("Erro ao buscar os contratos_mutados no Banco AL_BD (Postgres): ", e))
+  )
+  
+  return(contratos_mutados)
 }
 
 #' @title Busca contratos no Banco AL_DB do Postgres
@@ -55,15 +72,17 @@ carrega_propostas_licitacao <- function(al_db_con, ano_inicial = 2011, ano_final
 #' @rdname fetch_contratos
 #' @examples
 #' contratos <- fetch_contratos(al_db_con)
-carrega_contratos <- function(al_db_con, vigentes = TRUE, ano_inicial = 2014, ano_final = 2020, limite_inferior=140e3) {
+carrega_contratos <- function(al_db_con, vigentes = TRUE, data_range_inicio = "2014-01-01", data_range_fim = "2020-01-01", limite_inferior=140e3) {
+  print (data_range_inicio)
+  print (data_range_fim)
   contratos <- tibble::tibble()
   template <- (paste0('SELECT *
                 FROM contrato
-                WHERE dt_ano BETWEEN %d and %d AND
-                pr_vigencia ', dplyr::if_else(vigentes, '>=', '<'), ' \'%s\''))
+                WHERE dt_Assinatura BETWEEN \'%s\' and \'%s\' AND
+                pr_vigencia', dplyr::if_else(vigentes, '>=', '<'), ' \'%s\'', 'AND vl_total_contrato >= %d'))
   
   query <- template %>% 
-    sprintf(ano_inicial, ano_final, as.character(Sys.Date()), limite_inferior) %>% 
+    sprintf(data_range_inicio, data_range_fim, as.character(Sys.Date()), limite_inferior) %>% 
     dplyr::sql()
   
   tryCatch({

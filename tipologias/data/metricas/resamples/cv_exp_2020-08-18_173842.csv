@@ -1,5 +1,0 @@
-.metric,.estimator,mean,n,std_err,model,balance,id_cv
-accuracy,binary,0.9956107209265967,5,4.7855528732432034e-4,Reg Logistica,none,f4bad0295c272b0df52852cb8c40b2bb
-roc_auc,binary,0.708584731157555,5,0.0170669674574937,Reg Logistica,none,f4bad0295c272b0df52852cb8c40b2bb
-accuracy,binary,0.995556800362347,5,4.1997948236127854e-4,Flo Aleatoria,none,f4bad0295c272b0df52852cb8c40b2bb
-roc_auc,binary,0.6595636145337131,5,0.011627610214082198,Flo Aleatoria,none,f4bad0295c272b0df52852cb8c40b2bb

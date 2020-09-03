@@ -1,23 +1,18 @@
 library(magrittr)
 
-source(here::here("../lib_modelos/modelagem_medidas_avaliacao.R"))
+source(here::here("lib_modelos/modelagem_medidas_avaliacao.R"))
 source(here::here("R/MC_DB_DAO.R"))
+source(here::here("R/setup/constants.R"))
 
 
-.HELP <- "
-\t   Rscript gera_experimento.R
-\t   Modelos treinados: Floresta Aleatória e Regressão Logística.
-\t   Outputs desejados:
-\t   indice_exp_<data_geracao>.csv
-\t   metricas_<data_geracao>.csv
-\t   experimento_<data_geracao>.csv
-"
+#----Variáveis de acesso ao banco MCDB caso esteja rodando o script localmente----#
+# POSTGRES_MCDB_HOST="localhost"
+# POSTGRES_MCDB_DB="mc_db"
+# POSTGRES_MCDB_USER="postgres"
+# POSTGRES_MCDB_PASSWORD="secret"
+# POSTGRES_MCDB_PORT=7656
 
-POSTGRES_MCDB_HOST="localhost"
-POSTGRES_MCDB_DB="mc_db"
-POSTGRES_MCDB_USER="postgres"
-POSTGRES_MCDB_PASSWORD="secret"
-POSTGRES_MCDB_PORT=7656
+.HELP <- "Rscript script/gera_experimento.R --tipo_contrucao_feature_set vigentes"
 
 #-----------------------------------FUNÇÕES-----------------------------------#
 
@@ -26,11 +21,11 @@ get_args <- function() {
   args = commandArgs(trailingOnly=TRUE)
   
   option_list = list(
-    optparse::make_option(c("-v", "--vigentes"),
-                          type="logical",
-                          default="TRUE",
-                          help=.HELP,
-                          metavar="logical")
+    optparse::make_option(c("--tipo_contrucao_feature_set"),
+                          type="character",
+                          default="recentes",
+                          help="Tipo de construções possíveis: recentes (as features mais atuais)",
+                          metavar="character")
   );
   
   opt_parser <- optparse::OptionParser(option_list = option_list, usage = .HELP)
@@ -74,8 +69,6 @@ set.seed(123)
 options(scipen = 999)
 invisible(Sys.setlocale(category = "LC_ALL", locale = "pt_PT.UTF-8"))
 
-args <- get_args()
-
 data_hora <- gsub(":", "", gsub("[[:space:]]", "_", Sys.time()))
 id_experimento <- generate_id_experimento(data_hora)
 
@@ -91,39 +84,38 @@ algoritmo <- c("Regressão Logístia",
 #   Obtenção dos dados
 # ---------------------------
 
-feature_set <- tibble::tibble()
+# Parâmetros/Argumentos
+RECENTES <- "recentes"
+args <- get_args()
+tipo_contrucao_feature_set <- args$tipo_contrucao_feature_set
 
-template <- ('SELECT * FROM feature_set')
+# Verifica se o feature set contém as features mais atuais
+is_feature_set_atualizado = as.logical(is_features_sets_atualizados(mc_db_con)$case)
 
-query <- template %>%
-  dplyr::sql()
+# recupera o feature set de acordo com os argumentos de entrada
+if(tipo_contrucao_feature_set == RECENTES) {
+  if (!is_feature_set_atualizado) {
+    print ("Atualizando feature_set com as features mais recentes...")
+    system("Rscript scripts/gera_feature_set.R --tipo_construcao_features recentes")
+    print ("O feature_set foi atualizado.")
+  } else {
+    print ("Já existe um feature_set com o conjunto de features atuais.")
+  }
+} else {
+  stop("Tipo de construção inválida.")
+}
 
-tryCatch({
-  feature_set <- dplyr::tbl(mc_db_con, query) %>% dplyr::collect(n = Inf)
-},
-error = function(e) print(paste0("Erro ao buscar feature_set no Banco MC_DB (Postgres): ", e)))
+# pega o ultimo feature_set cadastrado no banco
+feature_set <- get_ultimo_feature_set(mc_db_con)
+
+entrada <- read.table("data/input_features.txt")$V1
 
 feature_set %<>% dplyr::mutate(match = all(entrada %>% purrr::map(~.x%in% jsonlite::fromJSON(features_descricao)))
                                        & length(entrada) == length(jsonlite::fromJSON(features_descricao)))
 
 matched_set <- (feature_set %>% dplyr::filter(match == TRUE) %>% tail(1))$id_feature_set
 
-features <- tibble::tibble()
-
-template <- ('SELECT * 
-              FROM feature
-              INNER JOIN feature_set_has_feature
-              ON feature_set_has_feature.id_feature_set = \'f8eac683daeabd41217776cd5cc0f6b9\' 
-              AND feature.id_feature = feature_set_has_feature.id_feature
-             ')
-
-query <- template %>%
-  dplyr::sql()
-
-tryCatch({
-  features <- dplyr::tbl(mc_db_con, query) %>% dplyr::collect(n = Inf)
-},
-error = function(e) print(paste0("Erro ao buscar featuresno Banco MC_DB (Postgres): ", e)))
+features <- carrega_features_by_id_feature_set(mc_db_con, feature_set$id_feature_set)
 
 tipologias_cgerais <- features %>% 
   dplyr::select(id_contrato, nome_feature, valor_feature) %>% 
@@ -135,6 +127,7 @@ tipologias_cgerais <- tipologias_cgerais %>%
 
 tipologias_cgerais$status_tramita <- as.factor(tipologias_cgerais$status_tramita)
 tipologias_cgerais$tp_licitacao <- as.factor(tipologias_cgerais$tp_licitacao)
+
 
 
 # ---------------------------
@@ -149,7 +142,6 @@ features_exc <- c("id_contrato",
                   "dt_ano", 
                   "data_inicio", 
                   "nu_cpfcnpj")
-
 
 index <- caret::createDataPartition(tipologias_cgerais$status_tramita, 
                              p = .8, list = FALSE, times = 1)
@@ -301,8 +293,6 @@ rf_fit_model <- rf_wf %>% parsnip::fit(treino_assado)
 
 
 
-
-
 # ---------------------------
 # Parte VI:
 #   Previsão do risco
@@ -357,8 +347,6 @@ mygc()
 # ---------------------------
 
 
-
-
 av_reglog <- avaliacao(algoritmo[1], previsoes, 
                        "reglog_class_pred", "ground_truth") %>%
   dplyr::select(!modelo)
@@ -396,7 +384,8 @@ avaliacao_modelos <- avaliacao_modelos %>%
 
 # Junção das métricas de cv com oob
 metricas <- dplyr::bind_rows(resample_metrics,
-                      avaliacao_modelos)
+                      avaliacao_modelos) %>%
+                      dplyr::distinct ()
 
 readr::write_csv(metricas, 
                  paste("data/metricas/metricas", "_",
@@ -408,21 +397,34 @@ readr::write_csv(metricas,
 # Parte VI:
 #   Salva experimento
 # ---------------------------
+# test1 = as.raw(serialize(rf_fit_model, connection=NULL))
+# test2 = unserialize(test1)
+
+
+# s <- serialize(rf_fit_model, NULL)
+# s2 <- paste0(s, collapse = "")
+# butcher::weigh(reglog_fit_model)
+# 
+# s3 <- substring(s2, seq(1,nchar(s2),2), seq(2,nchar(s2),2))
+# s4 = as.raw(as.integer(paste0('0x', s3)))
+# s5 <- unserialize(s4)
+# 
+# all.equal(rf_fit_model,s5)
+
 
 experimento_reglog <- data.frame(id_experimento = c(id_experimento),
                                  data_hora = c(data_hora),
                                  algoritmo = c("Regressão Logística"),
-                                 modelo = c("objeto_modelo"),
+                                 modelo = c(paste0(serialize(reglog_fit_model, NULL), collapse = "")),
                                  hiperparametros = c("crossvalidation 5 folds"),
                                  tipo_balanceamento = c("-"),
                                  fk_indice_part = c(id_experimento),
                                  fk_feature_set = c("feature_set"),
                                  hash_codigo_gerador = c(generate_hash_sourcecode()))
-
 experimento_rf <- data.frame(id_experimento = c(id_experimento),
                              data_hora = c(data_hora),
                              algoritmo = c("Floresta Aleatória"),
-                             modelo = c("objeto_modelo"),
+                             modelo = c(paste0(serialize(rf_fit_model, NULL), collapse = "")),
                              hiperparametros = c("crossvalidation 5 folds"),
                              tipo_balanceamento = c("-"),
                              fk_indice_part = c(id_experimento),
@@ -431,8 +433,15 @@ experimento_rf <- data.frame(id_experimento = c(id_experimento),
 
 
 experimento <- dplyr::bind_rows(experimento_reglog,
-                         experimento_rf)
+                         experimento_rf) 
+
+output_dir = 'data/experimento'
+if (!dir.exists(output_dir)){
+  dir.create(output_dir)
+}
 
 readr::write_csv(experimento, 
                  paste("data/experimento/experimento", "_",
                        gsub(":", "", gsub("[[:space:]]", "_", data_hora)), ".csv", sep = ""))
+
+
