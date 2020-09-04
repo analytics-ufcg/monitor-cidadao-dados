@@ -123,6 +123,45 @@ get_ultimo_feature_set<- function(mc_db_con) {
 }
 
 
+#' @description Busca o experimento treinado
+#' 
+#' @param mc_db_con Faz a conexão com o banco MC_DB
+#' @param data data que o experimento foi realizado
+#' @param algoritmo algorítmo utilizado (Regressão Logística, Random Forest, etc.)
+#' @param tipo_balanceamento Técnica de balanceamento utilizada
+#' 
+#' @return data frame com as informações do experimento.
+get_experimento<- function(mc_db_con, algoritmo, data, tipo_balanceamento) {
+  
+  experimento <- tibble::tibble()
+  
+  template <- ('SELECT 
+               * 
+               FROM 
+               experimento 
+               WHERE 
+               algoritmo=\'%s\' 
+               AND 
+               LEFT(data_hora, 10)=\'%s\' 
+               AND 
+               tipo_balanceamento=\'%s\''
+              )
+  
+  query <- template %>% 
+    sprintf(algoritmo, data, tipo_balanceamento) %>% 
+    dplyr::sql()
+  
+  tryCatch({
+    experimento <- dplyr::tbl(mc_db_con, query) %>% dplyr::collect(n = Inf)
+  },
+  error = function(e) {
+    stop(paste0("Erro ao buscar o experimento no Banco MC_DB (Postgres): ", e))
+  })
+  return(experimento)
+}
+
+
+
 
 
 
