@@ -6,11 +6,11 @@ source(here::here("R/setup/constants.R"))
 
 
 #----Variáveis de acesso ao banco MCDB caso esteja rodando o script localmente----#
-# POSTGRES_MCDB_HOST="localhost"
-# POSTGRES_MCDB_DB="mc_db"
-# POSTGRES_MCDB_USER="postgres"
-# POSTGRES_MCDB_PASSWORD="secret"
-# POSTGRES_MCDB_PORT=7656
+POSTGRES_MCDB_HOST="localhost"
+POSTGRES_MCDB_DB="mc_db"
+POSTGRES_MCDB_USER="postgres"
+POSTGRES_MCDB_PASSWORD="secret"
+POSTGRES_MCDB_PORT=7656
 
 .HELP <- "Rscript script/gera_experimento.R --tipo_contrucao_feature_set vigentes"
 

@@ -32,11 +32,11 @@ message("")
 .HELP <- "Rscript script/gera_previsao_producao.R --algoritmo <reglog ou randonforest> --data <ano-mes-dia> --tipo_balanceamento <nenhum>"
 
 #----Variáveis de acesso ao banco MCDB caso esteja rodando o script localmente----#
-# POSTGRES_MCDB_HOST="localhost"
-# POSTGRES_MCDB_DB="mc_db"
-# POSTGRES_MCDB_USER="postgres"
-# POSTGRES_MCDB_PASSWORD="secret"
-# POSTGRES_MCDB_PORT=7656
+POSTGRES_MCDB_HOST="localhost"
+POSTGRES_MCDB_DB="mc_db"
+POSTGRES_MCDB_USER="postgres"
+POSTGRES_MCDB_PASSWORD="secret"
+POSTGRES_MCDB_PORT=7656
 
 algoritmo <- "reglog" #randomforest
 data<-"2020-09-04" #caso tenha dois modelos treinados no mesmo dia, o último será recuperado.
@@ -78,6 +78,7 @@ message("")
 message(" INICIANDO A EXECUÇÃO DA PREVISÃO DOS CONTRATOS VIGENTES...")
 message("")
 
+
 # -----------------------------------------#
 # Parte I:
 #   Recuperando os dados
@@ -98,8 +99,46 @@ if ( nrow(experimento) == 0 ) stop ( error_not_found_message )
 
 message("   Experimento recuperando com sucesso!")
 message("")
+
+
 # -----------------------------------------#
 # Parte II:
+#   Recupera contratos vigentes
+# -----------------------------------------#
+message(" - RECUPERANDO CONTRATOS VIGENTES...")
+message("")
+
+# pega o ultimo feature_set cadastrado no banco
+feature_set <- get_ultimo_feature_set(mc_db_con)
+# inputs do feature_set
+entrada <- read.table("data/input_features.txt")$V1
+# adiciona match
+feature_set %<>% dplyr::mutate(match = all(entrada %>% purrr::map(~.x%in% jsonlite::fromJSON(features_descricao)))
+                               & length(entrada) == length(jsonlite::fromJSON(features_descricao)))
+# recuepra apenas aqueles que deram match com a lista
+matched_set <- (feature_set %>% dplyr::filter(match == TRUE) %>% tail(1))$id_feature_set
+# carrega as features pelo id do feature_set
+features <- carrega_features_by_id_feature_set(mc_db_con, feature_set$id_feature_set)
+
+tipologias_cgerais <- features %>% 
+  dplyr::select(id_contrato, nome_feature, valor_feature) %>% 
+  tidyr::spread(key = nome_feature, value = valor_feature)
+# filtra os contratos vigentes
+tipologias_cgerais <- tipologias_cgerais %>% 
+  dplyr::filter_all(dplyr::all_vars(!is.na(.))) %>% 
+  dplyr::filter(vigente == "TRUE") %>% dplyr::select(-vigente)
+# transforma status tramita em fator
+tipologias_cgerais$status_tramita <- as.factor(tipologias_cgerais$status_tramita)
+# transforma tipo da licitação em fator
+tipologias_cgerais$tp_licitacao <- as.factor(tipologias_cgerais$tp_licitacao)
+
+
+message("   Contratos vigentes recuperados com sucesso!")
+message("")
+
+
+# -----------------------------------------#
+# Parte III:
 #   Traduz experimento (unserialize arquivo)
 # -----------------------------------------#
 message(" - INICIANDO A TRADUÇÃO DO EXPERIMENTO SERIALIZADO...")
@@ -114,14 +153,23 @@ fit_model <- unserialize(fit_model)
 
 message("   Modelo traduzido com sucesso!")
 message("")
+
 # -----------------------------------------#
-# Parte III:
-#   Recupera contratos vigentes
+# Parte IV:
+#   Previsão do risco dos contratos vigentes
 # -----------------------------------------#
-message(" - RECUPERANDO CONTRATOS VIGENTES...")
+message(" - REALIZANDO PREVISAO DE RISCO DOS CONTRATOS VIGENTES...")
 message("")
 
-message("   Contratos vigentes recuperados com sucesso!")
-message("")
+
+# Regressão Logística
+reglog_pred <- fit_model %>% stats::predict(new_data = tipologias_cgerais)
+
+reglog_probs <- fit_model %>% stats::predict(new_data = teste_assado, type = "prob") %>% 
+  dplyr::mutate(reglog_prob_0 = .pred_1, reglog_prob_1 = .pred_2) %>% dplyr::select(-.pred_2, -.pred_1)
+  
+
+
+
 
 message("")
