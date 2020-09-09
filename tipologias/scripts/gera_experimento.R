@@ -54,6 +54,11 @@ generate_id_experimento <- function(momentum) {
   return(digest::digest(paste(momentum), algo="md5", serialize=F))
 }
 
+#' @title Gera identificador da previsao prod
+generate_id_previsa_prod <- function(id_experimento, id_contrato, momentum) {
+  return(digest::digest(paste(id_experimento, id_contrato, momentum), algo="md5", serialize=F))
+}
+
 
 message("   Funções carregadas com sucesso!")
 message("")
@@ -560,7 +565,12 @@ previsao_prod <- ident_tipologias_vigentes %>%
   dplyr::bind_cols(rf_class_probs_vigentes) %>% 
   dplyr::mutate(risco = rf_prob_1) %>% 
   dplyr::mutate(timestamp = data_hora) %>%
-  dplyr::select(-rf_prob_0, -rf_prob_1) 
+  dplyr::select(-rf_prob_0, -rf_prob_1) %>% 
+  dplyr::rowwise() %>% 
+  dplyr::mutate(id_previsao_prod = digest::digest(paste(id_contrato,
+                                                  id_experimento,
+                                                  data_hora), algo="md5", serialize=F)) %>% 
+  dplyr::select(id_previsao_prod, dplyr::everything())
 
 
 output_dir_experimento = 'data/previsao_prod'

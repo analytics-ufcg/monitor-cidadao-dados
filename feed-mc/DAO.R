@@ -35,7 +35,7 @@ create <- function() {
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-mc/scripts/create/create_indice_part.sql"))
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-mc/scripts/create/create_metrica.sql"))
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-mc/scripts/create/create_experimento.sql"))
-  # system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-mc/scripts/create/create_previsao_prod.sql"))
+  system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-mc/scripts/create/create_previsao_prod.sql"))
 }
 
 #' @title Importa dados das features para o MCDB
