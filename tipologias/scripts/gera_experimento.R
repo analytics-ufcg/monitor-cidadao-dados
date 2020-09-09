@@ -131,11 +131,10 @@ is_feature_set_atualizado = as.logical(is_features_sets_atualizados(mc_db_con)$c
 # recupera o feature set de acordo com os argumentos de entrada
 if(tipo_contrucao_feature_set == RECENTES) {
   if (!is_feature_set_atualizado) {
-    message ("   Atualizando feature_set com as features mais recentes...")
-    system("Rscript scripts/gera_feature_set.R --tipo_construcao_features recentes")
-    message ("   O feature_set foi atualizado.")
+    message ("   Atualizando feature_set com as features mais recentes:")
+    stop ("   Rscript scripts/gera_feature_set.R --tipo_construcao_features recentes")
   } else {
-    print ("   Já existe um feature_set com o conjunto de features atuais. Utilizando o mais atual..")
+    message ("   Já existe um feature_set com o conjunto de features atuais. Utilizando o mais atual..")
   }
 } else {
   stop("Tipo de construção do feature_set não existe.")
