@@ -183,10 +183,10 @@ fetch_codigo_unidade_gestora <- function(sagres_con) {
 #' @return Dataframe contendo informações sobre os empenhos
 #' @rdname fetch_empenhos
 #' @examples
-fetch_empenhos <- function(sagres_con, cd_municipio) {
+fetch_empenhos <- function(sagres_con, cd_Ugestora) {
   empenhos <- tibble::tibble()
   tryCatch({
-    empenhos <- DBI::dbGetQuery(sagres_con, sprintf("SELECT * FROM Empenhos WHERE RIGHT (cd_UGestora, 3) = %s;", cd_municipio)) %>%
+    empenhos <- DBI::dbGetQuery(sagres_con, sprintf("SELECT * FROM Empenhos WHERE cd_UGestora = %s;", cd_Ugestora)) %>%
       assert_dataframe_completo(COLNAMES_EMPENHOS)
   },
   error = function(e) print(paste0("Erro ao buscar empenhos no Banco Sagres (SQLServer): ", e))
@@ -217,10 +217,10 @@ fetch_aditivos <- function(sagres_con) {
 #' @return Dataframe contendo informações sobre pagamentos
 #' @rdname fetch_pagamentos
 #' @examples
-fetch_pagamentos <- function(sagres_con) {
+fetch_pagamentos <- function(sagres_con, cd_Ugestora) {
   pagamentos <- tibble::tibble()
   tryCatch({
-    pagamentos <- DBI::dbGetQuery(sagres_con, "SELECT TOP 1000 * FROM Pagamentos;") %>%
+    pagamentos <- DBI::dbGetQuery(sagres_con, sprintf("SELECT * FROM Pagamentos WHERE cd_UGestora = %s;", cd_Ugestora)) %>%
       assert_dataframe_completo(COLNAMES_PAGAMENTOS)
   },
   error = function(e) print(paste0("Erro ao buscar pagamentos no Banco Sagres (SQLServer): ", e))

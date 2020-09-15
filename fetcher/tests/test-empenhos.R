@@ -12,8 +12,8 @@ tryCatch({sagres <- DBI::dbConnect(odbc::odbc(),
                                    PWD = SQLSERVER_SAGRES19_PASS)
 }, error = function(e) print(paste0("Erro ao tentar se conectar ao Banco Sagres (SQLServer): ", e)))
 
-empenhos <- fetch_empenhos(sagres, '001')
-codigo_municipio <- fetch_codigo_municipio(sagres)
+empenhos <- fetch_empenhos(sagres, '101170')
+codigo_unidade_gestora <- fetch_codigo_unidade_gestora(sagres)
 
 DBI::dbDisconnect(sagres)
 
@@ -26,5 +26,5 @@ test_that("Not Empty", {
 })
 
 test_that("Contains All Cities", {
-  expect_true(nrow(codigo_municipio) == length(list.files("data/empenhos")))
+  expect_true(nrow(codigo_unidade_gestora) == length(list.files("data/empenhos")))
 })

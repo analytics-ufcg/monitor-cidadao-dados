@@ -129,7 +129,14 @@ translate_aditivos <- function(aditivos_raw) {
 #' @examples
 #' pagamentos_dt <- translate_pagamentos(translate_pagamentos_raw)
 translate_pagamentos <- function(pagamentos_raw) {
-  pagamentos_raw %<>% janitor::clean_names()
+  pagamentos_raw %<>% janitor::clean_names() %>%
+    dplyr::mutate_at(dplyr::vars(cd_unid_orcamentaria, nu_empenho,
+                                nu_parcela, nu_parcela, tp_lancamento,
+                                dt_pagamento, cd_conta, nu_cheque_pag,
+                                nu_deb_aut, cd_banco_rec, nu_conta_rec,
+                                tp_fonte_recursos, dt_mes_ano, cd_banco,
+                                cd_agencia, tp_conta_bancaria),
+                                function(x){gsub("[^[:alnum:][:blank:]?&/\\-]", "", x)})
 }
 
 #' @param convenios_raw Dados brutos dos Convênios

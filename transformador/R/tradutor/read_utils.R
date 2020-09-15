@@ -151,11 +151,11 @@ read_codigo_subelemento <- function() {
 
 #' @title Lê dataframe contendo informações dos empenhos
 #' @return Dataframe contendo informações sobre empenhos
-#' @rdname read_empenhos
+#' @rdname read_empenhos_by_unidade_gestora
 #' @examples
-#' empenhos_dt <- read_empenhos()
-read_empenhos_by_municipio <- function(cd_municipio) {
-  empenhos_df <- readr::read_csv(here::here(sprintf("../fetcher/data/empenhos/empenhos_%s.csv", cd_municipio)),
+#' empenhos_dt <- read_empenhos_by_unidade_gestora()
+read_empenhos_by_unidade_gestora <- function(cd_Ugestora) {
+  empenhos_df <- readr::read_csv(here::here(sprintf("../fetcher/data/empenhos/empenhos_%s.csv", cd_Ugestora)),
                                  col_types = list(
                                    .default = readr::col_number(),
                                    cd_UGestora = readr::col_number(),
@@ -213,17 +213,17 @@ read_aditivos <- function() {
 }
 
 
-#' @title Lê dataframe contendo informações de pagamentos
+#' @title Lê dataframe contendo informações dos pagamentos
 #' @return Dataframe contendo informações sobre pagamentos
-#' @rdname read_pagamentos
+#' @rdname read_pagamentos_by_unidade_gestora
 #' @examples
-#' pagamentos_dt <- read_pagamentos()
-read_pagamentos <- function() {
-  pagamentos_df <- readr::read_csv(here::here("../fetcher/data/pagamentos.csv"),
+#' pagamentos_dt <- read_pagamentos_by_unidade_gestora()
+read_pagamentos_by_unidade_gestora <- function(cd_Ugestora) {
+  pagamentos_df <- readr::read_csv(here::here(sprintf("../fetcher/data/pagamentos/pagamentos_%s.csv", cd_Ugestora)),
                                            col_types = list(
                                              .default = readr::col_number(),
-                                             cd_UGestora = readr::col_character(),
-                                             dt_Ano = readr::col_character(),
+                                             cd_UGestora = readr::col_number(),
+                                             dt_Ano = readr::col_number(),
                                              cd_UnidOrcamentaria = readr::col_character(),
                                              nu_Empenho = readr::col_character(),
                                              nu_Parcela = readr::col_character(),
