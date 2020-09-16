@@ -45,20 +45,8 @@ readr::write_csv(codigo_subfuncao, here::here("./data/codigo_subfuncao.csv"))
 codigo_unidade_gestora <- fetch_codigo_unidade_gestora(sagres)
 readr::write_csv(codigo_unidade_gestora, here::here("./data/codigo_unidade_gestora.csv"))
 
-for (cd_municipio in codigo_municipio$cd_Municipio) {
-  print(sprintf('[%s] empenhos cd_municipio = %s', Sys.time(), cd_municipio))
-  
-  output_dir = 'data/empenhos/'
-  if (!dir.exists(output_dir)){
-    dir.create(output_dir)
-  }
-  
-  empenhos <- fetch_empenhos(sagres, cd_municipio)
-  readr::write_csv(empenhos, here::here(sprintf("./data/empenhos/empenhos_%s.csv", cd_municipio)))
- 
-  rm(empenhos)  # remove o dataframe 'empenhos'
-  gc() # permite que o R retorne memória pro sistema operacional
-}
+estorno_pagamento <- fetch_estorno_pagamento(sagres)
+readr::write_csv(estorno_pagamento, here::here("./data/estorno_pagamento.csv"))
 
 fornecedores<- fetch_fornecedores(sagres)
 readr::write_csv(fornecedores, here::here("./data/fornecedores.csv"))
@@ -66,11 +54,11 @@ readr::write_csv(fornecedores, here::here("./data/fornecedores.csv"))
 licitacoes <- fetch_licitacoes(sagres)
 readr::write_csv(licitacoes, here::here("./data/licitacoes.csv"))
 
-pagamentos <- fetch_pagamentos(sagres)
-readr::write_csv(pagamentos, here::here("./data/pagamentos.csv"))
-
 participantes<- fetch_participantes(sagres)
 readr::write_csv(participantes, here::here("./data/participantes.csv"))
+
+propostas<- fetch_propostas(sagres)
+readr::write_csv(propostas, here::here("./data/propostas.csv"))
 
 regime_execucao <- fetch_regime_execucao(sagres)
 readr::write_csv(regime_execucao, here::here("./data/regime_execucao.csv"))
@@ -80,5 +68,30 @@ readr::write_csv(tipo_objeto_licitacao, here::here("./data/tipo_objeto_licitacao
 
 tipo_modalidade_licitacao <- fetch_tipo_modalidade_licitacao(sagres)
 readr::write_csv(tipo_modalidade_licitacao, here::here("./data/tipo_modalidade_licitacao.csv"))
+
+#
+# Recupera os dados por unidade gestora para empenhos e pagamentos
+#
+output_dir_empenhos = 'data/empenhos/'
+if (!dir.exists(output_dir_empenhos)){
+    dir.create(output_dir_empenhos)
+}
+output_dir_pagamentos = 'data/pagamentos/'
+if (!dir.exists(output_dir_pagamentos)){
+    dir.create(output_dir_pagamentos)
+}
+for (cd_Ugestora in codigo_unidade_gestora$cd_Ugestora) {
+    print(sprintf('[%s] empenhos da unidade gestora = %s', Sys.time(), cd_Ugestora))
+    empenhos <- fetch_empenhos(sagres, cd_Ugestora)
+    readr::write_csv(empenhos, here::here(sprintf("./data/empenhos/empenhos_%s.csv", cd_Ugestora)))
+
+    print(sprintf('[%s] pagamentos da unidade gestora = %s', Sys.time(), cd_Ugestora))
+    pagamentos <- fetch_pagamentos(sagres, cd_Ugestora)
+    readr::write_csv(pagamentos, here::here(sprintf("./data/pagamentos/pagamentos_%s.csv", cd_Ugestora)))
+    
+    rm(empenhos)  # remove o dataframe 'empenhos'
+    rm(pagamentos)  # remove o dataframe 'pagamentos'
+    gc() # permite que o R retorne memória pro sistema operacional
+}
 
 DBI::dbDisconnect(sagres)

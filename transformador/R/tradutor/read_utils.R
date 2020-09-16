@@ -151,11 +151,11 @@ read_codigo_subelemento <- function() {
 
 #' @title Lê dataframe contendo informações dos empenhos
 #' @return Dataframe contendo informações sobre empenhos
-#' @rdname read_empenhos
+#' @rdname read_empenhos_by_unidade_gestora
 #' @examples
-#' empenhos_dt <- read_empenhos()
-read_empenhos_by_municipio <- function(cd_municipio) {
-  empenhos_df <- readr::read_csv(here::here(sprintf("../fetcher/data/empenhos/empenhos_%s.csv", cd_municipio)),
+#' empenhos_dt <- read_empenhos_by_unidade_gestora()
+read_empenhos_by_unidade_gestora <- function(cd_Ugestora) {
+  empenhos_df <- readr::read_csv(here::here(sprintf("../fetcher/data/empenhos/empenhos_%s.csv", cd_Ugestora)),
                                  col_types = list(
                                    .default = readr::col_number(),
                                    cd_UGestora = readr::col_number(),
@@ -213,17 +213,17 @@ read_aditivos <- function() {
 }
 
 
-#' @title Lê dataframe contendo informações de pagamentos
+#' @title Lê dataframe contendo informações dos pagamentos
 #' @return Dataframe contendo informações sobre pagamentos
-#' @rdname read_pagamentos
+#' @rdname read_pagamentos_by_unidade_gestora
 #' @examples
-#' pagamentos_dt <- read_pagamentos()
-read_pagamentos <- function() {
-  pagamentos_df <- readr::read_csv(here::here("../fetcher/data/pagamentos.csv"),
+#' pagamentos_dt <- read_pagamentos_by_unidade_gestora()
+read_pagamentos_by_unidade_gestora <- function(cd_Ugestora) {
+  pagamentos_df <- readr::read_csv(here::here(sprintf("../fetcher/data/pagamentos/pagamentos_%s.csv", cd_Ugestora)),
                                            col_types = list(
                                              .default = readr::col_number(),
-                                             cd_UGestora = readr::col_character(),
-                                             dt_Ano = readr::col_character(),
+                                             cd_UGestora = readr::col_number(),
+                                             dt_Ano = readr::col_number(),
                                              cd_UnidOrcamentaria = readr::col_character(),
                                              nu_Empenho = readr::col_character(),
                                              nu_Parcela = readr::col_character(),
@@ -320,4 +320,63 @@ read_fornecedores <- function() {
                                              dt_MesAno = readr::col_character(),
                                              dt_MesAnoReferencia = readr::col_character()
                                            ))
+}
+
+#' @title Lê dataframe contendo informações dos contrados mutados
+#' @return Dataframe contendo informações sobre os contrados mutados
+#' @rdname read_contratos_mutados
+#' @examples
+#' contrados_mutados_df <- read_contrados_mutados()
+read_contratos_mutados <- function(){
+  contrados_mutados_df <-readr::read_csv(here::here("../fetcher/data/contratos_mutados.csv"),
+                                           col_types = list(
+                                             .default = readr::col_character(),
+                                              jurisdicionado = readr::col_character(),
+                                              cod_jurisdicionado = readr::col_number(),
+                                              cd_Ugestora = readr::col_number(),
+                                              numero_contrato = readr::col_character(),
+                                              id_contrato = readr::col_number(),
+                                              modalidade_licitacao = readr::col_character(),
+                                              numero_licitacao = readr::col_character(),
+                                              cpf_cnpj = readr::col_character(),
+                                              tipo_alteracao = readr::col_character(),
+                                              data_alteracao = readr::col_character(),
+                                              cd_Municipio = readr::col_character(),
+                                              no_Municipio = readr::col_character(),
+                                              de_Ugestora = readr::col_character()
+                                              ))
+}
+
+#' @title Lê dataframe contendo informações das propostas das licitações
+#' @return Dataframe contendo informações sobre as propostas
+#' @rdname read_propostas
+#' @examples
+#' propostas_dt <- read_propostas()
+read_propostas <- function() {
+  propostas_df <- readr::read_csv(here::here("../fetcher/data/propostas.csv"),
+                                   col_types = list(
+                                     .default = readr::col_character(),
+                                     cd_UGestora = readr::col_integer(),
+                                     dt_Ano = readr::col_integer(),
+                                     tp_Licitacao = readr::col_integer(),
+                                     cd_UGestoraItem = readr::col_integer(),
+                                     qt_Ofertada = readr::col_number(),
+                                     vl_Ofertado = readr::col_number(),
+                                     st_Proposta = readr::col_integer()
+                                   ))
+}
+
+#' @title Lê dataframe contendo informações dos estornos de pagamentos
+#' @return Dataframe contendo informações sobre estornos de pagamentos
+#' @rdname read_estorno_pagamento
+#' @examples
+#' estorno_pagamento_dt <- read_estorno_pagamento()
+read_estorno_pagamento <- function() {
+  estorno_pagamento_df <- readr::read_csv(here::here("../fetcher/data/estorno_pagamento.csv"),
+                                   col_types = list(
+                                     .default = readr::col_character(),
+                                     dt_Ano = readr::col_integer(),
+                                     tp_Lancamento = readr::col_integer(),
+                                     vl_Estorno = readr::col_number()
+                                   ))
 }

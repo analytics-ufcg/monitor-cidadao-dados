@@ -63,7 +63,6 @@ translate_codigo_funcao <- function(codigo_funcao_raw) {
   codigo_funcao_raw %<>% janitor::clean_names()
 }
 
-
 #' @title Traduz dado recebido para dataset
 #' @param contratos_raw Dados brutos dos contratos
 #' @return Dataframe contendo informações sobre os contratos
@@ -106,7 +105,6 @@ translate_codigo_subelemento <- function(codigo_subelemento_raw) {
   codigo_subelemento_raw %<>% janitor::clean_names()
 }
 
-
 #' @param empenhos_raw Dados brutos dos empenhos
 #' @return Dataframe contendo informações sobre empenhos
 #' @rdname translate_empenhos
@@ -131,7 +129,14 @@ translate_aditivos <- function(aditivos_raw) {
 #' @examples
 #' pagamentos_dt <- translate_pagamentos(translate_pagamentos_raw)
 translate_pagamentos <- function(pagamentos_raw) {
-  pagamentos_raw %<>% janitor::clean_names()
+  pagamentos_raw %<>% janitor::clean_names() %>%
+    dplyr::mutate_at(dplyr::vars(cd_unid_orcamentaria, nu_empenho,
+                                nu_parcela, nu_parcela, tp_lancamento,
+                                dt_pagamento, cd_conta, nu_cheque_pag,
+                                nu_deb_aut, cd_banco_rec, nu_conta_rec,
+                                tp_fonte_recursos, dt_mes_ano, cd_banco,
+                                cd_agencia, tp_conta_bancaria),
+                                function(x){gsub("[^[:alnum:][:blank:]?&/\\-]", "", x)})
 }
 
 #' @param convenios_raw Dados brutos dos Convênios
@@ -169,4 +174,41 @@ translate_participantes <- function(participantes_raw) {
 #' fornecedores_dt <- translate_fornecedores(translate_fornecedores_raw)
 translate_fornecedores <- function(fornecedores_raw) {
   fornecedores_raw %<>% janitor::clean_names()
+}
+
+#' @param contratos_mutados_raw Dados brutos dos contratos mutados
+#' @return Dataframe contendo informações sobre os fornecedores
+#' @rdname translate_contratos_mutados
+#' @examples
+#' contratos_mutados_dt <- translate_contratos_mutados(contratos_mutados_raw)
+translate_contratos_mutados <- function(contratos_mutados_raw){
+  contratos_mutados_raw %<>% janitor::clean_names() %>%
+    dplyr::mutate(data_atualização = "24-07-2020") %>%
+    dplyr::rename(cd_u_gestora = cd_ugestora) %>%
+    dplyr::rename(de_u_gestora = de_ugestora) %>%
+    dplyr::rename(nu_licitacao = numero_licitacao) %>%
+    dplyr::rename(nu_cpfcnpj = cpf_cnpj) %>%
+    dplyr::rename(nu_contrato = numero_contrato) %>%
+    dplyr::select(-id_contrato) %>%
+    dplyr::mutate(nu_licitacao = gsub("/", "", nu_licitacao))
+}
+
+#' @param propostas_raw Dados brutos das propostas
+#' @return Dataframe contendo informações sobre as propostas
+#' @rdname translate_propostas
+#' @examples
+#' propostas_dt <- translate_propostas(propostas_raw)
+translate_propostas <- function(propostas_raw) {
+  propostas_raw %<>% janitor::clean_names()
+}
+
+#' @title Traduz dado recebido para dataset
+#' @param estorno_pagamento_raw Dados brutos dos estornos de pagamentos
+#' @return Dataframe contendo informações sobre os estornos de pagamentos
+#' @rdname translate_estorno_pagamento
+#' @examples
+#' estorno_pagamento_dt <- translate_estorno_pagamento(estorno_pagamento_raw)
+translate_estorno_pagamento <- function(estorno_pagamento_raw) {
+  estorno_pagamento_raw %<>% janitor::clean_names() %>%
+    dplyr::mutate(de_motivo_estorno = gsub("[^[:alnum:][:blank:]?&/\\-]", "", de_motivo_estorno))
 }
