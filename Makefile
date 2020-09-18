@@ -20,9 +20,11 @@ help:
 	@echo "\tfeed-al-clean\t\t\tDropa as tabelas do Banco de Dados Analytics"
 	@echo "\tfeed-al-shell\t\t\tAcessa terminal do Banco de Dados Analytics"
 	@echo ""
-	@echo "\tfeed-mc-create\t\t\tCria as tabelas do banco de dados Monitor Cidadão"
-	@echo "\tfeed-mc-import\t\t\tImporta dados para as tabelas do Banco de dados Monitor Cidadão"
 	@echo "\tfeed-mc-clean\t\t\tDropa as tabelas do banco de dados Monitor Cidadão"
+	@echo "\tfeed-mc-create\t\t\tCria as tabelas do banco de dados Monitor Cidadão"
+	@echo "\tfeed-mc-import-features\t\t\tImporta features para o Banco de dados Monitor Cidadão"
+	@echo "\tfeed-mc-import-features\t\t\tImporta features set para o Banco de dados Monitor Cidadão"
+	@echo "\tfeed-mc-import-features\t\t\tImporta experimento para o Banco de dados Monitor Cidadão"
 	@echo "\tfeed-mc-shell\t\t\tAcessa terminal do banco de dados Monitor Cidadão"
 	@echo ""
 	@echo "\tgera-tipologias \t\tGera as tipologias de contratos"
@@ -76,8 +78,12 @@ enter-feed-mc-container:
 feed-mc-create:
 	docker exec -it feed-mc sh -c "Rscript feed-mc/DAO.R -f create"
 .PHONY: feed-mc-create
-feed-mc-import:
-	docker exec -it feed-mc sh -c "Rscript feed-mc/DAO.R -f import"
+feed-mc-import-feature:
+	docker exec -it feed-mc sh -c "Rscript feed-mc/DAO.R -f import_feature"
+feed-mc-import-feature-set:
+	docker exec -it feed-mc sh -c "Rscript feed-mc/DAO.R -f import_feature_set"
+feed-mc-import-experimento:
+	docker exec -it feed-mc sh -c "Rscript feed-mc/DAO.R -f import_experimento"
 .PHONY: feed-mc-import
 feed-mc-clean:
 	docker exec -it feed-mc sh -c "Rscript feed-mc/DAO.R -f clean"
