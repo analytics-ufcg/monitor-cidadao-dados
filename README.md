@@ -37,15 +37,21 @@ Nesta camada o make é utilizado como facilitador para execução. Abaixo estão
  2. Crie e inicie os containers do docker com `sudo make up`;
  3. Obtenha os dados através do `sudo make fetch-data`. Nesta etapa você também pode testar a integridade dos dados obtidos utilizando os testes unitários de cada tabela com `sudo docker exec -it fetcher sh -c "Rscript tests/<nome-da-tabela>.R"`;
  4. Traduza e transforme os dados colhidos `sudo make transform-data`;
+
 <b> Para o AL_DB </b>
+
  5. Crie as tabelas no banco AL_DB com `sudo make feed-al-create`;
  6. Agora importe os dados para as tabelas do banco com `sudo make feed-al-import`;
  7. Você pode verificar se a(s) tabela(s) estão no banco com `sudo make feed-al-shell` e `\dt`.
+
 <b>Geração das previsões </b>
+
  8. Gere as features da previsão com `sudo make gera-feature`;
  9. Gere o feature set da previsão com `gera-feature-set`;
  10. Gere o experimento com as informações do risco com `gera-experimento`.
+
 <b> Para o MC_DB </b>
+
  11. Crie as tabelas no banco MC_DB com `sudo make feed-mc-create`;
  12. Importe os dados das features para as tabelas do banco com `sudo make feed-mc-import-feature`;
  13. Importe os dados do features set para as tabelas do banco com `sudo make feed-mc-import-feature-set`;
