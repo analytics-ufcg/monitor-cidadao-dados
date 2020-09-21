@@ -27,7 +27,9 @@ help:
 	@echo "\tfeed-mc-import-features\t\t\tImporta experimento para o Banco de dados Monitor Cidadão"
 	@echo "\tfeed-mc-shell\t\t\tAcessa terminal do banco de dados Monitor Cidadão"
 	@echo ""
-	@echo "\tgera-tipologias \t\tGera as tipologias de contratos"
+	@echo "\tgera-experimento \t\tGera a previsão do risco associado aos contratos"
+	@echo "\tgera-feature-set \t\tGera o conjunto de features a se utilizar no experimento"
+	@echo "\tgera-experimento \t\tGera as features a se utilizar no experimento?"
 
 .PHONY: help
 build:
@@ -69,9 +71,15 @@ feed-al-clean:
 feed-al-shell:
 	docker exec -it feed-al sh -c "Rscript feed-al/DAO.R -f shell"
 .PHONY: feed-al-shell
-gera-tipologias:
-	docker exec -it fetcher sh -c "Rscript tipologias/scripts/gera_tipologias.R"
-.PHONY: gera-tipologias
+gera-feature:
+	docker exec -it tipologias sh -c "Rscript scripts/gera_feature.R"
+.PHONY: gera-feature
+gera-feature-set:
+	docker exec -it tipologias sh -c "Rscript scripts/gera_feature_set.R"
+.PHONY: gera-feature-set
+gera-experimento:
+	docker exec -it tipologias sh -c "Rscript scripts/gera_experimento.R"
+.PHONY: gera-experimento
 enter-feed-mc-container:
 	sudo docker exec -it feed-mc sh
 .PHONY: enter-feed-mc-container
