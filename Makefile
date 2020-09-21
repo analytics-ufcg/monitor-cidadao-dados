@@ -22,14 +22,14 @@ help:
 	@echo ""
 	@echo "\tfeed-mc-clean\t\t\tDropa as tabelas do banco de dados Monitor Cidadão"
 	@echo "\tfeed-mc-create\t\t\tCria as tabelas do banco de dados Monitor Cidadão"
-	@echo "\tfeed-mc-import-features\t\t\tImporta features para o Banco de dados Monitor Cidadão"
-	@echo "\tfeed-mc-import-features\t\t\tImporta features set para o Banco de dados Monitor Cidadão"
-	@echo "\tfeed-mc-import-features\t\t\tImporta experimento para o Banco de dados Monitor Cidadão"
+	@echo "\tfeed-mc-import-feature\t\t\tImporta features para o Banco de dados Monitor Cidadão"
+	@echo "\tfeed-mc-import-feature-set\t\t\tImporta features set para o Banco de dados Monitor Cidadão"
+	@echo "\tfeed-mc-import-experimento\t\t\tImporta experimento para o Banco de dados Monitor Cidadão"
 	@echo "\tfeed-mc-shell\t\t\tAcessa terminal do banco de dados Monitor Cidadão"
 	@echo ""
-	@echo "\tgera-experimento \t\tGera a previsão do risco associado aos contratos"
-	@echo "\tgera-feature-set \t\tGera o conjunto de features a se utilizar no experimento"
-	@echo "\tgera-experimento \t\tGera as features a se utilizar no experimento?"
+	@echo "\tgera-feature \t\tGera features"
+	@echo "\tgera-feature-set \t\tGera conjunto de features"
+	@echo "\tgera-experimento \t\tGera previsão de risco"
 
 .PHONY: help
 build:
@@ -72,13 +72,13 @@ feed-al-shell:
 	docker exec -it feed-al sh -c "Rscript feed-al/DAO.R -f shell"
 .PHONY: feed-al-shell
 gera-feature:
-	docker exec -it tipologias sh -c "Rscript scripts/gera_feature.R"
+	docker exec -it tipologias sh -c "Rscript scripts/gera_feature.R --vigencia todos --data_range_inicio 2017-01-01 --data_range_fim 2018-01-01"
 .PHONY: gera-feature
 gera-feature-set:
-	docker exec -it tipologias sh -c "Rscript scripts/gera_feature_set.R"
+	docker exec -it tipologias sh -c "Rscript scripts/gera_feature_set.R --tipo_construcao_features recentes"
 .PHONY: gera-feature-set
 gera-experimento:
-	docker exec -it tipologias sh -c "Rscript scripts/gera_experimento.R"
+	docker exec -it tipologias sh -c "Rscript scripts/gera_experimento.R --tipo_contrucao_feature_set recentes"
 .PHONY: gera-experimento
 enter-feed-mc-container:
 	sudo docker exec -it feed-mc sh
