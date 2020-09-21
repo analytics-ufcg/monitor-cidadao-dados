@@ -38,7 +38,7 @@ Nesta camada o make é utilizado como facilitador para execução. Abaixo estão
  3. Obtenha os dados através do `sudo make fetch-data`. Nesta etapa você também pode testar a integridade dos dados obtidos utilizando os testes unitários de cada tabela com `sudo docker exec -it fetcher sh -c "Rscript tests/<nome-da-tabela>.R"`;
  4. Traduza e transforme os dados colhidos `sudo make transform-data`;
 
-<b> Para o AL_DB </b>
+ ### Para o AL_DB 
 
  5. Crie as tabelas no banco AL_DB com `sudo make feed-al-create`;
  6. Agora importe os dados para as tabelas do banco com `sudo make feed-al-import`;
