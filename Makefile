@@ -27,9 +27,9 @@ help:
 	@echo "\tfeed-mc-import-experimento\t\t\tImporta experimento para o Banco de dados Monitor Cidadão"
 	@echo "\tfeed-mc-shell\t\t\tAcessa terminal do banco de dados Monitor Cidadão"
 	@echo ""
-	@echo "\tgera-feature \t\tGera features"
-	@echo "\tgera-feature-set \t\tGera conjunto de features"
-	@echo "\tgera-experimento \t\tGera previsão de risco"
+	@echo "\tgera-feature vigencia=<encerrados, vigentes e todos> data_range_inicio=<2012-01-01> data_range_fim=<2018-01-01>\t\tGera features"
+	@echo "\tgera-feature-set tipo_construcao_features=<recentes>\t\tGera conjunto de features"
+	@echo "\tgera-experimento tipo_contrucao_feature_set=<vigentes>\t\tGera previsão de risco"
 
 .PHONY: help
 build:
@@ -88,11 +88,13 @@ feed-mc-create:
 .PHONY: feed-mc-create
 feed-mc-import-feature:
 	docker exec -it feed-mc sh -c "Rscript feed-mc/DAO.R -f import_feature"
+.PHONY: feed-mc-import-feature
 feed-mc-import-feature-set:
 	docker exec -it feed-mc sh -c "Rscript feed-mc/DAO.R -f import_feature_set"
+.PHONY: feed-mc-import-feature-set
 feed-mc-import-experimento:
 	docker exec -it feed-mc sh -c "Rscript feed-mc/DAO.R -f import_experimento"
-.PHONY: feed-mc-import
+.PHONY: feed-mc-import-experimento
 feed-mc-clean:
 	docker exec -it feed-mc sh -c "Rscript feed-mc/DAO.R -f clean"
 .PHONY: feed-mc-clean
