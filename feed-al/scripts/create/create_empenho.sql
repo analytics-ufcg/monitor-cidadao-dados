@@ -1,8 +1,9 @@
 DROP TABLE IF EXISTS empenho;
 
-CREATE TABLE IF NOT EXISTS "empenho" ( 
+CREATE TABLE IF NOT EXISTS "empenho" (
     "id_empenho" VARCHAR(50),
     "id_licitacao" VARCHAR(50),
+    "id_contrato" VARCHAR(50),
     "cd_municipio" VARCHAR(3),
     "cd_u_gestora" INTEGER,
     "dt_ano" SMALLINT,
