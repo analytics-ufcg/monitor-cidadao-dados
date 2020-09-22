@@ -190,12 +190,12 @@ join_propostas_participantes <- function(df_propostas, df_participantes) {
 #' join_pagamentos_empenhos_dt <- join_pagamentos_empenhos(df_pagamentos, df_empenhos)
 #'
 join_pagamentos_empenhos <- function(df_pagamentos, df_empenhos) {
-  df_empenhos %<>% dplyr::select(nu_empenho, cd_unid_orcamentaria, 
-                                 dt_ano, cd_u_gestora, id_empenho, 
-                                 id_licitacao)
+  df_empenhos %<>% dplyr::select(nu_empenho, cd_unid_orcamentaria,
+                                 dt_ano, cd_u_gestora, id_empenho,
+                                 id_licitacao, id_contrato)
 
   df_pagamentos %<>% dplyr::left_join(df_empenhos) %>%
-    dplyr::select(id_pagamento, id_empenho, id_licitacao, dplyr::everything())
-} 
+    dplyr::select(id_pagamento, id_empenho, id_licitacao, id_contrato, dplyr::everything())
+}
 
 
