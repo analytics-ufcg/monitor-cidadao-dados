@@ -72,13 +72,13 @@ feed-al-shell:
 	docker exec -it feed-al sh -c "Rscript feed-al/DAO.R -f shell"
 .PHONY: feed-al-shell
 gera-feature:
-	docker exec -it tipologias sh -c "Rscript scripts/gera_feature.R --vigencia todos --data_range_inicio 2017-01-01 --data_range_fim 2018-01-01"
+	docker exec -it tipologias sh -c "Rscript scripts/gera_feature.R --vigencia $(vigencia) --data_range_inicio $(data_range_inicio) --data_range_fim $(data_range_fim)"
 .PHONY: gera-feature
 gera-feature-set:
-	docker exec -it tipologias sh -c "Rscript scripts/gera_feature_set.R --tipo_construcao_features recentes"
+	docker exec -it tipologias sh -c "Rscript scripts/gera_feature_set.R --tipo_construcao_features $(tipo_construcao_features)"
 .PHONY: gera-feature-set
 gera-experimento:
-	docker exec -it tipologias sh -c "Rscript scripts/gera_experimento.R --tipo_contrucao_feature_set recentes"
+	docker exec -it tipologias sh -c "Rscript scripts/gera_experimento.R --tipo_contrucao_feature_set $(tipo_contrucao_feature_set)"
 .PHONY: gera-experimento
 enter-feed-mc-container:
 	sudo docker exec -it feed-mc sh
