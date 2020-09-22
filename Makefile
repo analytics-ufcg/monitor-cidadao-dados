@@ -29,7 +29,7 @@ help:
 	@echo ""
 	@echo "\tgera-feature vigencia=<encerrados, vigentes e todos> data_range_inicio=<2012-01-01> data_range_fim=<2018-01-01>\t\tGera features"
 	@echo "\tgera-feature-set tipo_construcao_features=<recentes>\t\tGera conjunto de features"
-	@echo "\tgera-experimento tipo_contrucao_feature_set=<vigentes>\t\tGera previsão de risco"
+	@echo "\tgera-experimento tipo_contrucao_feature_set=<recentes>\t\tGera previsão de risco"
 
 .PHONY: help
 build:
