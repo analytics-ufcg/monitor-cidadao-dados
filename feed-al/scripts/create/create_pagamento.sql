@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS "pagamento" (
   "id_pagamento" VARCHAR(80),
   "id_empenho" VARCHAR(80),
   "id_licitacao" VARCHAR(50),
+  "id_contrato" VARCHAR(50),
   "cd_u_gestora" INTEGER,
   "dt_ano" SMALLINT,
   "cd_unid_orcamentaria" VARCHAR(5),

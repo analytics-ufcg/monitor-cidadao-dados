@@ -8,25 +8,35 @@ source(here::here("utils/join_utils.R"))
 #Instala pacote mcTransformador
 devtools::document()
 
-#Busca tabelas traduzidas
-licitacoes_df <- get_licitacoes()
-tipo_objeto_licitacao_df <- get_tipo_objeto_licitacao()
-tipo_modalidade_licitacao_df <- get_tipo_modalidade_licitacao()
-regime_execucao_df <- get_regime_execucao()
+
+# - Busca tabelas traduzidas - Ordem Alfabética
+aditivos_df <- get_aditivos()
+
 codigo_unidade_gestora_df <- get_codigo_unidade_gestora()
 codigo_funcao_df <- get_codigo_funcao()
 contratos_df <- get_contratos()
 codigo_subfuncao_df <- get_codigo_subfuncao()
 codigo_elemento_despesa_df <- get_codigo_elemento_despesa()
 codigo_subelemento_df <- get_codigo_subelemento()
-municipios_df <- get_codigo_municipio()
-aditivos_df <- get_aditivos()
 convenios_df <- get_convenios()
-fornecedores_df <- get_fornecedores()
-participantes_df <- get_participantes()
-estorno_pagamento_df <- get_estorno_pagamento()
-propostas_df <- get_propostas()
 contratos_mutados_df <- get_contratos_mutados()
+
+estorno_pagamento_df <- get_estorno_pagamento()
+fornecedores_df <- get_fornecedores()
+
+
+licitacoes_df <- get_licitacoes()
+municipios_df <- get_codigo_municipio()
+
+participantes_df <- get_participantes()
+propostas_df <- get_propostas()
+
+regime_execucao_df <- get_regime_execucao()
+
+tipo_objeto_licitacao_df <- get_tipo_objeto_licitacao()
+tipo_modalidade_licitacao_df <- get_tipo_modalidade_licitacao()
+# ----
+
 
 #Transforma tabelas
 licitacoes_transformadas <- licitacoes_df %>% mcTransformador::process_licitacao() %>%
@@ -51,6 +61,29 @@ propostas_transformadas <- propostas_df %>% mcTransformador::process_proposta() 
 estorno_pagamento_transformado <- estorno_pagamento_df %>% mcTransformador::process_estorno_pagamento()
 
 
+
+# Adiciona a chave de contratos a tabela de empenhos
+## Agrupamento de empenhos por contrato e por licitação
+### Caso I: Onde 1 credor possui apenas 1 único contrato de uma mesma licitação
+contratos_por_licitacao <- contratos_transformados %>%
+  dplyr::group_by(id_licitacao, nu_cpfcnpj) %>%
+  dplyr::summarise(amount = dplyr::n()) %>%
+  dplyr::filter(amount == 1) %>%
+  na.omit() %>%
+  dplyr::left_join(contratos_transformados,
+                  by = c("id_licitacao", "nu_cpfcnpj")) %>%
+  dplyr::select(id_licitacao, id_contrato, nu_cpfcnpj) %>%
+  dplyr::ungroup()
+
+
+# Caso II: Onde 1 credor possui mais de um contrato de uma mesma licitação
+contratos_lici_corner_cases <- contratos_transformados %>%
+  dplyr::group_by(id_licitacao, nu_cpfcnpj) %>%
+  dplyr::summarise(amount = dplyr::n()) %>%
+  dplyr::filter(amount > 1)
+
+
+
 #Recupera dados de empenhos e pagamentos pelo codigo da unidade gestora
 for (cd_u_gestora in codigo_unidade_gestora_df$cd_u_gestora) {
   print(sprintf('[%s] empenhos da unidade gestora = %s', Sys.time(), cd_u_gestora))
@@ -62,7 +95,11 @@ for (cd_u_gestora in codigo_unidade_gestora_df$cd_u_gestora) {
   empenhos_df <- get_empenhos_by_unidade_gestora(cd_u_gestora)
 
   empenhos_transformados <- empenhos_df %>% mcTransformador::process_empenho() %>%
-    join_empenhos_licitacao(licitacoes_transformadas)
+    join_empenhos_licitacao(licitacoes_transformadas) %>%
+    dplyr::left_join(contratos_por_licitacao,
+                     by = c("id_licitacao" = "id_licitacao", "cd_credor" = "nu_cpfcnpj")) %>% # Adiciona o número do contrato no Empenho
+    dplyr::select(id_empenho, id_licitacao, id_contrato, dplyr::everything())
+
 
   # Cria a pasta de saída caso ela não exista
   output_dir_emp = 'data/empenhos/'
