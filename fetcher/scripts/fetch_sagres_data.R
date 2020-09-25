@@ -18,6 +18,8 @@ tryCatch({sagres <- DBI::dbConnect(odbc::odbc(),
 #DBI::dbGetQuery(sagres, "SET NAMES 'utf8'")
 
 
+print("Iniciando Fetch ------------------------ 18 TABELAS")
+print("\n")
 
 print("1/18 ---------: Obtendo dados da tabela -- Aditivos")
 aditivos <- fetch_aditivos(sagres)
