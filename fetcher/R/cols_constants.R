@@ -62,7 +62,7 @@ COLNAMES_EMPENHOS <- c("cd_UGestora"="integer", "dt_Ano"="integer", "cd_UnidOrca
                        "tp_Credor"="character", "de_Historico1"="character", "de_Historico2"="character",
                        "de_Historico"="character", "tp_Meta"="character", "nu_Obra"="character",
                        "dt_MesAno"="character", "dt_MesAnoReferencia"="character", "tp_FonteRecursos"="character",
-                       "nu_CPF"="character"
+                       "nu_CPF"="character", "cd_SubElemento_"="character"
 )
 
 COLNAMES_ESTORNO_PAGAMENTO <- c("cd_UGestora"="character", "dt_Ano"="integer", "cd_UnidOrcamentaria"="character",
