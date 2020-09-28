@@ -48,9 +48,9 @@ Nesta camada o make é utilizado como facilitador para execução. Abaixo estão
 
 <b> Geração das previsões: </b>
 
- 8. Gere as features da previsão com `sudo make gera-feature`;
- 9. Gere o feature set da previsão com `gera-feature-set`;
- 10. Gere o experimento com as informações do risco com `gera-experimento`.
+ 8. Gere as features da previsão com `sudo make gera-feature --vigencia $(vigencia) --data_range_inicio $(data_range_inicio) --data_range_fim $(data_range_fim)`;
+ 9. Gere o feature set da previsão com `sudo make gera-feature-set --tipo_construcao_features $(tipo_construcao_features)`;
+ 10. Gere o experimento com as informações do risco com `sudo make gera-experimento --tipo_contrucao_feature_set $(tipo_contrucao_feature_set)`.
 
 <b> Para o MC_DB: </b>
 
