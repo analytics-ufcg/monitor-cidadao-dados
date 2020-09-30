@@ -3,6 +3,7 @@ library(magrittr)
 source(here::here("R/setup/constants.R"))
 source(here::here("R/AL_DB_DAO.R"))
 source(here::here("R/process_contratos.R"))
+source(here::here("R/process_empenhos.R"))
 source(here::here("R/tipologias.R"))
 source(here::here("R/utils.R"))
 source(here::here("R/process_gabarito_contratos.R"))
@@ -125,6 +126,15 @@ if (vigentes == "vigentes") {
 print("Carregando propostas de licitações...")
 propostas <- carrega_propostas_licitacao(al_db_con)
 
+empenhos <- carrega_empenhos_by_contrato(al_db_con, contratos$id_contrato) #Essa consulta tem melhor resultado, mas demora mais (boa pra testar)
+# empenhos <- carrega_empenhos(al_db_con) 
+
+pagamentos <- carrega_pagamentos_by_empenho(al_db_con, empenhos$id_empenho)
+# pagamentos <- carrega_pagamentos(al_db_con)
+
+estorno_pagamentos <- carrega_estorno_pagamentos(al_db_con)
+
+
 #Processa dados
 print("Processando contratos...")
 contratos_processados <- contratos %>% process_contratos()
@@ -136,11 +146,16 @@ licitacoes_vencedoras <- contratos_processados %>% get_vencedores_by_contratos()
 print("Cruzando propostas com licitações...")
 propostas_licitacoes <- propostas %>% dplyr::inner_join(licitacoes)
 
+empenhos_processados <- process_empenhos(empenhos, pagamentos, estorno_pagamentos, contratos_by_cnpj)
+
 #Carrega dados dependentes
 print("Carregando participantes...")
 participantes <- carrega_participantes(al_db_con, contratos_by_cnpj$nu_cpfcnpj)
 
 #Gera tipologias
+print("Gerando tipologias de fornecimento...")
+tipologias_fornecimento <- gera_tipologia_fornecimento(empenhos_processados)
+
 print("Gerando tipologias de licitações...")
 tipologias_licitacao <- gera_tipologia_licitacao(licitacoes, contratos_processados, contratos_by_cnpj, licitacoes_vencedoras, participantes)
 print("Gerando tipologias de propostas...")
@@ -150,7 +165,10 @@ tipologias_proposta <- gera_tipologia_proposta(propostas_licitacoes, contratos_b
 print("Cruzando tipologias...")
 contratos_tramita <- carrega_contratos_mutados(al_db_con)
 
-tipologias_merge <- merge_tipologias(contratos_processados, tipologias_licitacao, tipologias_proposta) %>% 
+tipologias_merge <- merge_tipologias(contratos_processados, 
+                                     tipologias_licitacao, 
+                                     tipologias_proposta,
+                                     tipologias_fornecimento) %>% 
   processa_gabarito_tramita(contratos_tramita) %>% 
   replace_nas()
 
