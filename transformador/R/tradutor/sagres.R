@@ -212,3 +212,19 @@ translate_estorno_pagamento <- function(estorno_pagamento_raw) {
   estorno_pagamento_raw %<>% janitor::clean_names() %>%
     dplyr::mutate(de_motivo_estorno = gsub("[^[:alnum:][:blank:]?&/\\-]", "", de_motivo_estorno))
 }
+
+
+#' @param propostas_raw Dados brutos dos distritos do IBGE
+#' @return Dataframe contendo informações sobre os distritos
+#' @rdname translate_distritos_ibge
+#' @examples
+#' distritos_ibge_dt <- translate_distritos_ibge(distrito_ibge_raw)
+translate_distritos_ibge <- function(distrito_ibge_raw){
+    distrito_ibge_raw %<>% janitor::clean_names() %>%
+    dplyr::mutate_at(dplyr::vars(uf,	nome_uf, mesorregiao_geografica,	
+                                nome_mesorregiao,	microrregiao_geografica, nome_microrregiao,	
+                                municipio, codigo_municipio_completo,	nome_municipio,	distrito,	
+                                codigo_de_distrito_completo, nome_distrito), 
+                               function(x){gsub("[^[:alnum:][:blank:]?&/\\-]", "", x)})
+}
+

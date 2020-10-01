@@ -35,6 +35,8 @@ regime_execucao_df <- get_regime_execucao()
 
 tipo_objeto_licitacao_df <- get_tipo_objeto_licitacao()
 tipo_modalidade_licitacao_df <- get_tipo_modalidade_licitacao()
+distritos_ibge_df <- get_distritos_ibge()
+
 # ----
 
 

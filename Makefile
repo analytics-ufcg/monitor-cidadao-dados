@@ -10,7 +10,7 @@ help:
 	@echo "\tstop \t\t\t\tPara todos os serviços."
 	@echo "\tclean-volumes \t\t\tPara e remove todos os volumes."
 	@echo "\tenter-fetcher-container \ttAbre cli do container fetcher"
-	@echo "\tfetch-data \t\t\tObtem dados"
+	@echo "\tfetch-data \t\t\tObtem dados do SAGRES-PB e IBGE"
 	@echo "\tenter-transformer-container \tAbre cli do container transformador"
 	@echo "\ttransform-data\t\t\tTraduz e transforma os dados colhidos"
 	@echo "\tenter-feed-al-container\t\tAbre cli do container feed-al"
@@ -48,6 +48,7 @@ enter-fetcher-container:
 	docker exec -it fetcher /bin/bash
 .PHONY: enter-fetcher-container
 fetch-data:
+	docker exec -it fetcher sh -c "Rscript scripts/fetch_ibge.R"
 	docker exec -it fetcher sh -c "Rscript scripts/fetch_sagres_data.R"
 .PHONY: fetch-data
 enter-transformer-container:

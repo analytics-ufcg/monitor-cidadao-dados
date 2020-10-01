@@ -380,3 +380,27 @@ read_estorno_pagamento <- function() {
                                      vl_Estorno = readr::col_number()
                                    ))
 }
+
+#' @title Lê dataframe contendo informações dos distritos de acordo com o IBGE
+#' @return Dataframe contendo informações dos distritos de acordo com o IBGE
+#' @rdname read_distritos_ibge
+#' @examples
+#' distritos_ibge_dt <- read_distritos_ibge()
+read_distritos_ibge <- function() {
+  estorno_pagamento_df <- readr::read_csv(here::here("../fetcher/data/brasil_distrito_ibge.csv"),
+                                   col_types = list(
+                                     .default = readr::col_character(),
+                                    UF = readr::col_number(),
+                                    Nome_UF	= readr::col_character(),
+                                    "Mesorregião Geográfica" = readr::col_number(),	
+                                    Nome_Mesorregião = readr::col_character(),	
+                                    "Microrregião Geográfica" = readr::col_number(),	
+                                    Nome_Microrregião	= readr::col_character(),
+                                    Município	= readr::col_number(),
+                                    "Código Município Completo"	= readr::col_number(),	
+                                    Nome_Município	= readr::col_character(),  
+                                    Distrito	= readr::col_number(), 	
+                                    "Código de Distrito Completo"	= readr::col_number(),	
+                                    Nome_Distrito	= readr::col_character()
+                                   ))
+}

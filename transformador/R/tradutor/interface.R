@@ -203,3 +203,13 @@ get_contratos_mutados <-function(){
   contratos_mutados_dt <- read_contratos_mutados() %>%
     translate_contratos_mutados()
 }
+
+#' @title Obtem dados dos distritos
+#' @return Dataframe contendo informações sobre os distritos do IBGE
+#' @rdname get_distritos_ibge
+#' @examples
+#' distritos_ibge_dt <- get_distritos_ibge()
+get_distritos_ibge <- function(){
+  distritos_ibge_dt  <- read_distritos_ibge() %>%
+    translate_distritos_ibge()
+}
