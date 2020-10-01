@@ -1,4 +1,3 @@
-
 #' @title Realiza o join dos contratos com o dataframe das licitações
 #' @param df_contratos dataframe com os contratos
 #' @param df_licitacoes dataframe com as licitações
@@ -14,7 +13,6 @@ join_contratos_licitacao <- function(df_contratos, df_licitacoes) {
   df_contratos %<>% dplyr::left_join(df_licitacoes) %>%
     dplyr::select(id_contrato, id_licitacao, cd_municipio, dplyr::everything())
 }
-
 
 #' @title Realiza o join dos empenhos com o dataframe das licitações
 #' @param empenhos_df dataframe com os empenhos
@@ -150,6 +148,22 @@ join_propostas_licitacao <- function(df_propostas, df_licitacoes) {
     dplyr::select(id_proposta, id_licitacao, dplyr::everything())
 }
 
+#' @title Realiza o join dos contratos mutados com os contratos
+#' @param df_contratos dataframe com os contratos
+#' @param df_contratos_mutados dataframe com os contratos mutados
+#' @return Dataframe contendo informações dos contratos mutados com o id do contrato
+#' @rdname join_contratos_mutados_contratos
+#' @examples
+#' join_contratos_mutados_contratos_dt <- join_contratos_mutados_contratos(
+#'          df_contratos, df_contratos_mutados)
+#'
+join_contratos_mutados_contratos <- function(df_contratos_mutados, df_contratos) {
+ df_contratos %<>% dplyr::select(id_contrato, nu_contrato, cd_u_gestora, nu_licitacao, nu_cpfcnpj)
+
+  df_contratos_mutados %<>% dplyr::left_join(df_contratos) %>%
+    dplyr::select(id_contrato, dplyr::everything())
+}
+
 #' @title Realiza o join das propostas com o dataframe dos participantes
 #' @param df_propostas dataframe com as propostas
 #' @param df_licitacoes dataframe com os participantes
@@ -166,3 +180,22 @@ join_propostas_participantes <- function(df_propostas, df_participantes) {
   df_propostas %<>% dplyr::left_join(df_participantes) %>%
     dplyr::select(id_proposta, id_licitacao, id_participante, dplyr::everything())
 }
+
+#' @title Realiza o join dos pagamentos com os dataframes dos empenhos
+#' @param pagamentos_df dataframe com os pagamentos
+#' @param empenhos_df dataframe com os empenhos
+#' @return Dataframe contendo informações dos pagamentos com os ids dos empenhos
+#' @rdname join_pagamentos_empenhos
+#' @examples
+#' join_pagamentos_empenhos_dt <- join_pagamentos_empenhos(df_pagamentos, df_empenhos)
+#'
+join_pagamentos_empenhos <- function(df_pagamentos, df_empenhos) {
+  df_empenhos %<>% dplyr::select(nu_empenho, cd_unid_orcamentaria,
+                                 dt_ano, cd_u_gestora, id_empenho,
+                                 id_licitacao, id_contrato)
+
+  df_pagamentos %<>% dplyr::left_join(df_empenhos) %>%
+    dplyr::select(id_pagamento, id_empenho, id_licitacao, id_contrato, dplyr::everything())
+}
+
+

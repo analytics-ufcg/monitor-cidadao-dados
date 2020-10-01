@@ -1,8 +1,9 @@
 DROP TABLE IF EXISTS empenho;
 
-CREATE TABLE IF NOT EXISTS "empenho" ( 
+CREATE TABLE IF NOT EXISTS "empenho" (
     "id_empenho" VARCHAR(50),
     "id_licitacao" VARCHAR(50),
+    "id_contrato" VARCHAR(50),
     "cd_municipio" VARCHAR(3),
     "cd_u_gestora" INTEGER,
     "dt_ano" SMALLINT,
@@ -16,7 +17,7 @@ CREATE TABLE IF NOT EXISTS "empenho" (
     "cd_nat_despesa" VARCHAR(1),
     "cd_modalidade" VARCHAR(2),
     "cd_elemento" VARCHAR(2),
-    "cd_sub_elemento" VARCHAR(2),
+    "cd_sub_elemento" VARCHAR(3),
     "tp_licitacao" SMALLINT,
     "nu_licitacao" VARCHAR(10),
     "nu_empenho" VARCHAR(7),
@@ -35,6 +36,7 @@ CREATE TABLE IF NOT EXISTS "empenho" (
     "dt_mes_ano_referencia" VARCHAR(6),
     "tp_fonte_recursos" SMALLINT,
     "nu_cpf" VARCHAR(14),
+    "cd_sub_elemento_2" VARCHAR(3),
     PRIMARY KEY("id_empenho"),
     CONSTRAINT empenho_key UNIQUE (nu_empenho, cd_unid_orcamentaria, dt_ano, cd_u_gestora),
     FOREIGN KEY("cd_municipio") REFERENCES municipio("cd_municipio") ON DELETE CASCADE ON UPDATE CASCADE,

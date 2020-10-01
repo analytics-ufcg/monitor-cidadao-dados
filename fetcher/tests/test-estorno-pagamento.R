@@ -24,6 +24,3 @@ test_that("Not Empty", {
   expect_true(nrow(estorno_pagamento) != 0)
 })
 
-test_that("fetch_estorno_pagamento()", {
- expect_true(all(sapply(estorno_pagamento, class) %in% COLNAMES_ESTORNO_PAGAMENTO))
-})

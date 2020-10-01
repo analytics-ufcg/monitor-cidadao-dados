@@ -10,7 +10,7 @@ COPY . .
 
 
 ## Instala dependências
-RUN R -e "install.packages(c('DBI', 'odbc', 'here', 'RPostgres'), repos='http://cran.rstudio.com/')"
+RUN R -e "install.packages(c('DBI', 'odbc', 'here', 'RPostgres', 'optparse', 'digest','mccr', 'recipes', 'tidymodels', 'caret', 'randomForest'), repos='http://cran.rstudio.com/')"
 
 
 ## Define em qual porta da máquina local o conteiner estará disponível

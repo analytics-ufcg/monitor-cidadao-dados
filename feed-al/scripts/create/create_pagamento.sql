@@ -2,6 +2,9 @@ DROP TABLE IF EXISTS pagamento;
 
 CREATE TABLE IF NOT EXISTS "pagamento" (
   "id_pagamento" VARCHAR(80),
+  "id_empenho" VARCHAR(80),
+  "id_licitacao" VARCHAR(50),
+  "id_contrato" VARCHAR(50),
   "cd_u_gestora" INTEGER,
   "dt_ano" SMALLINT,
   "cd_unid_orcamentaria" VARCHAR(5),
@@ -12,16 +15,18 @@ CREATE TABLE IF NOT EXISTS "pagamento" (
   "dt_pagamento" DATE,
   "cd_conta" VARCHAR(15),
   "nu_cheque_pag" VARCHAR(30),
-  "nu_deb_aut" VARCHAR(10),
+  "nu_deb_aut" VARCHAR(15),
   "cd_banco_rec" VARCHAR(5),
   "cd_agencia_rec" VARCHAR(6),
   "nu_conta_rec" VARCHAR(15),
-  "tp_fonte_recursos" VARCHAR(3),
+  "tp_fonte_recursos" VARCHAR(5),
   "dt_mes_ano" VARCHAR(6),
   "cd_banco" VARCHAR(3),
   "cd_agencia" VARCHAR(6),
   "tp_conta_bancaria" VARCHAR(1),
   PRIMARY KEY("id_pagamento"),
   CONSTRAINT pagamento_key UNIQUE (cd_u_gestora, dt_ano, cd_unid_orcamentaria,
-     nu_empenho, nu_parcela, tp_lancamento)
+     nu_empenho, nu_parcela, tp_lancamento),
+  FOREIGN KEY("id_empenho") REFERENCES empenho("id_empenho") ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY("id_licitacao") REFERENCES licitacao("id_licitacao") ON DELETE CASCADE ON UPDATE CASCADE
 );

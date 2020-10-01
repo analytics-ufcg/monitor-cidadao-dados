@@ -48,11 +48,29 @@ services:
     ports:
       - 7643:7643
     depends_on:
-      - postgres
+      - postgres-aldb
+      - postgres-mcdb
     networks:
       - proxynet
 
-  postgres:
+  feed-mc:
+    build:
+      context: feed-mc/
+    container_name: feed-mc
+    env_file:
+      - .env
+    volumes:
+      - ./tipologias/data:/data
+      - ./feed-mc:/feed-mc
+    ports:
+      - 7644:7644
+    depends_on:
+      - postgres-aldb
+      - postgres-mcdb
+    networks:
+      - proxynet
+
+  postgres-aldb:
     image: postgres:11.1-alpine
     container_name: postgres-analytics
     restart: always
@@ -62,9 +80,27 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-secret}
       - TZ=GMT
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - postgres_aldb_data:/var/lib/postgresql/data/
+      # - /mnt/datalake/postgres-aldb:/var/lib/postgresql/data/
     ports:
       - 7655:5432
+    networks:
+      - proxynet
+
+  postgres-mcdb:
+    image: postgres:11.1-alpine
+    container_name: postgres-monitor-cidadao
+    restart: always
+    environment:
+      - POSTGRES_DB=${POSTGRES_MC_DB:-mc_db}
+      - POSTGRES_USER=${POSTGRES_MC_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_MC_PASSWORD:-secret}
+      - TZ=GMT
+    volumes:
+      - postgres_mcdb_data:/var/lib/postgresql/data/
+      # - /mnt/datalake/postgres-mcdb:/var/lib/postgresql/data/
+    ports:
+      - 7656:5432
     networks:
       - proxynet
 
@@ -81,6 +117,11 @@ services:
       - POSTGRES_PORT=${POSTGRES_PORT:-7655}
       - POSTGRES_USER=${POSTGRES_USER:-user}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-secret}
+      - POSTGRES_MCDB_HOST=${POSTGRES_MCDB_HOST:-host}
+      - POSTGRES_MCDB_DB=${POSTGRES_MCDB_DB:-mc_db}
+      - POSTGRES_MCDB_PORT=${POSTGRES_MCDB_PORT:-5432}
+      - POSTGRES_MCDB_USER=${POSTGRES_MCDB_USER:-postgres}
+      - POSTGRES_MCDB_PASSWORD=${POSTGRES_MCDB_PASSWORD:-secret}
     volumes:
       - ./tipologias:/app/tipologias
     ports:
@@ -93,4 +134,5 @@ networks:
     name: monitor_cidadao_network
 
 volumes:
-  postgres_data:
+  postgres_aldb_data:
+  postgres_mcdb_data:

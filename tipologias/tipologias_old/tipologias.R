@@ -26,15 +26,15 @@ tipologias_contratos_gerais <- function(ano_inicial = 2014, ano_final = 2019) {
         select(nu_CPFCNPJ, data_inicio) %>% 
         filter(nu_CPFCNPJ != "")
     
-    #REFATORAMENTO CHEGOU AQUI
     
-    tipologias_fornecimento <- carrega_info_fornecimento(ano_inicial, ano_final, cnpjs_datas_contratos)
+    tipologias_fornecimento <- carrega_info_fornecimento(ano_inicial, ano_final, cnpjs_datas_contratos) #Depende de empenhos
     
-    tipologias_licitacao <- carrega_info_licitacao(ano_inicial, ano_final, cnpjs_datas_contratos) #Focar refatoramento aqui
+    tipologias_licitacao <- carrega_info_licitacao(ano_inicial, ano_final, cnpjs_datas_contratos) #Já feito
     
     tipologias_proposta <- carrega_info_proposta(ano_inicial, ano_final, cnpjs_datas_contratos)
     
-    tipologias_cadastrais_empresas <- gera_tipologias_empresa(cnpjs_datas_contratos,
+
+    tipologias_cadastrais_empresas <- gera_tipologias_empresa(cnpjs_datas_contratos, #Depende da base da receita federal
                                                               rfb_info_empresas_contratos_path = here::here("data/rfb_info_empresas_geral.csv"),
                                                               rfb_socios_empresas_contratos_path = here::here("data/rfb_socios_empresas_geral.csv"))
     
@@ -53,7 +53,7 @@ tipologias_contratos_gerais <- function(ano_inicial = 2014, ano_final = 2019) {
                                                                starts_with("montante_lic_venceu"), starts_with("n_licitacoes_part"),
                                                                starts_with("n_licitacoes_venceu"), starts_with("n_propostas"),
                                                                starts_with("n_contratos"), starts_with("perc_vitoria")))## substitui NA das colunas numéricas por 0
-    
+    #REFATORAMENTO CHEGOU AQUI
     tipologias_contrato <- tipologias_merge %>% 
         carrega_info_contrato(ano_inicial = ano_inicial, ano_final = ano_final, limite_inferior = 140e3)
     

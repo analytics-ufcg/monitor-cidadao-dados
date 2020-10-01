@@ -62,7 +62,7 @@ COLNAMES_EMPENHOS <- c("cd_UGestora"="integer", "dt_Ano"="integer", "cd_UnidOrca
                        "tp_Credor"="character", "de_Historico1"="character", "de_Historico2"="character",
                        "de_Historico"="character", "tp_Meta"="character", "nu_Obra"="character",
                        "dt_MesAno"="character", "dt_MesAnoReferencia"="character", "tp_FonteRecursos"="character",
-                       "nu_CPF"="character"
+                       "nu_CPF"="character", "cd_SubElemento_"="character"
 )
 
 COLNAMES_ESTORNO_PAGAMENTO <- c("cd_UGestora"="character", "dt_Ano"="integer", "cd_UnidOrcamentaria"="character",
@@ -70,6 +70,7 @@ COLNAMES_ESTORNO_PAGAMENTO <- c("cd_UGestora"="character", "dt_Ano"="integer", "
                                 "tp_Lancamento"="integer","dt_Estorno"="character","de_MotivoEstorno"="character",
                                 "st_DespLiquidada"="character", "vl_Estorno"="numeric","dt_MesAno"="character"
 )
+
 
 COLNAMES_FORNECEDORES <-c("cd_UGestora"="integer","dt_Ano"="integer",
                       			"nu_CPFCNPJ"="character","tp_Credor"="integer",
@@ -102,7 +103,6 @@ COLNAMES_PARTICIPANTES <- c("cd_UGestora"="integer","dt_Ano"="integer",
                         			"nu_Licitacao"="character","tp_Licitacao"="integer",
                         			"nu_CPFCNPJ"="character","dt_MesAno"="character"
 )
-
 
 COLNAMES_PROPOSTAS <- c("cd_UGestora"="integer", "dt_Ano"="integer", "nu_Licitacao"="character",
                         "tp_Licitacao"="integer", "cd_Item"="character", "cd_SubGrupoItem"="character",

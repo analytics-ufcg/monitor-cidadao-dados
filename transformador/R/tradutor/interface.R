@@ -103,13 +103,13 @@ get_codigo_subelemento <- function() {
     translate_codigo_subelemento()
 }
 
-#' @title Obtem dados dos empenhos pelo codigo do municipio
+#' @title Obtem dados dos empenhos pelo codigo da unidade gestora
 #' @return Dataframe contendo informações sobre empenhos
-#' @rdname get_empenhos
+#' @rdname get_empenhos_by_unidade_gestora
 #' @examples
-#' empenhos_dt <- get_empenhos_by_municipio()
-get_empenhos_by_municipio <- function(cd_municipio) {
-  empenhos_dt <- read_empenhos_by_municipio(cd_municipio) %>%
+#' empenhos_dt <- get_empenhos_by_unidade_gestora()
+get_empenhos_by_unidade_gestora <- function(codigo_u_gestora) {
+  empenhos_dt <- read_empenhos_by_unidade_gestora(codigo_u_gestora) %>%
     translate_empenhos()
 }
 
@@ -123,13 +123,13 @@ get_aditivos <- function() {
     translate_aditivos()
 }
 
-#' @title Obtem dados dos aditivos de pagamentos
+#' @title Obtem dados dos pagamentos pelo codigo da unidade gestora
 #' @return Dataframe contendo informações sobre pagamentos
-#' @rdname get_pagamentos
+#' @rdname get_pagamentos_by_unidade_gestora
 #' @examples
-#' pagamentos_dt <- get_pagamentos()
-get_pagamentos <- function() {
-  pagamentos_dt <- read_pagamentos() %>%
+#' pagamentos_dt <- get_pagamentos_by_unidade_gestora()
+get_pagamentos_by_unidade_gestora <- function(codigo_u_gestora) {
+  pagamentos_dt <- read_pagamentos_by_unidade_gestora(codigo_u_gestora) %>%
     translate_pagamentos()
 }
 
@@ -173,7 +173,6 @@ get_fornecedores <- function() {
     translate_fornecedores()
 }
 
-
 #' @title Obtem dados das propostas
 #' @return Dataframe contendo informações sobre as propostas
 #' @rdname get_propostas
@@ -193,4 +192,14 @@ get_propostas <- function() {
 get_estorno_pagamento <- function() {
   estorno_pagamento_dt <- read_estorno_pagamento() %>%
     translate_estorno_pagamento()
+}
+
+#' @title Obtem dados dos contratos mutados
+#' @return Dataframe contendo informações sobre os contratos mutados
+#' @rdname get_contratos_mutados
+#' @examples
+#' contratos_mutados_dt <- get_contratos_mutados()
+get_contratos_mutados <-function(){
+  contratos_mutados_dt <- read_contratos_mutados() %>%
+    translate_contratos_mutados()
 }

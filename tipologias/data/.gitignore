@@ -1,0 +1,4 @@
+# ignorar todos
+*.csv
+!.gitignore
+
