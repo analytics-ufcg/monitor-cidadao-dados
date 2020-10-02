@@ -204,12 +204,12 @@ get_contratos_mutados <-function(){
     translate_contratos_mutados()
 }
 
-#' @title Obtem dados dos distritos
-#' @return Dataframe contendo informações sobre os distritos do IBGE
-#' @rdname get_distritos_ibge
+#' @title Obtem dados das localidades de acordo com o IBGE
+#' @return Dataframe contendo informações sobre as localidades de acordo com o IBGE
+#' @rdname get_codigo_localidades_ibge
 #' @examples
-#' distritos_ibge_dt <- get_distritos_ibge()
-get_distritos_ibge <- function(){
-  distritos_ibge_dt  <- read_distritos_ibge() %>%
-    translate_distritos_ibge()
+#' codigo_localidades_ibge_dt <- get_codigo_localidades_ibge()
+get_codigo_localidades_ibge <- function(){
+  codigo_localidades_ibge_dt  <- read_codigo_localidades_ibge() %>%
+    translate_codigo_localidades_ibge()
 }
