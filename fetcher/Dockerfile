@@ -37,6 +37,6 @@ RUN chown root ./config && \
 WORKDIR ../../app/fetcher
 
 ## Instala dependências
-RUN R -e "install.packages(c('DBI', 'odbc', 'here', 'crayon', 'testthat'), repos='http://cran.rstudio.com/')"
+RUN R -e "install.packages(c('DBI', 'odbc', 'optparse', 'here', 'crayon', 'testthat'), repos='http://cran.rstudio.com/')"
 
 EXPOSE 8787

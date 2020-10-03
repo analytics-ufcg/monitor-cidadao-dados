@@ -35,3 +35,33 @@ assert_dataframe_completo <- function(x, y, warning = FALSE){
     x
   } else tibble::tibble()
 }
+
+
+
+#' Descompacta arquivos (desenvolvido para lidar com arquivos com 4gb+)
+#' @param directory diretorio de saida
+#' @param file arquivo zipado
+decompress_file <- function(directory, file, .file_cache = FALSE) {
+  
+  if (.file_cache == TRUE) {
+    print("skipped")
+  } else {
+    
+    wd <- getwd()
+    setwd(directory)
+    
+    # Run decompression
+    decompression <-
+      system2("unzip",
+              args = c("-o", # include override flag
+                       file),
+              stdout = TRUE)
+    
+    setwd(wd); rm(wd)
+    
+    # Teste
+    if (grepl("Warning message", tail(decompression, 1))) {
+      print(decompression)
+    }
+  }
+}    

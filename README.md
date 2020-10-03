@@ -37,7 +37,7 @@ Nesta camada o make é utilizado como facilitador para execução. Abaixo estão
 
  1. Faça o build das imagens necessárias com `sudo make build`;
  2. Crie e inicie os containers do docker com `sudo make up`;
- 3. Obtenha os dados através do `sudo make fetch-data`. Nesta etapa você também pode testar a integridade dos dados obtidos utilizando os testes unitários de cada tabela com `sudo docker exec -it fetcher sh -c "Rscript tests/<nome-da-tabela>.R"`;
+ 3. Obtenha os dados através do `sudo make fetch-data-sagres` e `sudo make fetch-data-rce-rs ano=<2016,2017, 2018 , 2019, 2020 ou todos>`. Nesta etapa você também pode testar a integridade dos dados obtidos utilizando os testes unitários de cada tabela com `sudo docker exec -it fetcher sh -c "Rscript tests/<nome-da-tabela>.R"`;
  4. Traduza e transforme os dados colhidos `sudo make transform-data`;
 
 <b> Para o AL_DB: </b>
