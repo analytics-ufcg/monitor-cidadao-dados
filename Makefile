@@ -9,8 +9,10 @@ help:
 	@echo "\tup \t\t\t\tCria e inicia os containers."
 	@echo "\tstop \t\t\t\tPara todos os serviços."
 	@echo "\tclean-volumes \t\t\tPara e remove todos os volumes."
+	@echo ""
 	@echo "\tenter-fetcher-container \ttAbre cli do container fetcher"
-	@echo "\tfetch-data \t\t\tObtem dados do SAGRES-PB e IBGE"
+	@echo "\tfetch-data-tce-rs \t\t\tObtem dados do TCE-RS"
+	@echo "\tfetch-data-sagres \t\t\tObtem dados do SAGRES-PB"
 	@echo "\tenter-transformer-container \tAbre cli do container transformador"
 	@echo "\ttransform-data\t\t\tTraduz e transforma os dados colhidos"
 	@echo "\tenter-feed-al-container\t\tAbre cli do container feed-al"
@@ -47,7 +49,10 @@ clean-volumes:
 enter-fetcher-container:
 	docker exec -it fetcher /bin/bash
 .PHONY: enter-fetcher-container
-fetch-data:
+fetch-data-tce-rs:
+	docker exec -it fetcher sh -c "Rscript scripts/fetch_tce_rs_opendata.R --ano $(ano)"
+.PHONY: fetch-data
+fetch-data-sagres:
 	docker exec -it fetcher sh -c "Rscript scripts/fetch_ibge.R"
 	docker exec -it fetcher sh -c "Rscript scripts/fetch_sagres_data.R"
 .PHONY: fetch-data
