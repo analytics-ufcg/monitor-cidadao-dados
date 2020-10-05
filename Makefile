@@ -53,6 +53,7 @@ fetch-data-tce-rs:
 	docker exec -it fetcher sh -c "Rscript scripts/fetch_tce_rs_opendata.R --ano $(ano)"
 .PHONY: fetch-data
 fetch-data-sagres:
+	docker exec -it fetcher sh -c "Rscript scripts/fetch_ibge.R"
 	docker exec -it fetcher sh -c "Rscript scripts/fetch_sagres_data.R"
 .PHONY: fetch-data
 enter-transformer-container:
