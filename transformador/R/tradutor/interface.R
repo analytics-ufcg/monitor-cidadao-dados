@@ -203,3 +203,13 @@ get_contratos_mutados <-function(){
   contratos_mutados_dt <- read_contratos_mutados() %>%
     translate_contratos_mutados()
 }
+
+#' @title Obtem dados das localidades de acordo com o IBGE
+#' @return Dataframe contendo informações sobre as localidades de acordo com o IBGE
+#' @rdname get_codigo_localidades_ibge
+#' @examples
+#' codigo_localidades_ibge_dt <- get_codigo_localidades_ibge()
+get_codigo_localidades_ibge <- function(){
+  codigo_localidades_ibge_dt  <- read_codigo_localidades_ibge() %>%
+    translate_codigo_localidades_ibge()
+}

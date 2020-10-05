@@ -3,3 +3,5 @@ SQLSERVER_SAGRES19_USER <- Sys.getenv("SQLSERVER_SAGRES19_USER")
 SQLSERVER_SAGRES19_Database <- Sys.getenv("SQLSERVER_SAGRES19_Database")
 SQLSERVER_SAGRES19_PORT <- Sys.getenv("SQLSERVER_SAGRES19_PORT")
 SQLSERVER_SAGRES19_PASS <- Sys.getenv("SQLSERVER_SAGRES19_PASS")
+
+DADOS_DISTRITOS_IBGE <- "ftp://geoftp.ibge.gov.br/organizacao_do_territorio/estrutura_territorial/divisao_territorial/2018/DTB_2018.zip"

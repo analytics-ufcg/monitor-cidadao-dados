@@ -122,3 +122,17 @@ COLNAMES_TIPO_OBJETO_LICITACAO <- c("tp_Objeto"="integer",
 COLNAMES_TIPO_MODALIDADE_LICITACAO <- c("tp_Licitacao"="integer",
                                         "de_TipoLicitacao"="character"
                                         )
+                                        
+COLNAMES_CODIGO_LOCALIDADES <- c("UF" ="integer",
+                                    "Nome_UF" = "character",
+                                    "Mesorregião Geográfica" = "integer",
+                                    "Nome_Mesorregião" = "character",
+                                    "Microrregião Geográfica" = "integer",
+                                    "Nome_Microrregião" = "character",
+                                    "Município" = "integer",
+                                    "Código Município Completo" = "integer",
+                                    "Nome_Município" = "character",
+                                    "Distrito"  = "integer",
+                                    "Código de Distrito Completo" = "integer",
+                                    "Nome_Distrito" = "character"
+                                    )
