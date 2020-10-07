@@ -8,10 +8,10 @@ source(here::here("utils/join_utils.R"))
 #Instala pacote mcTransformador
 devtools::document()
 
-
-# - Busca tabelas traduzidas - Ordem Alfabética
+#--------------------------------
+# RECUPERA AS TABELAS DO SAGRES-PB (ORDEM ALFABÉTICA)
+#--------------------------------
 aditivos_df <- get_aditivos()
-
 codigo_unidade_gestora_df <- get_codigo_unidade_gestora()
 codigo_funcao_df <- get_codigo_funcao()
 contratos_df <- get_contratos()
@@ -21,37 +21,42 @@ codigo_subelemento_df <- get_codigo_subelemento()
 convenios_df <- get_convenios()
 contratos_mutados_df <- get_contratos_mutados()
 codigo_localidades_ibge_df <- get_codigo_localidades_ibge()
-
 estorno_pagamento_df <- get_estorno_pagamento()
 fornecedores_df <- get_fornecedores()
-
-
 licitacoes_df <- get_licitacoes()
 municipios_df <- get_codigo_municipio()
-
 participantes_df <- get_participantes()
 propostas_df <- get_propostas()
-
 regime_execucao_df <- get_regime_execucao()
-
 tipo_objeto_licitacao_df <- get_tipo_objeto_licitacao()
 tipo_modalidade_licitacao_df <- get_tipo_modalidade_licitacao()
-distritos_ibge_df <- get_distritos_ibge()
 
-# ----
+#--------------------------------
+# RECUPERA AS TABELA DO IBGE
+#--------------------------------
+codigo_localidades_ibge_df <- get_codigo_localidades_ibge()
 
+#--------------------------------
+# TRANSFORMA TABELAS
+#--------------------------------
 
-#Transforma tabelas
+codigo_localidades_ibge_transformados <- codigo_localidades_ibge_df  %>%
+  mcTransformador::process_codigo_localidades_ibge()
+
+municipios_sagres_df <- municipios_df %>% mcTransformador::process_municipio()
+
 licitacoes_transformadas <- licitacoes_df %>% mcTransformador::process_licitacao() %>%
   join_licitacoes_codigo_unidade_gestora(codigo_unidade_gestora_df) %>%
-  join_licitacoes_tipo_modalidade_licitacao(tipo_modalidade_licitacao_df)
+  join_licitacoes_tipo_modalidade_licitacao(tipo_modalidade_licitacao_df) %>%
+  join_licitacoes_municipios_sagres(municipios_sagres_df) %>%
+  join_licitacoes_localidades_ibge(codigo_localidades_ibge_transformados)
 
 contratos_transformados <- contratos_df %>% mcTransformador::process_contrato() %>%
   join_contratos_licitacao(licitacoes_transformadas) %>%
   join_contratos_codigo_unidade_gestora(codigo_unidade_gestora_df) %>%
-  join_contratos_fornecedores(fornecedores_df)
-
-municipios_transformados <- municipios_df %>% mcTransformador::process_municipio()
+  join_contratos_fornecedores(fornecedores_df) %>%
+  join_contratos_municipios_sagres(municipios_sagres_df) %>%
+  join_contratos_localidades_ibge(codigo_localidades_ibge_transformados)
 
 participantes_transformados <- participantes_df %>% mcTransformador::process_participante() %>%
   join_participantes_licitacao(licitacoes_transformadas) %>%
@@ -157,7 +162,8 @@ readr::write_csv(codigo_subelemento_df, here::here("data/codigo_subelemento.csv"
 readr::write_csv(aditivos_df, here::here("data/aditivos.csv"))
 readr::write_csv(estorno_pagamento_transformado, here::here("data/estorno_pagamento.csv"))
 readr::write_csv(convenios_df, here::here("data/convenios.csv"))
-readr::write_csv(municipios_transformados, here::here("data/municipios.csv"))
+readr::write_csv(municipios_sagres_df, here::here("data/municipios_sagres.csv"))
+readr::write_csv(codigo_localidades_ibge_transformados, here::here("data/localidades_ibge.csv"))
 readr::write_csv(fornecedores_df, here::here("data/fornecedores.csv"))
 readr::write_csv(participantes_transformados, here::here("data/participantes.csv"))
 readr::write_csv(contratos_mutados_transformados, here::here("data/contratos_mutados.csv"))

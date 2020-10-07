@@ -98,6 +98,68 @@ join_licitacoes_tipo_modalidade_licitacao <- function(df_licitacoes, df_tipo_mod
     dplyr::select(id_licitacao, dplyr::everything())
 }
 
+#' @title Realiza o join das licitações com os municipios do SAGRES
+#' @param df_licitacoes dataframe com as licitações
+#' @param df_municipios_sagres dataframe com os id dos municipios do SAGRES
+#' @return Dataframe contendo informações das licitações com o id do IBGE
+#' @rdname join_licitacoes_municipios_sagres
+#' @examples
+#' join_licitacoes_municipios_sagres_dt <- join_licitacoes_municipios_sagres(
+#'          df_licitacoes, df_municipios_sagres)
+#'
+join_licitacoes_municipios_sagres <- function(df_licitacoes, df_municipios_sagres) {
+  df_licitacoes %<>% dplyr::left_join(df_municipios_sagres) %>%
+    dplyr::select(id_licitacao, dplyr::everything())
+}
+
+#' @title Realiza o join das licitações com as localidades do IBGE
+#' @param df_licitacoes dataframe com as licitações
+#' @param df_localidades_ibge dataframe com as localidades cadastradas no IBGE
+#' @return Dataframe contendo informações das licitações com o ids do IBGE
+#' @rdname join_licitacoes_localidades_ibge
+#' @examples
+#' join_licitacoes_localidades_ibge_dt <- join_licitacoes_localidades_ibge(
+#'          df_licitacoes, df_localidades_ibge)
+#'
+join_licitacoes_localidades_ibge <- function(df_licitacoes, df_localidades_ibge) {
+  df_localidades_ibge %<>% dplyr::select(uf, mesorregiao_geografica, microrregiao_geografica, cd_ibge)
+
+  df_licitacoes %<>% dplyr::left_join(df_localidades_ibge) %>%
+    dplyr::select(id_licitacao, dplyr::everything()) %>%
+    dplyr::select(-c(cd_municipio))
+}
+
+#' @title Realiza o join dos contratos com os municipios do SAGRES
+#' @param df_contratos dataframe com os contratos
+#' @param df_municipios_sagres dataframe com os id dos municipios do SAGRES
+#' @return Dataframe contendo informações dos contratos com os ids do IBGE
+#' @rdname join_contratos_municipios_sagres
+#' @examples
+#' join_contratos_municipios_sagres_dt <- join_contratos_municipios_sagres(
+#'          df_contratos, df_municipios_sagres)
+#'
+join_contratos_municipios_sagres <- function(df_contratos, df_municipios_sagres) {
+  df_contratos %<>% dplyr::left_join(df_municipios_sagres) %>%
+    dplyr::select(id_contrato, dplyr::everything())
+}
+
+#' @title Realiza o join dos contratos com as localidades do IBGE
+#' @param df_contratos dataframe com os contratos
+#' @param df_localidades_ibge dataframe com as localidades cadastradas no IBGE
+#' @return Dataframe contendo informações dos contratos com o ids do IBGE
+#' @rdname join_contratos_localidades_ibge
+#' @examples
+#' join_contratos_localidades_ibge_dt <- join_contratos_localidades_ibge(
+#'          df_contratos, df_localidades_ibge)
+#'
+join_contratos_localidades_ibge <- function(df_contratos, df_localidades_ibge) {
+  df_localidades_ibge %<>% dplyr::select(uf, mesorregiao_geografica, microrregiao_geografica, cd_ibge)
+
+  df_contratos %<>% dplyr::left_join(df_localidades_ibge) %>%
+    dplyr::select(id_licitacao, dplyr::everything()) %>%
+    dplyr::select(-c(cd_municipio))
+}
+
 #' @title Realiza o join dos participantes com o dataframe das licitações
 #' @param df_participantes dataframe com os participantes
 #' @param df_licitacoes dataframe com as licitações
