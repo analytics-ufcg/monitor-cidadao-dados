@@ -85,11 +85,11 @@ ENCERRADOS <- "encerrados"
 VIGENTES <- "vigentes"
 GERAIS <- "todos"
 
-args <- get_args()
+#args <- get_args()
 
-vigentes <- args$vigencia
-data_range_inicio <- args$data_range_inicio
-data_range_fim <- args$data_range_fim
+#vigentes <- args$vigencia
+data_range_inicio <- "2014-01-01"
+data_range_fim <- "2020-01-01"
 
 al_db_con <- NULL
 
@@ -114,23 +114,23 @@ print("Carregando contratos...")
 
 contratos <- tibble::tibble()
 
-if (vigentes == "vigentes") {
-  contratos = carrega_contratos(al_db_con, vigentes = TRUE, data_range_inicio, data_range_fim) %>% dplyr::mutate(vigente = TRUE)
-} else if (vigentes == "encerrados") {
-  contratos = carrega_contratos(al_db_con, vigentes = FALSE, data_range_inicio, data_range_fim) %>% dplyr::mutate(vigente = FALSE)
-} else {
+# if (vigentes == "vigentes") {
+#   contratos = carrega_contratos(al_db_con, vigentes = TRUE, data_range_inicio, data_range_fim) %>% dplyr::mutate(vigente = TRUE)
+# } else if (vigentes == "encerrados") {
+#   contratos = carrega_contratos(al_db_con, vigentes = FALSE, data_range_inicio, data_range_fim) %>% dplyr::mutate(vigente = FALSE)
+# } else {
   contratos = dplyr::bind_rows(carrega_contratos(al_db_con, vigentes = TRUE, data_range_inicio, data_range_fim) %>% dplyr::mutate(vigente = TRUE),
                                carrega_contratos(al_db_con, vigentes = FALSE, data_range_inicio, data_range_fim) %>% dplyr::mutate(vigente = FALSE))
-}
+#}
 
 print("Carregando propostas de licitações...")
 propostas <- carrega_propostas_licitacao(al_db_con)
 
-empenhos <- carrega_empenhos_by_contrato(al_db_con, contratos$id_contrato) #Essa consulta tem melhor resultado, mas demora mais (boa pra testar)
-# empenhos <- carrega_empenhos(al_db_con) 
+#empenhos <- carrega_empenhos_by_contrato(al_db_con, contratos$id_contrato) #Essa consulta tem melhor resultado, mas demora mais (boa pra testar)
+empenhos <- carrega_empenhos(al_db_con) 
 
-pagamentos <- carrega_pagamentos_by_empenho(al_db_con, empenhos$id_empenho)
-# pagamentos <- carrega_pagamentos(al_db_con)
+#pagamentos <- carrega_pagamentos_by_empenho(al_db_con, empenhos$id_empenho)
+pagamentos <- carrega_pagamentos(al_db_con)
 
 estorno_pagamentos <- carrega_estorno_pagamentos(al_db_con)
 
@@ -197,13 +197,13 @@ features <- tipologias_final_contratos_gerais %>% tidyr::gather(key = "nome_feat
   dplyr::select(id_feature, dplyr::everything())
 
 #Escrevendo arquivos
-if (vigentes == "vigentes") {
-  write_features(tipologias_final_contratos_gerais, features, VIGENTES, data_range_inicio, data_range_fim)
-} else if (vigentes == "encerrados") {
-  write_features(tipologias_final_contratos_gerais, features, ENCERRADOS, data_range_inicio, data_range_fim)
-} else {
-  write_features(tipologias_final_contratos_gerais, features, GERAIS, data_range_inicio, data_range_fim)
-}
+# if (vigentes == "vigentes") {
+#   write_features(tipologias_final_contratos_gerais, features, VIGENTES, data_range_inicio, data_range_fim)
+# } else if (vigentes == "encerrados") {
+#   write_features(tipologias_final_contratos_gerais, features, ENCERRADOS, data_range_inicio, data_range_fim)
+# } else {
+write_features(tipologias_final_contratos_gerais, features, GERAIS, data_range_inicio, data_range_fim)
+#}
 
 #Compactando código gerador 
 #zip(paste("data/source_code/",hash_source_code, ".zip", sep = ""), c("R", "scripts"))

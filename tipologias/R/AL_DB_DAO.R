@@ -139,6 +139,13 @@ carrega_empenhos_by_contrato <- function(al_db_con, ids_contratos) {
 carrega_empenhos <- function(al_db_con) {
   empenhos <- tibble::tibble()
   
+  template <- paste0('
+                SELECT * 
+                FROM empenho')
+  
+  query <- template %>% 
+    dplyr::sql()
+  
   tryCatch({
     empenhos <- dplyr::tbl(al_db_con, query) %>% dplyr::collect(n = Inf)
   },
@@ -161,7 +168,7 @@ carrega_pagamentos_by_empenho <- function(al_db_con, ids_empenhos) {
   return(pagamentos)
 }
 
-arrega_pagamentos <- function(al_db_con) {
+carrega_pagamentos <- function(al_db_con) {
   pagamentos <- tibble::tibble()
   
   template <- paste0('
