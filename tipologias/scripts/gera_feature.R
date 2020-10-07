@@ -123,16 +123,30 @@ contratos <- tibble::tibble()
                                carrega_contratos(al_db_con, vigentes = FALSE, data_range_inicio, data_range_fim) %>% dplyr::mutate(vigente = FALSE))
 #}
 
+  
 print("Carregando propostas de licitações...")
 propostas <- carrega_propostas_licitacao(al_db_con)
 
-#empenhos <- carrega_empenhos_by_contrato(al_db_con, contratos$id_contrato) #Essa consulta tem melhor resultado, mas demora mais (boa pra testar)
-empenhos <- carrega_empenhos(al_db_con) 
+gera_tipologia_fornecimento_by_unidade_gestora <- function(unidade_gestora, al_db_con, contratos_by_cnpj) {
+  empenhos <- carrega_empenhos_by_contrato(al_db_con, unidade_gestora) #Essa consulta tem melhor resultado, mas demora mais (boa pra testar)
+  #empenhos <- carrega_empenhos(al_db_con) 
+  
+  pagamentos <- carrega_pagamentos_by_empenho(al_db_con, unidade_gestora)
+  #pagamentos <- carrega_pagamentos(al_db_con)
+  
+  estorno_pagamentos <- carrega_estorno_pagamentos(al_db_con)
+  
+  empenhos_processados <- process_empenhos(empenhos, pagamentos, estorno_pagamentos, contratos_by_cnpj)
+  
+  print(unidade_gestora)
+  print("CHEGOU AQUI GRAÇAS A DEUS!!")
+  
+  tipologias_fornecimento <- gera_tipologia_fornecimento(empenhos_processados)
+  
 
-#pagamentos <- carrega_pagamentos_by_empenho(al_db_con, empenhos$id_empenho)
-pagamentos <- carrega_pagamentos(al_db_con)
+}
 
-estorno_pagamentos <- carrega_estorno_pagamentos(al_db_con)
+
 
 
 #Processa dados
@@ -154,7 +168,8 @@ participantes <- carrega_participantes(al_db_con, contratos_by_cnpj$nu_cpfcnpj)
 
 #Gera tipologias
 print("Gerando tipologias de fornecimento...")
-tipologias_fornecimento <- gera_tipologia_fornecimento(empenhos_processados)
+tipologias_fornecimento <- contratos$cd_u_gestora %>% 
+  purrr::map_df(~gera_tipologia_fornecimento_by_unidade_gestora(.x, al_db_con,contratos_by_cnpj))
 
 print("Gerando tipologias de licitações...")
 tipologias_licitacao <- gera_tipologia_licitacao(licitacoes, contratos_processados, contratos_by_cnpj, licitacoes_vencedoras, participantes)
