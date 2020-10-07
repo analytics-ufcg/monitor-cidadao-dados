@@ -24,10 +24,11 @@ join_contratos_licitacao <- function(df_contratos, df_licitacoes) {
 #'
 join_empenhos_licitacao <- function(df_empenhos, df_licitacoes) {
   df_licitacoes %<>% dplyr::select(cd_u_gestora, dt_ano, nu_licitacao,
-                                   tp_licitacao, id_licitacao)
+                                   tp_licitacao, id_licitacao, cd_ibge)
 
   df_empenhos %<>% dplyr::left_join(df_licitacoes) %>%
-    dplyr::select(id_empenho, id_licitacao, cd_municipio, dplyr::everything())
+    dplyr::select(id_empenho, id_licitacao, dplyr::everything()) %>%
+    dplyr::select(-c(cd_municipio))
 }
 
 #' @title Realiza o join dos contratos com os códigos das unidades gestoras
@@ -156,7 +157,7 @@ join_contratos_localidades_ibge <- function(df_contratos, df_localidades_ibge) {
   df_localidades_ibge %<>% dplyr::select(uf, mesorregiao_geografica, microrregiao_geografica, cd_ibge)
 
   df_contratos %<>% dplyr::left_join(df_localidades_ibge) %>%
-    dplyr::select(id_licitacao, dplyr::everything()) %>%
+    dplyr::select(id_contrato, dplyr::everything()) %>%
     dplyr::select(-c(cd_municipio))
 }
 
