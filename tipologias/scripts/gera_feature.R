@@ -3,6 +3,7 @@ library(magrittr)
 source(here::here("R/setup/constants.R"))
 source(here::here("R/AL_DB_DAO.R"))
 source(here::here("R/process_contratos.R"))
+source(here::here("R/process_empenhos.R"))
 source(here::here("R/tipologias.R"))
 source(here::here("R/utils.R"))
 source(here::here("R/process_gabarito_contratos.R"))
@@ -84,11 +85,11 @@ ENCERRADOS <- "encerrados"
 VIGENTES <- "vigentes"
 GERAIS <- "todos"
 
-args <- get_args()
+#args <- get_args()
 
-vigentes <- args$vigencia
-data_range_inicio <- args$data_range_inicio
-data_range_fim <- args$data_range_fim
+#vigentes <- args$vigencia
+data_range_inicio <- "2014-01-01"
+data_range_fim <- "2020-01-01"
 
 al_db_con <- NULL
 
@@ -113,17 +114,40 @@ print("Carregando contratos...")
 
 contratos <- tibble::tibble()
 
-if (vigentes == "vigentes") {
-  contratos = carrega_contratos(al_db_con, vigentes = TRUE, data_range_inicio, data_range_fim) %>% dplyr::mutate(vigente = TRUE)
-} else if (vigentes == "encerrados") {
-  contratos = carrega_contratos(al_db_con, vigentes = FALSE, data_range_inicio, data_range_fim) %>% dplyr::mutate(vigente = FALSE)
-} else {
+# if (vigentes == "vigentes") {
+#   contratos = carrega_contratos(al_db_con, vigentes = TRUE, data_range_inicio, data_range_fim) %>% dplyr::mutate(vigente = TRUE)
+# } else if (vigentes == "encerrados") {
+#   contratos = carrega_contratos(al_db_con, vigentes = FALSE, data_range_inicio, data_range_fim) %>% dplyr::mutate(vigente = FALSE)
+# } else {
   contratos = dplyr::bind_rows(carrega_contratos(al_db_con, vigentes = TRUE, data_range_inicio, data_range_fim) %>% dplyr::mutate(vigente = TRUE),
                                carrega_contratos(al_db_con, vigentes = FALSE, data_range_inicio, data_range_fim) %>% dplyr::mutate(vigente = FALSE))
-}
+#}
 
+  
 print("Carregando propostas de licitações...")
 propostas <- carrega_propostas_licitacao(al_db_con)
+
+gera_tipologia_fornecimento_by_unidade_gestora <- function(unidade_gestora, al_db_con, contratos_by_cnpj) {
+  empenhos <- carrega_empenhos_by_contrato(al_db_con, unidade_gestora) #Essa consulta tem melhor resultado, mas demora mais (boa pra testar)
+  #empenhos <- carrega_empenhos(al_db_con) 
+  
+  pagamentos <- carrega_pagamentos_by_empenho(al_db_con, unidade_gestora)
+  #pagamentos <- carrega_pagamentos(al_db_con)
+  
+  estorno_pagamentos <- carrega_estorno_pagamentos(al_db_con)
+  
+  empenhos_processados <- process_empenhos(empenhos, pagamentos, estorno_pagamentos, contratos_by_cnpj)
+  
+  print(unidade_gestora)
+  print("CHEGOU AQUI GRAÇAS A DEUS!!")
+  
+  tipologias_fornecimento <- gera_tipologia_fornecimento(empenhos_processados)
+  
+
+}
+
+
+
 
 #Processa dados
 print("Processando contratos...")
@@ -136,11 +160,17 @@ licitacoes_vencedoras <- contratos_processados %>% get_vencedores_by_contratos()
 print("Cruzando propostas com licitações...")
 propostas_licitacoes <- propostas %>% dplyr::inner_join(licitacoes)
 
+empenhos_processados <- process_empenhos(empenhos, pagamentos, estorno_pagamentos, contratos_by_cnpj)
+
 #Carrega dados dependentes
 print("Carregando participantes...")
 participantes <- carrega_participantes(al_db_con, contratos_by_cnpj$nu_cpfcnpj)
 
 #Gera tipologias
+print("Gerando tipologias de fornecimento...")
+tipologias_fornecimento <- contratos$cd_u_gestora %>% 
+  purrr::map_df(~gera_tipologia_fornecimento_by_unidade_gestora(.x, al_db_con,contratos_by_cnpj))
+
 print("Gerando tipologias de licitações...")
 tipologias_licitacao <- gera_tipologia_licitacao(licitacoes, contratos_processados, contratos_by_cnpj, licitacoes_vencedoras, participantes)
 print("Gerando tipologias de propostas...")
@@ -150,7 +180,10 @@ tipologias_proposta <- gera_tipologia_proposta(propostas_licitacoes, contratos_b
 print("Cruzando tipologias...")
 contratos_tramita <- carrega_contratos_mutados(al_db_con)
 
-tipologias_merge <- merge_tipologias(contratos_processados, tipologias_licitacao, tipologias_proposta) %>% 
+tipologias_merge <- merge_tipologias(contratos_processados, 
+                                     tipologias_licitacao, 
+                                     tipologias_proposta,
+                                     tipologias_fornecimento) %>% 
   processa_gabarito_tramita(contratos_tramita) %>% 
   replace_nas()
 
@@ -179,13 +212,13 @@ features <- tipologias_final_contratos_gerais %>% tidyr::gather(key = "nome_feat
   dplyr::select(id_feature, dplyr::everything())
 
 #Escrevendo arquivos
-if (vigentes == "vigentes") {
-  write_features(tipologias_final_contratos_gerais, features, VIGENTES, data_range_inicio, data_range_fim)
-} else if (vigentes == "encerrados") {
-  write_features(tipologias_final_contratos_gerais, features, ENCERRADOS, data_range_inicio, data_range_fim)
-} else {
-  write_features(tipologias_final_contratos_gerais, features, GERAIS, data_range_inicio, data_range_fim)
-}
+# if (vigentes == "vigentes") {
+#   write_features(tipologias_final_contratos_gerais, features, VIGENTES, data_range_inicio, data_range_fim)
+# } else if (vigentes == "encerrados") {
+#   write_features(tipologias_final_contratos_gerais, features, ENCERRADOS, data_range_inicio, data_range_fim)
+# } else {
+write_features(tipologias_final_contratos_gerais, features, GERAIS, data_range_inicio, data_range_fim)
+#}
 
 #Compactando código gerador 
 #zip(paste("data/source_code/",hash_source_code, ".zip", sep = ""), c("R", "scripts"))
