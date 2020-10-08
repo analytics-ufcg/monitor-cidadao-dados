@@ -10,7 +10,9 @@ source(here::here("R/process_gabarito_contratos.R"))
 
 .HELP <- "Rscript gera_feature.R --vigencia <encerrados, vigentes e todos> --data_range_inicio <2012-01-01> --data_range_fim <2012_01_01>"
 
-#-----------------------------------FUNÇÕES-----------------------------------#
+
+#--------------------------------------#
+#---------------FUNÇÕES----------------#
 
 #' @title Obtém argumentos passados por linha de comando
 get_args <- function() {
@@ -77,9 +79,8 @@ generate_hash_source_code <- function() {
   hash_source_code <- digest::digest(source_code_string, algo="md5", serialize=F)
 }
 
-#-----------------------------------------------------------------------------#
-
-#-----------------------------------CONFIG-----------------------------------#
+#-------------------------------------#
+#---------------CONFIG----------------#
 
 ENCERRADOS <- "encerrados"
 VIGENTES <- "vigentes"
@@ -103,15 +104,16 @@ tryCatch({al_db_con <- DBI::dbConnect(RPostgres::Postgres(),
 
 hash_source_code <- generate_hash_source_code()
 
-#-----------------------------------------------------------------------------#
 
-#-----------------------------------EXECUÇÃO-----------------------------------#
+#-------------------------------------#
+#-----------------EXEC----------------#
+
+
 #Carrega dados
 print("Carregando licitações...")
 licitacoes <- carrega_licitacoes(al_db_con)
 
 print("Carregando contratos...")
-
 contratos <- tibble::tibble()
 
 # if (vigentes == "vigentes") {
@@ -140,23 +142,22 @@ gera_tipologia_fornecimento_by_unidade_gestora <- function(unidade_gestora, al_d
   
   print(unidade_gestora)
   print("CHEGOU AQUI GRAÇAS A DEUS!!")
-  
   tipologias_fornecimento <- gera_tipologia_fornecimento(empenhos_processados)
-  
-
 }
-
 
 
 
 #Processa dados
 print("Processando contratos...")
 contratos_processados <- contratos %>% process_contratos()
+
 print("Calculando contratos por cnpj...")
 contratos_by_cnpj <- contratos_processados %>% count_contratos_by_cnpj() %>% 
   dplyr::mutate(nu_cpfcnpj = gsub ("\\D", "", nu_cpfcnpj))
+
 print("Buscando vencedores a partir dos contratos...")
 licitacoes_vencedoras <- contratos_processados %>% get_vencedores_by_contratos()
+
 print("Cruzando propostas com licitações...")
 propostas_licitacoes <- propostas %>% dplyr::inner_join(licitacoes)
 
@@ -166,13 +167,15 @@ empenhos_processados <- process_empenhos(empenhos, pagamentos, estorno_pagamento
 print("Carregando participantes...")
 participantes <- carrega_participantes(al_db_con, contratos_by_cnpj$nu_cpfcnpj)
 
-#Gera tipologias
+#Gera tipologias de fornecimento
 print("Gerando tipologias de fornecimento...")
-tipologias_fornecimento <- contratos$cd_u_gestora %>% 
+tipologias_fornecimento <- contratos$cd_u_gestora %>% unique() %>%
   purrr::map_df(~gera_tipologia_fornecimento_by_unidade_gestora(.x, al_db_con,contratos_by_cnpj))
+
 
 print("Gerando tipologias de licitações...")
 tipologias_licitacao <- gera_tipologia_licitacao(licitacoes, contratos_processados, contratos_by_cnpj, licitacoes_vencedoras, participantes)
+
 print("Gerando tipologias de propostas...")
 tipologias_proposta <- gera_tipologia_proposta(propostas_licitacoes, contratos_by_cnpj)
 
