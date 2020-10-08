@@ -3,7 +3,6 @@ DROP TABLE IF EXISTS contrato;
 CREATE TABLE IF NOT EXISTS "contrato" ( 
     "id_contrato" VARCHAR(50),
     "id_licitacao" VARCHAR(50),
-    "cd_municipio" VARCHAR(3),
     "cd_u_gestora" INTEGER,   
     "dt_ano" SMALLINT,
     "nu_contrato" VARCHAR(9),
@@ -24,9 +23,13 @@ CREATE TABLE IF NOT EXISTS "contrato" (
     "language" VARCHAR(10),
     "de_ugestora" VARCHAR(100),
     "no_fornecedor" VARCHAR(100),
+    "cd_ibge" VARCHAR(7),
+    "uf" VARCHAR(2),
+    "mesorregiao_geografica" VARCHAR(2),
+    "microrregiao_geografica" VARCHAR(2),
     PRIMARY KEY("id_contrato"),
     CONSTRAINT contrato_key UNIQUE (cd_u_gestora, dt_ano, nu_licitacao, tp_licitacao, nu_contrato),
-    FOREIGN KEY("cd_municipio") REFERENCES municipio("cd_municipio") ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY("cd_ibge") REFERENCES localidade_ibge("cd_ibge") ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY("id_licitacao") REFERENCES licitacao("id_licitacao") ON DELETE CASCADE ON UPDATE CASCADE
 
 );
