@@ -141,8 +141,21 @@ process_participante <- function(participantes_df) {
 #' @param municipios_df Dataframe contendo informações dos municipios
 #' @return Dataframe contendo informações dos municipios processados
 process_municipio <- function(municipios_df) {
-  municipios_df %<>% dplyr::select(cd_municipio, dplyr::everything())
+  municipios_df %<>% dplyr::select(cd_municipio, cd_ibge) %>%
+    dplyr::mutate(cd_ibge = substr( cd_ibge , start = 1 , stop = 7 ))
 }
+
+#' @title Processa dataframe de codigos das localidades do IBGE
+#' @description Manipula tabela pra forma que será utilizada no banco
+#' @param process_codigo_localidades_df Dataframe contendo informações
+#' dos codigos das localidades do IBGE
+#' @return Dataframe contendo informações dos codigos das localidades do IBGE
+process_codigo_localidades_ibge <- function(codigo_localidades_ibge_df) {
+  codigo_localidades_ibge_df %<>% dplyr::rename(cd_ibge = codigo_municipio_completo) %>%
+    dplyr::mutate_all(as.character) %>%
+    dplyr::select(cd_ibge, dplyr::everything())
+}
+
 
 #' @title Processa dataframe de propostas
 #' @description Manipula tabela pra forma que será utilizada no banco

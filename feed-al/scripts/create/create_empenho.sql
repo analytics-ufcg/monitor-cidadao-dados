@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS "empenho" (
     "id_empenho" VARCHAR(50),
     "id_licitacao" VARCHAR(50),
     "id_contrato" VARCHAR(50),
-    "cd_municipio" VARCHAR(3),
     "cd_u_gestora" INTEGER,
     "dt_ano" SMALLINT,
     "cd_unid_orcamentaria" VARCHAR(5),
@@ -37,9 +36,12 @@ CREATE TABLE IF NOT EXISTS "empenho" (
     "tp_fonte_recursos" SMALLINT,
     "nu_cpf" VARCHAR(14),
     "cd_sub_elemento_2" VARCHAR(3),
+    "cd_ibge" VARCHAR(7),
     PRIMARY KEY("id_empenho"),
     CONSTRAINT empenho_key UNIQUE (nu_empenho, cd_unid_orcamentaria, dt_ano, cd_u_gestora),
-    FOREIGN KEY("cd_municipio") REFERENCES municipio("cd_municipio") ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY("cd_ibge") REFERENCES localidade_ibge("cd_ibge") ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY("id_licitacao") REFERENCES licitacao("id_licitacao") ON DELETE CASCADE ON UPDATE CASCADE
 
+
+																										
 );
