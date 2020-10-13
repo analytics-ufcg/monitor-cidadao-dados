@@ -293,3 +293,19 @@ join_licitacoes_tramita_tipo_objeto_licitacao <- function(df_licitacoes_tramita,
   df_licitacoes_tramita %<>% dplyr::left_join(df_tipo_objeto_licitacao) %>%
     dplyr::select(nu_licitacao, cd_u_gestora, dplyr::everything())
 }
+
+#' @title Realiza o join dos contratos com os tipos de modalidade de licitações
+#' @param df_contratos_tramita dataframe com os contratos
+#' @param df_tipo_modalidade_licitacao dataframe com os tipos de modalidade de licitações
+#' @return Dataframe contendo informações dos contratos com o tipo da modalidade de licitação
+#' @rdname join_contratos_tramita_tipo_modalidade_licitacao
+#' @examples
+#' join_contratos_tramita_tipo_modalidade_licitacao_dt <- join_contratos_tramita_tipo_modalidade_licitacao(
+#'          df_contratos_tramita, df_tipo_modalidade_licitacao)
+#'
+join_contratos_tramita_tipo_modalidade_licitacao <- function(df_contratos_tramita, df_tipo_modalidade_licitacao) {
+  df_tipo_modalidade_licitacao %<>% dplyr::select(tp_licitacao, de_tipo_licitacao)
+
+  df_contratos_tramita %<>% dplyr::left_join(df_tipo_modalidade_licitacao) %>%
+    dplyr::select(nu_licitacao, cd_u_gestora, nu_contrato, dplyr::everything())
+}

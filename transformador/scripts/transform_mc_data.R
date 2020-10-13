@@ -15,6 +15,7 @@ devtools::document()
 codigo_unidade_gestora_df <- get_codigo_unidade_gestora()
 # codigo_funcao_df <- get_codigo_funcao()
 # contratos_df <- get_contratos()
+contratos_tramita_df <- get_contratos_tramita()
 # codigo_subfuncao_df <- get_codigo_subfuncao()
 # codigo_elemento_despesa_df <- get_codigo_elemento_despesa()
 # codigo_subelemento_df <- get_codigo_subelemento()
@@ -72,6 +73,9 @@ licitacoes_transformadas <- licitacoes_df %>% mcTransformador::process_licitacao
 licitacoes_tramita_transformadas <- licitacoes_tramita_df %>% 
    join_licitacoes_tramita_tipo_modalidade_licitacao(tipo_modalidade_licitacao_df) %>%
    join_licitacoes_tramita_tipo_objeto_licitacao(tipo_objeto_licitacao_df) 
+
+contratos_tramita_transformados <- contratos_tramita_df %>%
+   join_contratos_tramita_tipo_modalidade_licitacao(tipo_modalidade_licitacao_df)
    
 # # Adiciona a chave de contratos a tabela de empenhos
 # ## Agrupamento de empenhos por contrato e por licitação
@@ -172,3 +176,4 @@ readr::write_csv(codigo_localidades_ibge_transformados, here::here("data/localid
 # readr::write_csv(contratos_mutados_transformados, here::here("data/contratos_mutados.csv"))
 # readr::write_csv(propostas_transformadas, here::here("data/propostas.csv"))
 readr::write_csv(licitacoes_tramita_transformadas, here::here("data/licitacoes_tramita.csv"))
+readr::write_csv(contratos_tramita_transformados, here::here("data/contratos_tramita.csv"))

@@ -244,6 +244,21 @@ translate_licitacoes_tramita <- function(licitacoes_tramita_raw){
      
 }
 
+#' @param contratos_tramita_raw Dados brutos dos contratos contidos no Tramita
+#' @return Dataframe contendo informações sobre os contratos contidos no Tramita
+#' @rdname translate_contratos_tramita
+#' @examples
+#' contratos_tramita_df <- translate_contratos_tramita(contratos_tramita_raw)
+translate_contratos_tramita <- function(contratos_tramita_raw){
+    contratos_tramita_raw %<>% janitor::clean_names() %>%
+    dplyr::rename(cd_u_gestora = cod_unidade_gestora_contrato) %>%
+    dplyr::rename(pr_vigencia = data_finalizacao) %>%
+    dplyr::rename(nu_licitacao = numero_licitacao) %>%
+    dplyr::rename(nu_contrato = numero_contrato) %>%
+    dplyr::mutate(nu_licitacao = gsub("/", "", nu_licitacao)) %>%
+    dplyr::rename(de_tipo_licitacao = modalidade_licitacao)      
+}
+
 
 
 

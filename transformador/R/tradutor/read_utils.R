@@ -408,7 +408,7 @@ read_codigo_localidades_ibge <- function() {
 #' @examples
 #' licitacoes_tramita_df <- read_licitacoes_tramita()
 read_licitacoes_tramita <- function() {
-  codigo_localidades_ibge_df <- readr::read_csv(here::here("../fetcher/data/licitacoes_pb_2020.csv"),
+  licitacoes_tramita_df <- readr::read_csv(here::here("../fetcher/data/licitacoes_pb_2020.csv"),
                                    col_types = list(
                                     .default = readr::col_character(),
                                     cod_unidade_gestora = readr::col_integer(),
@@ -429,5 +429,40 @@ read_licitacoes_tramita <- function() {
                                     nome_licitante = readr::col_character(),
                                     numero_protocolo = readr::col_character(),
                                     tipo_protocolo = readr::col_character()
+                                   ))
+}
+
+#' @title Lê dataframe contendo informações dos contratos contidas no tramita
+#' @return Dataframe contendo informações dos contratos
+#' @rdname read_contratos_tramita
+#' @examples
+#' contratos_tramita_df <- read_contratos_tramita()
+read_contratos_tramita <- function() {
+  contratos_tramita_df <- readr::read_csv(here::here("../fetcher/data/contratos_pb_2020.csv"),
+                                   col_types = list(
+                                    .default = readr::col_character(),
+                                    poder = readr::col_character(),
+                                    ente = readr::col_character(),
+                                    cod_unidade_gestora_contrato = readr::col_integer(),
+                                    unidade_gestora = readr::col_character(),
+                                    cod_modalidade_licitacao = readr::col_integer(),
+                                    modalidade_licitacao = readr::col_character(),
+                                    numero_licitacao = readr::col_character(), 
+                                    numero_regcge = readr::col_character(),
+                                    esfera = readr::col_character(),
+                                    cpf_cnpj_licitante = readr::col_character(),
+                                    licitante = readr::col_character(),
+                                    numero_contrato = readr::col_character(),
+                                    numero_protocolo_contrato = readr::col_character(),
+                                    tipo_protocolo_contrato = readr::col_character(),
+                                    numero_protocolo_licitacao = readr::col_character(),
+                                    tipo_protocolo_licitacao = readr::col_character(),
+                                    data_assinatura = readr::col_character(), 
+                                    data_publicacao = readr::col_character(),
+                                    data_finalizacao = readr::col_character(),
+                                    valor_contratado = readr::col_number(),
+                                    valor_proposta = readr::col_number(),
+                                    descricao_contrato = readr::col_character(),
+                                    informacao_complementar = readr::col_character()
                                    ))
 }
