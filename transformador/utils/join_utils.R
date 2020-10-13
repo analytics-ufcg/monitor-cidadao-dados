@@ -261,4 +261,35 @@ join_pagamentos_empenhos <- function(df_pagamentos, df_empenhos) {
     dplyr::select(id_pagamento, id_empenho, id_licitacao, id_contrato, dplyr::everything())
 }
 
+#' @title Realiza o join das licitações com os tipos de modalidade de licitações
+#' @param df_licitacoes_tramita dataframe com as licitações
+#' @param df_tipo_modalidade_licitacao dataframe com os tipos de modalidade de licitações
+#' @return Dataframe contendo informações das licitações com nome da modalidade de licitação
+#' @rdname join_licitacoes_tipo_modalidade_licitacao
+#' @examples
+#' join_licitacoes_tramita_tipo_modalidade_licitacao_dt <- join_licitacoes_tramita_tipo_modalidade_licitacao(
+#'          df_licitacoes_tramita, df_tipo_modalidade_licitacao)
+#'
+join_licitacoes_tramita_tipo_modalidade_licitacao <- function(df_licitacoes_tramita, df_tipo_modalidade_licitacao) {
+  df_tipo_modalidade_licitacao %<>% dplyr::select(tp_licitacao, de_tipo_licitacao)
 
+  df_licitacoes_tramita %<>% dplyr::left_join(df_tipo_modalidade_licitacao) %>%
+    dplyr::select(nu_licitacao, cd_u_gestora, dplyr::everything())
+}
+
+
+#' @title Realiza o join das licitações obtidas nos dados do tramita e os tipos de objeto das licitações
+#' @param df_licitacoes_tramita dataframe com as licitações
+#' @param df_tipo_objeto_licitacao dataframe com os tipos de objeto das licitações
+#' @return Dataframe contendo informações das licitações com os tipos de objetos das licitações
+#' @rdname join_licitacoes_tramita_tipo_objeto_licitacao
+#' @examples
+#' join_licitacoes_tramita_tipo_objeto_licitacao_dt <- join_licitacoes_tramita_tipo_modalidade_licitacao(
+#'          df_licitacoes_tramita, df_tipo_modalidade_licitacao)
+#'
+join_licitacoes_tramita_tipo_objeto_licitacao <- function(df_licitacoes_tramita, df_tipo_objeto_licitacao) {
+  df_tipo_objeto_licitacao %<>% dplyr::select(tp_objeto, de_tipo_objeto)
+
+  df_licitacoes_tramita %<>% dplyr::left_join(df_tipo_objeto_licitacao) %>%
+    dplyr::select(nu_licitacao, cd_u_gestora, dplyr::everything())
+}

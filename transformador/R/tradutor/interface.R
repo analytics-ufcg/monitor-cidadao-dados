@@ -213,3 +213,14 @@ get_codigo_localidades_ibge <- function(){
   codigo_localidades_ibge_dt  <- read_codigo_localidades_ibge() %>%
     translate_codigo_localidades_ibge()
 }
+
+
+#' @title Obtem dados das licitações contidas no tramita
+#' @return Dataframe contendo informações sobre as licitações contidas no tramita
+#' @rdname get_licitacoes_tramita
+#' @examples
+#' licitacoes_tramita_df <- get_licitacoes_tramita()
+get_licitacoes_tramita <- function(){
+  licitacoes_tramita_df <- read_licitacoes_tramita() %>%
+  translate_licitacoes_tramita()
+}

@@ -401,3 +401,33 @@ read_codigo_localidades_ibge <- function() {
                                     Nome_Município = readr::col_character()
                                    ))
 }
+
+#' @title Lê dataframe contendo informações das licitações contidas no tramita
+#' @return Dataframe contendo informações das licitações do tramita
+#' @rdname read_licitacoes_tramita
+#' @examples
+#' licitacoes_tramita_df <- read_licitacoes_tramita()
+read_licitacoes_tramita <- function() {
+  codigo_localidades_ibge_df <- readr::read_csv(here::here("../fetcher/data/licitacoes_pb_2020.csv"),
+                                   col_types = list(
+                                    .default = readr::col_character(),
+                                    cod_unidade_gestora = readr::col_integer(),
+                                    ente = readr::col_character(),
+                                    unidade_gestora = readr::col_character(),
+                                    esfera = readr::col_character(),
+                                    numero_licitacao = readr::col_character(),
+                                    data_homologacao = readr::col_character(),
+                                    valor_homologacao = readr::col_number(),
+                                    valor_estimado = readr::col_number(),
+                                    objeto = readr::col_character(),
+                                    tipo_objeto = readr::col_character(),
+                                    cod_modalidade_licitacao = readr::col_integer(),
+                                    modalidade_licitacao = readr::col_character(),
+                                    situacao = readr::col_character(),
+                                    valor_proposta = readr::col_number(),
+                                    cpf_cnpj_licitante = readr::col_character(),
+                                    nome_licitante = readr::col_character(),
+                                    numero_protocolo = readr::col_character(),
+                                    tipo_protocolo = readr::col_character()
+                                   ))
+}

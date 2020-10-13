@@ -214,7 +214,7 @@ translate_estorno_pagamento <- function(estorno_pagamento_raw) {
 }
 
 
-#' @param propostas_raw Dados brutos dos distritos do IBGE
+#' @param localidades_ibge_raw Dados brutos dos distritos do IBGE
 #' @return Dataframe contendo informações sobre os distritos
 #' @rdname translate_distritos_ibge
 #' @examples
@@ -226,3 +226,25 @@ translate_codigo_localidades_ibge <- function(localidades_ibge_raw){
                                 municipio, codigo_municipio_completo,	nome_municipio),
                                function(x){gsub("[^[:alnum:][:blank:]?&/\\-]", "", x)})
 }
+
+#' @param licitacoes_tramita_raw Dados brutos das licitações contidas no Tramita
+#' @return Dataframe contendo informações sobre as licitações contidas no Tramita
+#' @rdname translate_licitacoes_tramita
+#' @examples
+#' licitacoes_tramita_df <- translate_licitacoes_tramita(licitacoes_tramita_raw)
+translate_licitacoes_tramita <- function(licitacoes_tramita_raw){
+    licitacoes_tramita_raw %<>% janitor::clean_names() %>%
+     dplyr::rename(cd_u_gestora = cod_unidade_gestora) %>%
+     dplyr::rename(nu_licitacao = numero_licitacao) %>%
+     dplyr::rename(vl_licitacao = valor_estimado) %>%
+     dplyr::rename(dt_homologacao = data_homologacao) %>%
+     dplyr::mutate(nu_licitacao = gsub("/", "", nu_licitacao)) %>%
+     dplyr::rename(de_tipo_licitacao = modalidade_licitacao) %>%
+     dplyr::rename(de_tipo_objeto = tipo_objeto)
+     
+}
+
+
+
+
+
