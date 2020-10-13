@@ -12,7 +12,7 @@ fetch_licitacoes_2020 <- function(licitacoes) {
     unzip (temp, exdir = "./data/licitacoes_tramita_pb_2020")
     unlink(temp)
     
-    licitacoes_tramita_pb_2020 <- readr::read_csv2("./data/licitacoes_tramita_pb_2020/TCE-PB-Licitacoes_2020.csv")
+    licitacoes_tramita_pb_2020 <- readr::read_csv2("./data/licitacoes_tramita_pb_2020/TCE-PB-Licitacoes_2020.csv", locale = readr::locale(encoding = "ISO-8859-1"))
     unlink("./data/licitacoes_tramita_pb_2020", recursive = TRUE)
   
   },
@@ -35,7 +35,7 @@ fetch_contratos_2020 <- function(contratos) {
     unzip (temp, exdir = "./data/contratos_tramita_pb_2020")
     unlink(temp)
     
-    contratos_tramita_pb_2020 <- readr::read_csv2("./data/contratos_tramita_pb_2020/TCE-PB-Contratos_2020.csv")
+    contratos_tramita_pb_2020 <- readr::read_csv2("./data/contratos_tramita_pb_2020/TCE-PB-Contratos_2020.csv", locale = readr::locale(encoding = "ISO-8859-1"))
     unlink("./data/contratos_tramita_pb_2020", recursive = TRUE)
   
   },
