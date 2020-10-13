@@ -86,6 +86,8 @@ ENCERRADOS <- "encerrados"
 VIGENTES <- "vigentes"
 GERAIS <- "todos"
 
+
+
 #args <- get_args()
 
 #vigentes <- args$vigencia
