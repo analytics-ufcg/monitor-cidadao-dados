@@ -1,3 +1,9 @@
+message("")
+message(" ------------------------------------------")
+message("    INICIANDO SCRIPT - TRANSFORMAÇÃO DOS DADOS   ")
+message(" ------------------------------------------")
+message("")
+
 library(magrittr)
 
 source(here::here("R/tradutor/interface.R"))
@@ -8,9 +14,39 @@ source(here::here("utils/join_utils.R"))
 #Instala pacote mcTransformador
 devtools::document()
 
-#--------------------------------
-# RECUPERA AS TABELAS DO SAGRES-PB (ORDEM ALFABÉTICA)
-#--------------------------------
+
+#-----------------------------------------------------------------------------#
+#-------------------------          IBGE            --------------------------#
+#-----------------------------------------------------------------------------#
+
+message(" CARREGANDO DADOS DO IBGE...")
+message("")
+
+# RECUPERA AS TABELAS
+codigo_localidades_ibge_df <- get_codigo_localidades_ibge()
+
+message(" TRANSFORMANDO OS DADOS DO IBGE...")
+message("")
+# TRANSFORMA AS TABELAS
+codigo_localidades_ibge_transformados <- codigo_localidades_ibge_df  %>%
+  mcTransformador::process_codigo_localidades_ibge()
+
+message(" SALVANDO OS DADOS DO IBGE...")
+message("")
+# SALVA MODIFICAÇÕES
+readr::write_csv(codigo_localidades_ibge_transformados, here::here("data/localidades_ibge.csv"))
+
+message("   Dados do IBGE carregados, transformados e salvos com sucesso!")
+message("")
+message("")
+
+#-----------------------------------------------------------------------------#
+#-------------------------          SAGRES          --------------------------#
+#-----------------------------------------------------------------------------#
+
+message(" CARREGANDO DADOS DO SAGRES...")
+message("")
+# RECUPERA AS TABELAS
 aditivos_df <- get_aditivos()
 codigo_unidade_gestora_df <- get_codigo_unidade_gestora()
 codigo_funcao_df <- get_codigo_funcao()
@@ -31,18 +67,9 @@ regime_execucao_df <- get_regime_execucao()
 tipo_objeto_licitacao_df <- get_tipo_objeto_licitacao()
 tipo_modalidade_licitacao_df <- get_tipo_modalidade_licitacao()
 
-#--------------------------------
-# RECUPERA AS TABELA DO IBGE
-#--------------------------------
-codigo_localidades_ibge_df <- get_codigo_localidades_ibge()
-
-#--------------------------------
-# TRANSFORMA TABELAS
-#--------------------------------
-
-codigo_localidades_ibge_transformados <- codigo_localidades_ibge_df  %>%
-  mcTransformador::process_codigo_localidades_ibge()
-
+message(" TRANSFORMANDO OS DADOS DO SAGRES...")
+message("")
+# TRANSFORMA AS TABELAS
 municipios_sagres_df <- municipios_df %>% mcTransformador::process_municipio()
 
 licitacoes_transformadas <- licitacoes_df %>% mcTransformador::process_licitacao() %>%
@@ -68,8 +95,6 @@ propostas_transformadas <- propostas_df %>% mcTransformador::process_proposta() 
 
 estorno_pagamento_transformado <- estorno_pagamento_df %>% mcTransformador::process_estorno_pagamento()
 
-
-
 # Adiciona a chave de contratos a tabela de empenhos
 ## Agrupamento de empenhos por contrato e por licitação
 ### Caso I: Onde 1 credor possui apenas 1 único contrato de uma mesma licitação
@@ -83,18 +108,15 @@ contratos_por_licitacao <- contratos_transformados %>%
   dplyr::select(id_licitacao, id_contrato, nu_cpfcnpj) %>%
   dplyr::ungroup()
 
-
 # Caso II: Onde 1 credor possui mais de um contrato de uma mesma licitação
 contratos_lici_corner_cases <- contratos_transformados %>%
   dplyr::group_by(id_licitacao, nu_cpfcnpj) %>%
   dplyr::summarise(amount = dplyr::n()) %>%
   dplyr::filter(amount > 1)
 
-
-
 #Recupera dados de empenhos e pagamentos pelo codigo da unidade gestora
 for (cd_u_gestora in codigo_unidade_gestora_df$cd_u_gestora) {
-  print(sprintf('[%s] empenhos da unidade gestora = %s', Sys.time(), cd_u_gestora))
+  print(sprintf('  Transformando empenhos da unidade gestora = %s', Sys.time(), cd_u_gestora))
 
   # Verificar se o arquivo existe
   input_dir_emp = sprintf("../fetcher/data/empenhos/empenhos_%s.csv", cd_u_gestora)
@@ -117,7 +139,7 @@ for (cd_u_gestora in codigo_unidade_gestora_df$cd_u_gestora) {
 
   readr::write_csv(empenhos_transformados, here::here(sprintf("./data/empenhos/empenhos_%s.csv", cd_u_gestora)))
 
-  print(sprintf('[%s] pagamentos da unidade gestora = %s', Sys.time(), cd_u_gestora))
+  print(sprintf('  Transformando pagamentos da unidade gestora = %s', Sys.time(), cd_u_gestora))
 
   # Verificar se o arquivo existe
   input_dir_pag = sprintf("../fetcher/data/pagamentos/pagamentos_%s.csv", cd_u_gestora)
@@ -148,7 +170,8 @@ contratos_mutados_transformados <- contratos_mutados_df %>% mcTransformador::pro
   dplyr::filter(!is.na(id_contrato)) %>% #Remove as linhas que contém o id_contrato=NA.
   dplyr::filter(!duplicated(id_contrato,data_alteracao)) #Remove as linhas que são repetidas.
 
-#Salva tabelas localmente
+message(" SALVANDO OS DADOS DO SAGRES...")
+message("")
 readr::write_csv(licitacoes_transformadas, here::here("data/licitacoes.csv"))
 readr::write_csv(tipo_objeto_licitacao_df, here::here("data/tipo_objeto_licitacao.csv"))
 readr::write_csv(tipo_modalidade_licitacao_df, here::here("data/tipo_modalidade_licitacao.csv"))
@@ -163,8 +186,64 @@ readr::write_csv(aditivos_df, here::here("data/aditivos.csv"))
 readr::write_csv(estorno_pagamento_transformado, here::here("data/estorno_pagamento.csv"))
 readr::write_csv(convenios_df, here::here("data/convenios.csv"))
 readr::write_csv(municipios_sagres_df, here::here("data/municipios_sagres.csv"))
-readr::write_csv(codigo_localidades_ibge_transformados, here::here("data/localidades_ibge.csv"))
 readr::write_csv(fornecedores_df, here::here("data/fornecedores.csv"))
 readr::write_csv(participantes_transformados, here::here("data/participantes.csv"))
 readr::write_csv(contratos_mutados_transformados, here::here("data/contratos_mutados.csv"))
 readr::write_csv(propostas_transformadas, here::here("data/propostas.csv"))
+
+#-----------------------------------------------------------------------------#
+#-------------------------          TCE-RS          --------------------------#
+#-----------------------------------------------------------------------------#
+
+ANOS_DISPONIVEIS <- c(2016, 2017, 2018, 2019, 2020)
+anos_fetch <- list.dirs(path = "./../fetcher/data/rs/contratos", full.names = FALSE, recursive = TRUE)
+
+message(" CARREGANDO DADOS DO TCE-RS...")
+message("")
+
+# --- Carregando e transformando Órgãos ---
+message("  - Carregando e processando órgãos auditados...")
+orgaos_rs_df <- get_orgaos_tce_rs()
+
+orgaos_rs_transformados <- orgaos_rs_df  %>%
+  join_orgaos_rs_localidades_ibge(codigo_localidades_ibge_transformados)
+
+# --- Carregando os tipos de licitações existentes ---
+message("  - Carregando tipos de licitação...")
+modalidade_licitacao_rs_df <- get_modalidade_licitacao_tce_rs()
+
+# ----------------------------
+# Recupera dados do RS por ano
+# ----------------------------
+for(ano in anos_fetch){
+  # evita a leitura de pastas estranhas no diretório
+  if (! (ano %in% ANOS_DISPONIVEIS)) next
+
+  # --- Carregando e transformando Licitações ---
+  message(sprintf("  - Carregando e processando licitações do ano %s...", ano))
+  licitacao_rs_df <- get_licitacoes_tce_rs(ano)
+
+  licitacao_rs_transformados <- licitacao_rs_df %>% mcTransformador::process_licitacao_tce_rs() %>%
+    join_licitacoes_rs_modalidade(modalidade_licitacao_rs_df) %>%
+    join_licitacoes_rs_orgaos(orgaos_rs_transformados)
+
+  # --- Carregando e transformando Contratos ---
+  message(sprintf("  - Carregando e processando contratos do ano %s...", ano))
+  contratos_rs_df <- get_contratos_tce_rs(ano)
+
+  contratos_rs_transformados <- contratos_rs_df %>% mcTransformador::process_contrato_tce_rs() %>%
+    join_contratos_rs_licitacoes(licitacao_rs_transformados)
+
+  # --- Formata tabelas ---
+  message(sprintf("  - Formatando licitações do ano %s...", ano))
+  licitacoes_rs_formatadas <- licitacao_rs_transformados %>%
+    format_licitacao_tce_rs()
+
+  message(sprintf("  - Formatando contratos do ano %s...", ano))
+  contratos_rs_formatados <- contratos_rs_transformados %>%
+    format_contrato_tce_rs()
+
+}
+
+
+

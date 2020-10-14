@@ -6,4 +6,4 @@ WORKDIR /app/transformador
 RUN touch .here
 
 ## Instala dependências
-RUN R -e "install.packages(c('here', 'testthat', 'digest', 'janitor', 'stringr'), repos='http://cran.rstudio.com/')"
+RUN R -e "install.packages(c('here', 'testthat', 'digest', 'janitor', 'stringr', tibble), repos='http://cran.rstudio.com/')"
