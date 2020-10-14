@@ -10,7 +10,7 @@ process_contrato_mutado(contratos_mutados_df)
 \item{contratos_mutados_df}{Dataframe contendo informações dos contratos mutados}
 }
 \value{
-Dataframe contendo informações dos contratos mutados  processados
+Dataframe contendo informações dos contratos mutados processados
 }
 \description{
 Manipula tabela pra forma que será utilizada no banco

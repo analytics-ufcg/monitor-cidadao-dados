@@ -45,7 +45,7 @@ tipo_modalidade_licitacao_df <- get_tipo_modalidade_licitacao()
 codigo_localidades_ibge_transformados <- codigo_localidades_ibge_df  %>%
    mcTransformador::process_codigo_localidades_ibge()
 
- municipios_sagres_df <- municipios_df %>% mcTransformador::process_municipio()
+municipios_sagres_df <- municipios_df %>% mcTransformador::process_municipio()
 
 licitacoes_transformadas <- licitacoes_df %>% mcTransformador::process_licitacao() %>%
   join_licitacoes_codigo_unidade_gestora(codigo_unidade_gestora_df) %>%
@@ -75,7 +75,8 @@ licitacoes_tramita_transformadas <- licitacoes_tramita_df %>%
    join_licitacoes_tramita_tipo_objeto_licitacao(tipo_objeto_licitacao_df) 
 
 contratos_tramita_transformados <- contratos_tramita_df %>%
-   join_contratos_tramita_tipo_modalidade_licitacao(tipo_modalidade_licitacao_df)
+   join_contratos_tramita_tipo_modalidade_licitacao(tipo_modalidade_licitacao_df) %>% 
+   mcTransformador::process_contrato_tramita()
    
 # # Adiciona a chave de contratos a tabela de empenhos
 # ## Agrupamento de empenhos por contrato e por licitação

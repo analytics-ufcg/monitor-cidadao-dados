@@ -251,6 +251,7 @@ translate_licitacoes_tramita <- function(licitacoes_tramita_raw){
 #' contratos_tramita_df <- translate_contratos_tramita(contratos_tramita_raw)
 translate_contratos_tramita <- function(contratos_tramita_raw){
     contratos_tramita_raw %<>% janitor::clean_names() %>%
+    dplyr::filter(esfera == "Municipal") %>%
     dplyr::rename(cd_u_gestora = cod_unidade_gestora_contrato) %>%
     dplyr::rename(pr_vigencia = data_finalizacao) %>%
     dplyr::rename(nu_licitacao = numero_licitacao) %>%
@@ -260,10 +261,9 @@ translate_contratos_tramita <- function(contratos_tramita_raw){
     dplyr::mutate(de_tipo_licitacao = gsub("Adesão a Ata de Registro de Preços", "Adesão a Registro de Preço", de_tipo_licitacao)) %>%
     dplyr::mutate(de_tipo_licitacao = gsub("Inexigibilidade", "Inexigível", de_tipo_licitacao)) %>%
     dplyr::mutate(de_tipo_licitacao = gsub("Tomada de Preço", "Tomada de Preços", de_tipo_licitacao)) %>%
-  ##  dplyr::mutate(de_tipo_licitacao = gsub("Dispensa (Art. 24 - Lei 8.666/93)
-##", "Tomada de Preços", de_tipo_licitacao))    
-   
-    
+    dplyr::mutate(de_tipo_licitacao = gsub("Dispensa \\(Art. 24 - Lei 8.666/93\\)", "Dispensa por Valor", de_tipo_licitacao)) %>%
+    dplyr::mutate(de_tipo_licitacao = gsub("Dispensada \\(Art. 17 - Lei 8.666/93\\)", "Dispensa por outros motivos", de_tipo_licitacao)) %>%    
+    dplyr::mutate(de_tipo_licitacao = gsub("Dispensa COVID-19 \\(Art. 4º da Lei 13.979/2020\\)", "Dispensa por outros motivos", de_tipo_licitacao))
 }
 
 
