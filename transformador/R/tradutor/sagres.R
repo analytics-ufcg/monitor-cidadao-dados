@@ -253,7 +253,7 @@ translate_licitacoes_tramita <- function(licitacoes_tramita_raw){
      dplyr::mutate(dt_mes_ano = NA) %>%
      dplyr::mutate(registro_cge = NA) %>%
      dplyr::mutate(dt_ano = NA) %>%
-     dplyr::mutate(tp_regime_execucao = NA)   
+     dplyr::mutate(tp_regime_execucao = NA)    
 }
 
 #' @param contratos_tramita_raw Dados brutos dos contratos contidos no Tramita
