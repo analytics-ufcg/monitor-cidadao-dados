@@ -309,3 +309,83 @@ join_contratos_tramita_tipo_modalidade_licitacao <- function(df_contratos_tramit
   df_contratos_tramita %<>% dplyr::left_join(df_tipo_modalidade_licitacao) %>%
     dplyr::select(nu_licitacao, cd_u_gestora, nu_contrato, dplyr::everything())
 }
+
+#' @title Realiza o join dos contratos com o dataframe das licitações
+#' @param df_contratos dataframe com os contratos
+#' @param df_licitacoes dataframe com as licitações
+#' @return Dataframe contendo informações dos contratos com os ids das licitações
+#' @rdname join_contratos_licitacao
+#' @examples
+#' join_contrato_licitacao_dt <- join_contratos_licitacao(df_contratos, df_licitacoes)
+#'
+join_contratos_tramita_licitacoes_tramita <- function(df_contratos_tramita, df_licitacoes_tramita) {
+  df_licitacoes_tramita %<>% dplyr::select(cd_u_gestora, nu_licitacao,
+                                     tp_licitacao, id_licitacao)
+
+  df_contratos_tramita %<>% dplyr::left_join(df_licitacoes_tramita) %>%
+    dplyr::select(id_contrato, id_licitacao, cd_municipio, dplyr::everything())
+}
+
+#' @title Realiza o join das licitações contidas no TRAMITA com os municipios do SAGRES
+#' @param df_licitacoes_tramita dataframe com as licitações
+#' @param df_municipios_sagres dataframe com os id dos municipios do SAGRES
+#' @return Dataframe contendo informações das licitações contidas no TRAMITA com o id do IBGE
+#' @rdname join_licitacoes_tramita_municipios_sagres
+#' @examples
+#' join_licitacoes_tramita_municipios_sagres_dt <- join_licitacoes_tramita_municipios_sagres(
+#'          df_licitacoes, df_municipios_sagres)
+#'
+join_licitacoes_tramita_municipios_sagres <- function(df_licitacoes_tramita, df_municipios_sagres) {
+  df_licitacoes_tramita %<>% dplyr::left_join(df_municipios_sagres) %>%
+    dplyr::select(id_licitacao, dplyr::everything())
+}
+
+#' @title Realiza o join das licitações do tamita com as localidades do IBGE
+#' @param df_licitacoes_tramita dataframe com as licitações
+#' @param df_localidades_ibge dataframe com as localidades cadastradas no IBGE
+#' @return Dataframe contendo informações das licitações com o ids do IBGE
+#' @rdname join_licitacoes_tramita_localidades_ibge
+#' @examples
+#' join_licitacoes_tramita_localidades_ibge_dt <- join_licitacoes_tramita_localidades_ibge(
+#'          df_licitacoes_tramita, df_localidades_ibge)
+#'
+join_licitacoes_tramita_localidades_ibge <- function(df_licitacoes_tramita, df_localidades_ibge) {
+  df_localidades_ibge %<>% dplyr::select(uf, mesorregiao_geografica, microrregiao_geografica, cd_ibge)
+
+  df_licitacoes_tramita %<>% dplyr::left_join(df_localidades_ibge) %>%
+    dplyr::select(id_licitacao, dplyr::everything()) %>%
+    dplyr::select(-c(cd_municipio))
+}
+
+
+#' @title Realiza o join dos contratos contidos no TRAMITA com os municipios do SAGRES
+#' @param df_contratos_tramita dataframe com os contratos
+#' @param df_municipios_sagres dataframe com os id dos municipios do SAGRES
+#' @return Dataframe contendo informações dos contratos com os ids do IBGE
+#' @rdname join_contratos_tramita_municipios_sagres
+#' @examples
+#' join_contratos_tramita_municipios_sagres_dt <- join_contratos_tramita_municipios_sagres(
+#'          df_contratos_tramita, df_municipios_sagres)
+#'
+join_contratos_tramita_municipios_sagres <- function(df_contratos_tramita, df_municipios_sagres) {
+  df_contratos_tramita %<>% dplyr::left_join(df_municipios_sagres) %>%
+    dplyr::select(id_contrato, dplyr::everything())
+}
+
+#' @title Realiza o join dos contratos do tramita com as localidades do IBGE
+#' @param df_contratos_tramita dataframe com os contratos
+#' @param df_localidades_ibge dataframe com as localidades cadastradas no IBGE
+#' @return Dataframe contendo informações dos contratos com o ids do IBGE
+#' @rdname join_contratos_localidades_ibge
+#' @examples
+#' join_contratos_tramita_localidades_ibge_dt <- join_contratos_tramita_localidades_ibge(
+#'          df_contratos_tramita, df_localidades_ibge)
+#'
+join_contratos_tramita_localidades_ibge <- function(df_contratos_tramita, df_localidades_ibge) {
+  df_localidades_ibge %<>% dplyr::select(uf, mesorregiao_geografica, microrregiao_geografica, cd_ibge)
+
+  df_contratos_tramita %<>% dplyr::left_join(df_localidades_ibge) %>%
+    dplyr::select(id_contrato, dplyr::everything()) %>%
+    dplyr::select(-c(cd_municipio))
+}
+

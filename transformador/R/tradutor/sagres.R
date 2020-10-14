@@ -234,14 +234,26 @@ translate_codigo_localidades_ibge <- function(localidades_ibge_raw){
 #' licitacoes_tramita_df <- translate_licitacoes_tramita(licitacoes_tramita_raw)
 translate_licitacoes_tramita <- function(licitacoes_tramita_raw){
     licitacoes_tramita_raw %<>% janitor::clean_names() %>%
+     dplyr::filter(esfera == "Municipal") %>%
      dplyr::rename(cd_u_gestora = cod_unidade_gestora) %>%
      dplyr::rename(nu_licitacao = numero_licitacao) %>%
-     dplyr::rename(vl_licitacao = valor_estimado) %>%
+     dplyr::rename(vl_licitacao = valor_homologacao) %>% # Foi utilizado o valor homologação porque o valor estimado tinha muitas observações com NA
      dplyr::rename(dt_homologacao = data_homologacao) %>%
      dplyr::mutate(nu_licitacao = gsub("/", "", nu_licitacao)) %>%
      dplyr::rename(de_tipo_licitacao = modalidade_licitacao) %>%
-     dplyr::rename(de_tipo_objeto = tipo_objeto)
-     
+     dplyr::rename(de_tipo_objeto = tipo_objeto) %>%
+     dplyr::rename(de_obs = objeto) %>%
+     dplyr::rename(de_ugestora = unidade_gestora) %>%
+     dplyr::mutate(de_tipo_licitacao = gsub("Adesão a Ata de Registro de Preços", "Adesão a Registro de Preço", de_tipo_licitacao)) %>%
+     dplyr::mutate(de_tipo_licitacao = gsub("Inexigibilidade", "Inexigível", de_tipo_licitacao)) %>%
+     dplyr::mutate(de_tipo_licitacao = gsub("Tomada de Preço", "Tomada de Preços", de_tipo_licitacao)) %>%
+     dplyr::mutate(de_tipo_licitacao = gsub("Dispensa \\(Art. 24 - Lei 8.666/93\\)", "Dispensa por Valor", de_tipo_licitacao)) %>%
+     dplyr::mutate(de_tipo_licitacao = gsub("Dispensada \\(Art. 17 - Lei 8.666/93\\)", "Dispensa por outros motivos", de_tipo_licitacao)) %>%    
+     dplyr::mutate(de_tipo_licitacao = gsub("Dispensa COVID-19 \\(Art. 4º da Lei 13.979/2020\\)", "Dispensa por outros motivos", de_tipo_licitacao)) %>%
+     dplyr::mutate(dt_mes_ano = NA) %>%
+     dplyr::mutate(registro_cge = NA) %>%
+     dplyr::mutate(dt_ano = NA) %>%
+     dplyr::mutate(tp_regime_execucao = NA)   
 }
 
 #' @param contratos_tramita_raw Dados brutos dos contratos contidos no Tramita
@@ -263,7 +275,22 @@ translate_contratos_tramita <- function(contratos_tramita_raw){
     dplyr::mutate(de_tipo_licitacao = gsub("Tomada de Preço", "Tomada de Preços", de_tipo_licitacao)) %>%
     dplyr::mutate(de_tipo_licitacao = gsub("Dispensa \\(Art. 24 - Lei 8.666/93\\)", "Dispensa por Valor", de_tipo_licitacao)) %>%
     dplyr::mutate(de_tipo_licitacao = gsub("Dispensada \\(Art. 17 - Lei 8.666/93\\)", "Dispensa por outros motivos", de_tipo_licitacao)) %>%    
-    dplyr::mutate(de_tipo_licitacao = gsub("Dispensa COVID-19 \\(Art. 4º da Lei 13.979/2020\\)", "Dispensa por outros motivos", de_tipo_licitacao))
+    dplyr::mutate(de_tipo_licitacao = gsub("Dispensa COVID-19 \\(Art. 4º da Lei 13.979/2020\\)", "Dispensa por outros motivos", de_tipo_licitacao)) %>%
+    dplyr::mutate(dt_ano = NA) %>%
+    dplyr::rename(dt_assinatura = data_assinatura) %>%
+    dplyr::rename(nu_cpfcnpj = cpf_cnpj_licitante) %>%
+    dplyr::rename(vl_total_contrato = valor_contratado) %>%
+    dplyr::rename(de_obs = descricao_contrato) %>%
+    dplyr::mutate(registro_cge = NA) %>%
+    dplyr::mutate(cd_siafi = NA) %>%
+    dplyr::mutate(dt_recebimento = NA) %>%
+    dplyr::mutate(foto = NA) %>%
+    dplyr::mutate(dt_mes_ano = NA) %>%
+    dplyr::mutate(planilha = NA) %>%
+    dplyr::mutate(ordem_servico = NA)  %>%
+    dplyr::mutate(language = 'portuguese') %>%
+    dplyr::rename(de_ugestora = unidade_gestora) %>%
+    dplyr::rename(no_fornecedor = licitante) 
 }
 
 

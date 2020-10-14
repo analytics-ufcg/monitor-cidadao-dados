@@ -211,3 +211,25 @@ process_contrato_tramita <- function(contratos_tramita_df) {
     dplyr::filter(cd_municipio != "612") %>%  #registro preenchido errado
     generate_contrato_tramita_id()
 }
+
+#' @title Gera um identificador único para cada licitação do tramita
+#' @param licitacoes_tramita_df Dataframe contendo informações sobre as licitações
+#' @return Dataframe contendo informações sobre as licitações contidas no Tramita e seus ids
+#' @rdname generate_licitacao_tramita_id
+#' @examples
+#' licitacoes_tramita_dt <- generate_licitacao_tramita_id(licitacoes_tramita_df)
+generate_licitacao_tramita_id <- function(licitacoes_tramita_df) {
+  licitacoes_tramita_df %<>% .generate_hash_id(c("cd_u_gestora",
+                                        "nu_licitacao", "tp_licitacao"),
+                                      "id_licitacao") %>%
+    dplyr::select(id_licitacao, dplyr::everything())
+}
+
+#' @title Processa dataframe das licitações contidas no tramita
+#' @description Manipula tabela pra forma que será utilizada no banco
+#' @param licitacoes_df Dataframe contendo informações das licitações
+#' @return Dataframe contendo informações das licitações do tramita processados
+process_licitacao_tramita <- function(licitacoes_tramita_df) {
+  licitacoes_tramita_df %<>% .extract_cd_municipio("cd_u_gestora") %>%
+    generate_licitacao_tramita_id()
+}
