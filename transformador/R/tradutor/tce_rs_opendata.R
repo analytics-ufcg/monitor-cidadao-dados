@@ -14,21 +14,6 @@ translate_contratos_tce_rs <- function(contratos_tce_rs_raw){
     dplyr::rename(vl_total_contrato = vl_contrato) %>%
     dplyr::rename(de_obs = ds_objeto) %>%
     dplyr::rename(de_ugestora = nm_orgao)
-    # dt_assinatura ok
-    # tp_licitacao not exists
-    # dt_mes_ano,
-    # registro_cge,
-    # cd_siafi,
-    # dt_recebimento,
-    # foto,
-    # planilha,
-    # ordem_servico,
-    # language,
-    # no_forcenedor,
-    # cd_ibge,
-    # uf,
-    # mesorregiao_geografia,
-    # microrregiao_geografia
 }
 
 #' @param orgaos_tce_rs_raw Dados brutos dos órgãos auditados pelo TCE-RS
@@ -56,19 +41,20 @@ translate_licitacoes_tce_rs <- function(licitacoes_tce_rs_raw){
     dplyr::rename(nu_licitacao = nr_licitacao) %>% #tp_licitacao, dt_homologacao,vl_licitacao ok
     dplyr::rename(de_obs = ds_objeto) %>%
     dplyr::rename(de_ugestora = nm_orgao)
-
-    # nu_propostas x
-    # tp_objeto
-    # dt_mes_ano
-    # registro_cge
-    # tp_regime_execucao
-    # de_ugestora
-    # de_tipo_licitacao
-    # cd_ibge
-    # uf
-    # mesorregiao_geografica
-    # microrregiao_geografica
-
 }
+
+#' @param pessoas_tce_rs_raw Dados brutos das pessoas/fornecedores
+#' @return Dataframe contendo informações sobre os fornecedores da base do TCE-RS
+#' @rdname translate_pessoas_tce_rs
+#' @examples
+#' pessoas_tce_rs_dt <- translate_pessoas_tce_rs(pessoas_tce_rs_raw)
+translate_pessoas_tce_rs <- function(pessoas_tce_rs_raw){
+  pessoas_tce_rs_raw %<>% janitor::clean_names() %>%
+    dplyr::rename(cd_u_gestora = cd_orgao) %>%
+    dplyr::rename(nu_cpfcnpj = nr_documento) %>%
+    dplyr::rename(no_fornecedor = nm_pessoa)
+}
+
+
 
 

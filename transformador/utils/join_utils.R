@@ -195,6 +195,23 @@ join_contratos_rs_licitacoes <- function(df_contratos_rs, df_licitacoes_rs) {
     dplyr::select(id_contrato, id_licitacao, dplyr::everything())
 }
 
+#' @title Realiza o join entre as tabelas de contratos e pessoas
+#' @param df_contratos_rs dataframe com as contratos
+#' @param df_pessoas_rs dataframe com as pessoas
+#' @return Dataframe contendo informações dos contratos e das pessoas/fornecedores
+#' @rdname join_contratos_rs_pessoas
+#' @examples
+#' join_contratos_rs_pessoas_dt <- join_contratos_rs_pessoas(
+#'          df_contratos_rs, df_orgaos_rs)
+#'
+join_contratos_rs_pessoas <- function(df_contratos_rs, df_pessoas_rs) {
+  df_pessoas_rs %<>% dplyr::select(nu_cpfcnpj, no_fornecedor) %>%
+    dplyr::distinct(nu_cpfcnpj, .keep_all = TRUE)
+
+  df_contratos_rs %<>% dplyr::left_join(df_pessoas_rs, by="nu_cpfcnpj") %>%
+    dplyr::select(id_contrato, id_licitacao, dplyr::everything())
+}
+
 
 #' @title Realiza o join dos contratos com os municipios do SAGRES
 #' @param df_contratos dataframe com os contratos

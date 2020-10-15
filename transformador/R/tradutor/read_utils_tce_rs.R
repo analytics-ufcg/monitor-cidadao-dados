@@ -75,4 +75,18 @@ read_modalidade_licitacoes_tce_rs <- function() {
 }
 
 
+#' @title Lê dataframe contendo informações dos fornecedores/pessoas da base de dados do TCE-RS
+#' @return Dataframe contendo informações sobre os fornecedores
+#' @rdname read_pessoas_tce_rs
+#' @examples
+#' pessoas_tce_rs_dt <- read_pessoas_tce_rs(ano)
+read_pessoas_tce_rs <- function(ano) {
+  pessoas_tce_rs_df <- readr::read_csv(here::here(sprintf("../fetcher/data/rs/contratos/%s/pessoas.csv", ano)),
+                                          col_types = list(
+                                            .default = readr::col_character()
+                                          ))
+}
+
+
+
 

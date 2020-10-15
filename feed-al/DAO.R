@@ -48,6 +48,12 @@ import <- function() {
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/import/import_data.sql"))
 }
 
+#' @title Importa dados do TCE-RS para as tabelas do banco de dados
+import_tce_rs <- function() {
+  system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/import/import_data_tce_rs.sql"))
+}
+
+
 #' @title "Dropa as tabelas do Banco de Dados"
 clean <- function() {
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/drop/drop_tables.sql"))
@@ -75,7 +81,9 @@ if (funct == "create") {
   create()
 } else if (funct == "import") {
   import()
-} else if ( funct == "shell") {
+}  else if (funct == "import-tce-rs") {
+  import_tce_rs()
+}else if ( funct == "shell") {
   shell()
 } else if ( funct == "clean"){
   clean()

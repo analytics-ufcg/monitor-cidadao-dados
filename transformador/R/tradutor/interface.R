@@ -266,3 +266,14 @@ get_licitacoes_tce_rs <- function(ano){
     translate_licitacoes_tce_rs()
 }
 
+#' @title Obtem dados os dados dos fornecedores do TCE-RS
+#' @return Dataframe contendo informações sobre os fornecedores
+#' @rdname get_pessoas_tce_rs
+#' @examples
+#' essoas_tce_rs_dt <- get_pessoas_tce_rs()
+get_pessoas_tce_rs <- function(ano){
+  pessoas_tce_rs_dt  <- read_pessoas_tce_rs(ano) %>%
+    translate_pessoas_tce_rs()
+}
+
+

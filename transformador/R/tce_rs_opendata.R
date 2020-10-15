@@ -9,7 +9,7 @@ source(here::here("R/utils.R"))
 #' @examples
 #' contratos_tce_rs_dt <- generate_contrato_tce_rs_id(contrato_df)
 generate_contrato_tce_rs_id <- function(contratos_tce_rs_dt) {
-  contratos_tce_rs_dt %<>% .generate_hash_id(c("cd_u_gestora", "ano_licitacao","nu_licitacao",
+  contratos_tce_rs_dt %<>% .generate_hash_id(c("cd_u_gestora", "nu_cpfcnpj", "ano_licitacao","nu_licitacao",
                                         "cd_tipo_modalidade", "nu_contrato", "dt_ano",
                                         "tp_instrumento"),
                                        "id_contrato") %>%
@@ -56,7 +56,7 @@ format_licitacao_tce_rs <- function(licitacoes_transformadas_rs_df) {
                          "de_ugestora", "de_tipo_licitacao", "cd_ibge", "uf", "mesorregiao_geografica", "microrregiao_geografica")
 
   licitacoes_rs_formatadas <- fncols(licitacoes_transformadas_rs_df, colunas_licitacoes) %>%
-    select(colunas_licitacoes)
+    dplyr::select(colunas_licitacoes)
 }
 
 #' @title Processa dataframe dos contratos
@@ -71,7 +71,7 @@ format_contrato_tce_rs <- function(contratos_transformados_rs_df) {
                          "mesorregiao_geografica", "microrregiao_geografica")
 
   contratos_rs_formatados <-fncols(contratos_transformados_rs_df, colunas_contratos) %>%
-    select(colunas_contratos)
+    dplyr::select(colunas_contratos)
 }
 
 
