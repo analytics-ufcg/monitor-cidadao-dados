@@ -53,12 +53,16 @@ licitacoes_transformadas <- licitacoes_df %>% mcTransformador::process_licitacao
   join_licitacoes_municipios_sagres(municipios_sagres_df) %>%
   join_licitacoes_localidades_ibge(codigo_localidades_ibge_transformados)
 
+descricoes_licitacoes <- licitacoes_transformadas %>% dplyr::select(id_licitacao, obs = de_obs)
+
 contratos_transformados <- contratos_df %>% mcTransformador::process_contrato() %>%
   join_contratos_licitacao(licitacoes_transformadas) %>%
   join_contratos_codigo_unidade_gestora(codigo_unidade_gestora_df) %>%
   join_contratos_fornecedores(fornecedores_df) %>%
   join_contratos_municipios_sagres(municipios_sagres_df) %>%
-  join_contratos_localidades_ibge(codigo_localidades_ibge_transformados)
+  join_contratos_localidades_ibge(codigo_localidades_ibge_transformados) %>%
+  dplyr::left_join(descricoes_licitacoes) %>%
+  dplyr::mutate(de_obs = dplyr::if_else(is.na(de_obs),  obs, de_obs))
 
 participantes_transformados <- participantes_df %>% mcTransformador::process_participante() %>%
   join_participantes_licitacao(licitacoes_transformadas) %>%
