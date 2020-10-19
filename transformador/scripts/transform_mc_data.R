@@ -43,7 +43,7 @@ codigo_localidades_ibge_df <- get_codigo_localidades_ibge()
 #--------------------------------
 
 codigo_localidades_ibge_transformados <- codigo_localidades_ibge_df  %>%
-   mcTransformador::process_codigo_localidades_ibge()
+  mcTransformador::process_codigo_localidades_ibge()
 
 municipios_sagres_df <- municipios_df %>% mcTransformador::process_municipio()
 
@@ -85,8 +85,6 @@ licitacoes_tramita_transformadas <- licitacoes_tramita_df %>%
    dplyr::select(id_licitacao, cd_u_gestora, dt_ano, nu_licitacao, tp_licitacao, dt_homologacao, nu_propostas, vl_licitacao, tp_objeto, de_obs, dt_mes_ano, registro_cge, tp_regime_execucao, de_ugestora, de_tipo_licitacao,	cd_ibge, uf, mesorregiao_geografica, microrregiao_geografica) %>%
    dplyr::distinct(id_licitacao, .keep_all=TRUE)
 
-
-
 contratos_tramita_transformados <- contratos_tramita_df %>%
    join_contratos_tramita_tipo_modalidade_licitacao(tipo_modalidade_licitacao_df) %>% 
    mcTransformador::process_contrato_tramita() %>%
@@ -95,6 +93,56 @@ contratos_tramita_transformados <- contratos_tramita_df %>%
    join_contratos_tramita_localidades_ibge(codigo_localidades_ibge_transformados) %>%
    dplyr::select(id_contrato, id_licitacao, cd_u_gestora, dt_ano, nu_contrato, dt_assinatura, pr_vigencia, nu_cpfcnpj, nu_licitacao, tp_licitacao, vl_total_contrato, de_obs, dt_mes_ano, registro_cge, cd_siafi, dt_recebimento, foto, planilha, ordem_servico, language, de_ugestora, no_fornecedor, cd_ibge,	uf,	mesorregiao_geografica,	microrregiao_geografica) %>%
    dplyr::distinct(id_contrato, .keep_all=TRUE)
+
+
+# Adiciona a chave de contratos a tabela de empenhos
+## Agrupamento de empenhos por contrato e por licitação
+### Caso I: Onde 1 credor possui apenas 1 único contrato de uma mesma licitação
+contratos_por_licitacao <- contratos_transformados %>%
+  dplyr::group_by(id_licitacao, nu_cpfcnpj) %>%
+  dplyr::summarise(amount = dplyr::n()) %>%
+  dplyr::filter(amount == 1) %>%
+  na.omit() %>%
+  dplyr::left_join(contratos_transformados,
+                  by = c("id_licitacao", "nu_cpfcnpj")) %>%
+  dplyr::select(id_licitacao, id_contrato, nu_cpfcnpj) %>%
+  dplyr::ungroup()
+
+
+# Caso II: Onde 1 credor possui mais de um contrato de uma mesma licitação
+contratos_lici_corner_cases <- contratos_transformados %>%
+  dplyr::group_by(id_licitacao, nu_cpfcnpj) %>%
+  dplyr::summarise(amount = dplyr::n()) %>%
+  dplyr::filter(amount > 1)
+
+
+
+#Recupera dados de empenhos e pagamentos pelo codigo da unidade gestora
+for (cd_u_gestora in codigo_unidade_gestora_df$cd_u_gestora) {
+  print(sprintf('[%s] empenhos da unidade gestora = %s', Sys.time(), cd_u_gestora))
+
+  # Verificar se o arquivo existe
+  input_dir_emp = sprintf("../fetcher/data/empenhos/empenhos_%s.csv", cd_u_gestora)
+  if (!file.exists(input_dir_emp) || file.size(input_dir_emp) == 0){next}
+
+  empenhos_df <- get_empenhos_by_unidade_gestora(cd_u_gestora)
+
+  empenhos_transformados <- empenhos_df %>% mcTransformador::process_empenho() %>%
+    join_empenhos_licitacao(licitacoes_transformadas) %>%
+    dplyr::left_join(contratos_por_licitacao,
+                     by = c("id_licitacao" = "id_licitacao", "cd_credor" = "nu_cpfcnpj")) %>% # Adiciona o número do contrato no Empenho
+    dplyr::select(id_empenho, id_licitacao, id_contrato, dplyr::everything())
+
+
+  # Cria a pasta de saída caso ela não exista
+  output_dir_emp = 'data/empenhos/'
+  if (!dir.exists(output_dir_emp)){
+    dir.create(output_dir_emp)
+  }
+
+  readr::write_csv(empenhos_transformados, here::here(sprintf("./data/empenhos/empenhos_%s.csv", cd_u_gestora)))
+
+  print(sprintf('[%s] pagamentos da unidade gestora = %s', Sys.time(), cd_u_gestora))
 
   # Verificar se o arquivo existe
   input_dir_pag = sprintf("../fetcher/data/pagamentos/pagamentos_%s.csv", cd_u_gestora)
@@ -131,7 +179,6 @@ output_dir_pag = 'data/licitacoes/'
 if (!dir.exists(output_dir_pag)){
    dir.create(output_dir_pag)
 }
-
 
 # Cria a pasta de saída para armazenamento dos contratos, caso ela não exista
 output_dir_pag = 'data/contratos/'
