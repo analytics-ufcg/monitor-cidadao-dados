@@ -92,28 +92,28 @@ contratos_tramita_transformados <- contratos_tramita_df %>%
    dplyr::select(id_contrato, id_licitacao, cd_u_gestora, dt_ano, nu_contrato, dt_assinatura, pr_vigencia, nu_cpfcnpj, nu_licitacao, tp_licitacao, vl_total_contrato, de_obs, dt_mes_ano, registro_cge, cd_siafi, dt_recebimento, foto, planilha, ordem_servico, language, de_ugestora, no_fornecedor, cd_ibge,	uf,	mesorregiao_geografica,	microrregiao_geografica) %>%
    dplyr::distinct(id_contrato, .keep_all=TRUE)
 
-#   # Verificar se o arquivo existe
-#   input_dir_pag = sprintf("../fetcher/data/pagamentos/pagamentos_%s.csv", cd_u_gestora)
-#   if (!file.exists(input_dir_pag) || file.size(input_dir_pag) == 0){next}
+  # Verificar se o arquivo existe
+  input_dir_pag = sprintf("../fetcher/data/pagamentos/pagamentos_%s.csv", cd_u_gestora)
+  if (!file.exists(input_dir_pag) || file.size(input_dir_pag) == 0){next}
 
-#   pagamentos_df <- get_pagamentos_by_unidade_gestora(cd_u_gestora)
-#   pagamentos_transformados <- pagamentos_df %>% mcTransformador::process_pagamento() %>%
-#     join_pagamentos_empenhos(empenhos_transformados)
+  pagamentos_df <- get_pagamentos_by_unidade_gestora(cd_u_gestora)
+  pagamentos_transformados <- pagamentos_df %>% mcTransformador::process_pagamento() %>%
+    join_pagamentos_empenhos(empenhos_transformados)
 
-#   # Cria a pasta de saída caso ela não exista
-#   output_dir_pag = 'data/pagamentos/'
-#   if (!dir.exists(output_dir_pag)){
-#     dir.create(output_dir_pag)
-#   }
+  # Cria a pasta de saída caso ela não exista
+  output_dir_pag = 'data/pagamentos/'
+  if (!dir.exists(output_dir_pag)){
+    dir.create(output_dir_pag)
+  }
 
-#   readr::write_csv(pagamentos_transformados, here::here(sprintf("./data/pagamentos/pagamentos_%s.csv", cd_u_gestora)))
+  readr::write_csv(pagamentos_transformados, here::here(sprintf("./data/pagamentos/pagamentos_%s.csv", cd_u_gestora)))
 
-#   rm(empenhos_df) # remove o dataframe 'empenhos'
-#   rm(empenhos_transformados)
-#   rm(pagamentos_df) # remove o dataframe 'pagamentos'
-#   rm(pagamentos_transformados)
-#   gc() # permite que o R retorne memória pro sistema operacional
-# }
+  rm(empenhos_df) # remove o dataframe 'empenhos'
+  rm(empenhos_transformados)
+  rm(pagamentos_df) # remove o dataframe 'pagamentos'
+  rm(pagamentos_transformados)
+  gc() # permite que o R retorne memória pro sistema operacional
+}
 
 
 contratos_mutados_transformados <- contratos_mutados_df %>% mcTransformador::process_contrato_mutado() %>%
