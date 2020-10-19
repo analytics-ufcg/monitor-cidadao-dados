@@ -38,12 +38,12 @@ Nesta camada o make é utilizado como facilitador para execução. Abaixo estão
  1. Faça o build das imagens necessárias com `sudo make build`;
  2. Crie e inicie os containers do docker com `sudo make up`;
  3. Obtenha os dados através do `sudo make fetch-data-sagres` e `sudo make fetch-data-tce-rs ano=<2016,2017, 2018 , 2019, 2020 ou todos>`. Nesta etapa você também pode testar a integridade dos dados obtidos utilizando os testes unitários de cada tabela com `sudo docker exec -it fetcher sh -c "Rscript tests/<nome-da-tabela>.R"`;
- 4. Traduza e transforme os dados colhidos `sudo make transform-data`;
+ 4. Traduza e transforme os dados colhidos `sudo make transform-data` e `sudo make transform-data-tce-rs`;
 
 <b> Para o AL_DB: </b>
 
  5. Crie as tabelas no banco AL_DB com `sudo make feed-al-create`;
- 6. Agora importe os dados para as tabelas do banco com `sudo make feed-al-import`;
+ 6. Agora importe os dados para as tabelas do banco com `sudo make feed-al-import` e `sudo make feed-al-import-tce-rs`;
  7. Você pode verificar se a(s) tabela(s) estão no banco com `sudo make feed-al-shell` e `\dt`.
 
 <b> Geração das previsões: </b>
@@ -71,11 +71,14 @@ stop | Para todos os serviços.
 clean-volumes | Para e remove todos os volumes.
 enter-fetcher-container  | Abre cli do container fetcher
 fetch-data | Obtem dados
+fetch-data-tce-rs | Obtem dados do TCE-RS
 enter-transformer-container | Abre cli do container transformador
 transform-data | Traduz e transforma os dados colhidos
+transform-data-tce-rs | Traduz e transforma os dados do TCE-RS
 enter-feed-al-container | Abre cli do container feed-al
 feed-al-create | Cria as tabelas do Banco de Dados Analytics
 feed-al-import | Importa dados para as tabelas do Banco de Dados Analytics
+feed-al-import-tce-rs | Importa dados do RS para as tabelas do Banco de Dados Analytics
 feed-al-clean | Dropa as tabelas do Banco de Dados Analytics
 feed-al-shell | Acessa terminal do Banco de Dados Analytics
 gera-feature | Gera features

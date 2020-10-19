@@ -16,7 +16,7 @@
   return(df)
 }
 
-#' Extrai o código do município do código da unidade gestora. 
+#' Extrai o código do município do código da unidade gestora.
 #' Essa estração é feita através da coleta dos últimos 3 digitos da unidade gestora.
 #' @param df Dataframe sem o código do município
 #' @param cd_u_gestora código da unidade gestora
@@ -24,7 +24,7 @@
 .extract_cd_municipio  <- function (df, cd_u_gestora) {
   df <- df %>%
     dplyr::mutate(cd_municipio = .substrRight(cd_u_gestora, 3))
-  
+
   return(df)
 }
 
@@ -35,4 +35,17 @@
 .substrRight <- function(x, n) {
   substr(x, nchar(x)-n+1, nchar(x))
 }
+
+
+#' Adiciona uma nova coluna caso ela não exista
+#' @param data dataframe principal
+#' @param cname colunas que serão verificadas
+#' @return dataframe com as novas colunas
+fncols <- function(data, cname) {
+  add <-cname[!cname%in%names(data)]
+
+  if(length(add)!=0) data[add] <- NA
+  data
+}
+
 
