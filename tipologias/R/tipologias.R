@@ -140,17 +140,17 @@ gera_tipologia_fornecimento <- function(empenhos_data) {
     dplyr::ungroup() %>% 
     dplyr::select(cd_credor, data, dt_ano, n_municipios, n_ugestora, total_ganho)
   
-  empenhos_features <- empenhos_por_fornecedor_ano %>% 
-    dplyr::group_by(cd_credor, data) %>% 
-    dplyr::summarise(media_municipio = mean(n_municipios), # ordem das operações importa. Média calculada apenas para o anos com observações (fornecimento da empresa).
-              n_municipios = sum(n_municipios),
-              media_ugestora = mean(n_ugestora),
-              n_ugestora = sum(n_ugestora),
-              media_ganho = mean(total_ganho),
-              total_ganho = sum(total_ganho)) %>% 
-    dplyr::ungroup()
-  
-  empenhos_features_nome <- empenhos_features %>% 
+  # empenhos_features <- empenhos_por_fornecedor_ano %>% 
+  #   dplyr::group_by(cd_credor, data) %>% 
+  #   dplyr::summarise(media_municipio = mean(n_municipios), # ordem das operações importa. Média calculada apenas para o anos com observações (fornecimento da empresa).
+  #             n_municipios = sum(n_municipios),
+  #             media_ugestora = mean(n_ugestora),
+  #             n_ugestora = sum(n_ugestora),
+  #             media_ganho = mean(total_ganho),
+  #             total_ganho = sum(total_ganho)) %>% 
+  #   dplyr::ungroup()
+  # 
+  empenhos_features_nome <- empenhos_por_fornecedor_ano %>% 
     dplyr::left_join(cnpjs_nome, by = "cd_credor") %>% 
     dplyr::select(cd_credor, no_credor, dplyr::everything())
   

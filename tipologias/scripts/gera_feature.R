@@ -132,19 +132,17 @@ print("Carregando propostas de licitações...")
 propostas <- carrega_propostas_licitacao(al_db_con)
 
 gera_tipologia_fornecimento_by_unidade_gestora <- function(unidade_gestora, al_db_con, contratos_by_cnpj) {
-  empenhos <- carrega_empenhos_by_contrato(al_db_con, unidade_gestora) #Essa consulta tem melhor resultado, mas demora mais (boa pra testar)
-  #empenhos <- carrega_empenhos(al_db_con) 
   
-  pagamentos <- carrega_pagamentos_by_empenho(al_db_con, unidade_gestora)
-  #pagamentos <- carrega_pagamentos(al_db_con)
-  
+  empenhos <- carrega_empenhos_by_unidade(al_db_con, unidade_gestora) 
+
+  pagamentos <- carrega_pagamentos_by_unidade(al_db_con, unidade_gestora)
+
   estorno_pagamentos <- carrega_estorno_pagamentos(al_db_con)
   
-  empenhos_processados <- process_empenhos(empenhos, pagamentos, estorno_pagamentos, contratos_by_cnpj)
+  empenhos_processados <- suppressMessages(process_empenhos(empenhos, pagamentos, estorno_pagamentos, contratos_by_cnpj))
   
-  print(unidade_gestora)
-  print("CHEGOU AQUI GRAÇAS A DEUS!!")
-  tipologias_fornecimento <- gera_tipologia_fornecimento(empenhos_processados)
+  print("Calculando tipologias fornecimento... ")
+  tipologias_fornecimento <- suppressMessages(gera_tipologia_fornecimento(empenhos_processados))
 }
 
 
@@ -163,17 +161,36 @@ licitacoes_vencedoras <- contratos_processados %>% get_vencedores_by_contratos()
 print("Cruzando propostas com licitações...")
 propostas_licitacoes <- propostas %>% dplyr::inner_join(licitacoes)
 
-empenhos_processados <- process_empenhos(empenhos, pagamentos, estorno_pagamentos, contratos_by_cnpj)
-
 #Carrega dados dependentes
 print("Carregando participantes...")
 participantes <- carrega_participantes(al_db_con, contratos_by_cnpj$nu_cpfcnpj)
 
+credores <- c("09123654000187", "09095183000140", "01518579000141", "00360305000104", "24513574000121")
+
 #Gera tipologias de fornecimento
 print("Gerando tipologias de fornecimento...")
-tipologias_fornecimento <- contratos$cd_u_gestora %>% unique() %>%
+tipologias_fornecimento <- credores %>% unique() %>%
   purrr::map_df(~gera_tipologia_fornecimento_by_unidade_gestora(.x, al_db_con,contratos_by_cnpj))
 
+tipologias_fornecimento_agrupadas <- tipologias_fornecimento %>% 
+  dplyr::group_by(cd_credor, no_credor, data, dt_ano) %>% 
+  dplyr::summarise(media_municipio = mean(n_municipios), 
+            n_municipios = sum(n_municipios),
+            media_ugestora = mean(n_ugestora),
+            n_ugestora = sum(n_ugestora),
+            media_ganho = mean(total_ganho),
+            total_ganho = sum(total_ganho)) %>% 
+  dplyr::ungroup()
+
+saelpa <- tipologias_fornecimento %>% 
+  dplyr::filter(no_credor == "SAELPA") %>% 
+  dplyr::group_by(cd_credor, no_credor, data, dt_ano) %>% 
+  dplyr::summarise(media_municipio = mean(n_municipios)) %>% 
+  dplyr::ungroup()
+
+tipologias_bb <- tipologias_fornecimento %>% dplyr::filter(no_credor == "A UNIAO")
+
+tipologias_fornecimento <- readr::read_csv("data/features/tipologias_fornecimento.csv")
 
 print("Gerando tipologias de licitações...")
 tipologias_licitacao <- gera_tipologia_licitacao(licitacoes, contratos_processados, contratos_by_cnpj, licitacoes_vencedoras, participantes)

@@ -115,24 +115,31 @@ carrega_participantes <- function(al_db_con, list_cnpjs) {
   return(participacoes)
 }
 
-carrega_empenhos_by_contrato <- function(al_db_con, cd_u_gestora) {
+carrega_empenhos_by_unidade <- function(al_db_con, cd_u_gestora) {
   empenhos <- tibble::tibble()
+  
+  
   
   template <- paste0('
                 SELECT * 
-                FROM empenho WHERE cd_u_gestora=\'%s\'')
+                FROM empenho WHERE cd_credor=\'%s\'')
   
   query <- template %>%
     sprintf(cd_u_gestora) %>% 
     dplyr::sql()
   
-  tryCatch({
-    # empenhos <- ids_contratos %>% purrr::map_df(~DBI::dbGetQuery(al_db_con, paste0("SELECT * FROM empenho WHERE cd_u_gestora=\'", .x, "\'")))
-      
-    empenhos <- dplyr::tbl(al_db_con, query) %>% dplyr::collect(n = Inf)
-  },
-  error = function(e) print(paste0("Erro ao buscar empenhos no Banco AL_BD (Postgres): ", e))
-  )
+  tentativas <- 0
+  while (nrow(empenhos) == 0 & tentativas <= 3) {
+    
+    tentativas <- tentativas + 1
+    print(paste0("Buscando empenhos credor = ", cd_u_gestora, ", tentativa = ", tentativas))
+    
+    tryCatch({
+      empenhos <- dplyr::tbl(al_db_con, query) %>% dplyr::collect(n = Inf)
+    },
+    error = function(e) print(paste0("Erro ao buscar empenhos no Banco AL_BD (Postgres): ", e))
+    )
+  }
   
   return(empenhos)
 }
@@ -142,7 +149,7 @@ carrega_empenhos <- function(al_db_con) {
   
   template <- paste0('
                 SELECT * 
-                FROM empenho LIMIT 2000000')
+                FROM empenho')
   
   query <- template %>% 
     dplyr::sql()
@@ -156,23 +163,30 @@ carrega_empenhos <- function(al_db_con) {
   return(empenhos)
 }
 
-carrega_pagamentos_by_empenho <- function(al_db_con, cd_u_gestora) {
+carrega_pagamentos_by_unidade <- function(al_db_con, cd_u_gestora) {
+  
   pagamentos <- tibble::tibble()
+  
   template <- paste0('
                 SELECT * 
-                FROM pagamento WHERE cd_u_gestora=\'%s\'')
+                FROM pagamento WHERE cd_credor=\'%s\'')
   
   query <- template %>% 
     sprintf(cd_u_gestora) %>% 
     dplyr::sql()
-    
-  tryCatch({
-    # pagamentos <- ids_empenhos %>% purrr::map_df(~DBI::dbGetQuery(al_db_con, paste0("SELECT * FROM pagamento WHERE cd_u_gestora=\'", .x, "\'")))
-    pagamentos <- dplyr::tbl(al_db_con, query) %>% dplyr::collect(n = Inf)
-    
-  },
+  
+  tentativas <- 0
+  
+  while (nrow(pagamentos) == 0 & tentativas <= 3) {
+    tentativas <- tentativas + 1
+    print(paste0("Buscando pagamentos credor = ", cd_u_gestora, ", tentativa = ", tentativas))
+    tryCatch({
+      pagamentos <- dplyr::tbl(al_db_con, query) %>% dplyr::collect(n = Inf)
+      
+    },
     error = function(e) print(paste0("Erro ao buscar pagamentos no Banco AL_BD (Postgres): ", e))
-  )
+    )
+  }
   
   return(pagamentos)
 }
