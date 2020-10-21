@@ -87,7 +87,8 @@ contratos_transformados <- contratos_df %>% mcTransformador::process_contrato() 
   join_contratos_municipios_sagres(municipios_sagres_df) %>%
   join_contratos_localidades_ibge(codigo_localidades_ibge_transformados) %>%
   dplyr::left_join(descricoes_licitacoes) %>%
-  dplyr::mutate(de_obs = dplyr::if_else(is.na(de_obs),  obs, de_obs))
+  dplyr::mutate(de_obs = dplyr::if_else(is.na(de_obs),  obs, de_obs)) %>%
+  dplyr::select(-obs)
 
 participantes_transformados <- participantes_df %>% mcTransformador::process_participante() %>%
   join_participantes_licitacao(licitacoes_transformadas) %>%
