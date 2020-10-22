@@ -47,33 +47,6 @@ codigo_localidades_ibge_transformados <- codigo_localidades_ibge_df  %>%
 
 municipios_sagres_df <- municipios_df %>% mcTransformador::process_municipio()
 
-licitacoes_transformadas <- licitacoes_df %>% mcTransformador::process_licitacao() %>%
-  join_licitacoes_codigo_unidade_gestora(codigo_unidade_gestora_df) %>%
-  join_licitacoes_tipo_modalidade_licitacao(tipo_modalidade_licitacao_df) %>%
-  join_licitacoes_municipios_sagres(municipios_sagres_df) %>%
-  join_licitacoes_localidades_ibge(codigo_localidades_ibge_transformados)
-
-descricoes_licitacoes <- licitacoes_transformadas %>% dplyr::select(id_licitacao, obs = de_obs)
-
-contratos_transformados <- contratos_df %>% mcTransformador::process_contrato() %>%
-  join_contratos_licitacao(licitacoes_transformadas) %>%
-  join_contratos_codigo_unidade_gestora(codigo_unidade_gestora_df) %>%
-  join_contratos_fornecedores(fornecedores_df) %>%
-  join_contratos_municipios_sagres(municipios_sagres_df) %>%
-  join_contratos_localidades_ibge(codigo_localidades_ibge_transformados) %>%
-  dplyr::left_join(descricoes_licitacoes) %>%
-  dplyr::mutate(de_obs = dplyr::if_else(is.na(de_obs),  obs, de_obs))
-
-participantes_transformados <- participantes_df %>% mcTransformador::process_participante() %>%
-  join_participantes_licitacao(licitacoes_transformadas) %>%
-  join_participantes_fornecedores (fornecedores_df)
-
-propostas_transformadas <- propostas_df %>% mcTransformador::process_proposta() %>%
-  join_propostas_licitacao(licitacoes_transformadas)  %>%
-  join_propostas_participantes(participantes_transformados)
-
-estorno_pagamento_transformado <- estorno_pagamento_df %>% mcTransformador::process_estorno_pagamento()
-
 licitacoes_tramita_transformadas <- licitacoes_tramita_df %>% 
    join_licitacoes_tramita_tipo_modalidade_licitacao(tipo_modalidade_licitacao_df) %>%
    join_licitacoes_tramita_tipo_objeto_licitacao(tipo_objeto_licitacao_df) %>%
@@ -85,6 +58,16 @@ licitacoes_tramita_transformadas <- licitacoes_tramita_df %>%
    dplyr::select(id_licitacao, cd_u_gestora, dt_ano, nu_licitacao, tp_licitacao, dt_homologacao, nu_propostas, vl_licitacao, tp_objeto, de_obs, dt_mes_ano, registro_cge, tp_regime_execucao, de_ugestora, de_tipo_licitacao,	cd_ibge, uf, mesorregiao_geografica, microrregiao_geografica) %>%
    dplyr::distinct(id_licitacao, .keep_all=TRUE)
 
+licitacoes_transformadas <- licitacoes_df %>% mcTransformador::process_licitacao() %>%
+  join_licitacoes_codigo_unidade_gestora(codigo_unidade_gestora_df) %>%
+  join_licitacoes_tipo_modalidade_licitacao(tipo_modalidade_licitacao_df) %>%
+  join_licitacoes_municipios_sagres(municipios_sagres_df) %>%
+  join_licitacoes_localidades_ibge(codigo_localidades_ibge_transformados) %>%
+  join_licitacoes_tramita_licitacoes_sagres(licitacoes_tramita_transformadas)
+
+
+descricoes_licitacoes <- licitacoes_transformadas %>% dplyr::select(id_licitacao, obs = de_obs)
+
 contratos_tramita_transformados <- contratos_tramita_df %>%
    join_contratos_tramita_tipo_modalidade_licitacao(tipo_modalidade_licitacao_df) %>% 
    mcTransformador::process_contrato_tramita() %>%
@@ -92,7 +75,32 @@ contratos_tramita_transformados <- contratos_tramita_df %>%
    join_contratos_tramita_municipios_sagres(municipios_sagres_df) %>%
    join_contratos_tramita_localidades_ibge(codigo_localidades_ibge_transformados) %>%
    dplyr::select(id_contrato, id_licitacao, cd_u_gestora, dt_ano, nu_contrato, dt_assinatura, pr_vigencia, nu_cpfcnpj, nu_licitacao, tp_licitacao, vl_total_contrato, de_obs, dt_mes_ano, registro_cge, cd_siafi, dt_recebimento, foto, planilha, ordem_servico, language, de_ugestora, no_fornecedor, cd_ibge,	uf,	mesorregiao_geografica,	microrregiao_geografica) %>%
-   dplyr::distinct(id_contrato, .keep_all=TRUE)
+   dplyr::distinct(id_contrato, .keep_all=TRUE) %>%
+   dplyr::left_join(descricoes_licitacoes) %>%
+   dplyr::mutate(de_obs = dplyr::if_else(is.na(de_obs),  obs, de_obs)) %>%
+   dplyr::select(-c(obs)) 
+
+
+contratos_transformados <- contratos_df %>% mcTransformador::process_contrato() %>%
+  join_contratos_licitacao(licitacoes_transformadas) %>%
+  join_contratos_codigo_unidade_gestora(codigo_unidade_gestora_df) %>%
+  join_contratos_fornecedores(fornecedores_df) %>%
+  join_contratos_municipios_sagres(municipios_sagres_df) %>%
+  join_contratos_localidades_ibge(codigo_localidades_ibge_transformados) %>%
+  dplyr::left_join(descricoes_licitacoes) %>%
+  dplyr::mutate(de_obs = dplyr::if_else(is.na(de_obs),  obs, de_obs)) %>%
+  dplyr::select(-c(obs)) %>%
+  join_contratos_tramita_contratos_sagres(contratos_tramita_transformados)
+
+participantes_transformados <- participantes_df %>% mcTransformador::process_participante() %>%
+  join_participantes_licitacao(licitacoes_transformadas) %>%
+  join_participantes_fornecedores (fornecedores_df)
+
+propostas_transformadas <- propostas_df %>% mcTransformador::process_proposta() %>%
+  join_propostas_licitacao(licitacoes_transformadas)  %>%
+  join_propostas_participantes(participantes_transformados)
+
+estorno_pagamento_transformado <- estorno_pagamento_df %>% mcTransformador::process_estorno_pagamento()
 
 
 # Adiciona a chave de contratos a tabela de empenhos
@@ -173,27 +181,14 @@ contratos_mutados_transformados <- contratos_mutados_df %>% mcTransformador::pro
   dplyr::filter(!is.na(id_contrato)) %>% #Remove as linhas que contém o id_contrato=NA.
   dplyr::filter(!duplicated(id_contrato,data_alteracao)) #Remove as linhas que são repetidas.
 
-
-# Cria a pasta de saída para armazenamento das licitações, caso ela não exista
-output_dir_pag = 'data/licitacoes/'
-if (!dir.exists(output_dir_pag)){
-   dir.create(output_dir_pag)
-}
-
-# Cria a pasta de saída para armazenamento dos contratos, caso ela não exista
-output_dir_pag = 'data/contratos/'
-if (!dir.exists(output_dir_pag)){
-   dir.create(output_dir_pag)
-}
-
 #Salva tabelas localmente
-readr::write_csv(licitacoes_transformadas, here::here("data/licitacoes/licitacoes.csv"))
+readr::write_csv(licitacoes_transformadas, here::here("data/licitacoes.csv"))
 readr::write_csv(tipo_objeto_licitacao_df, here::here("data/tipo_objeto_licitacao.csv"))
 readr::write_csv(tipo_modalidade_licitacao_df, here::here("data/tipo_modalidade_licitacao.csv"))
 readr::write_csv(regime_execucao_df, here::here("data/regime_execucao.csv"))
 readr::write_csv(codigo_unidade_gestora_df, here::here("data/codigo_unidade_gestora.csv"))
 readr::write_csv(codigo_funcao_df, here::here("data/codigo_funcao.csv"))
-readr::write_csv(contratos_transformados, here::here("data/contratos/contratos.csv"))
+readr::write_csv(contratos_transformados, here::here("data/contratos.csv"))
 readr::write_csv(codigo_subfuncao_df, here::here("data/codigo_subfuncao.csv"))
 readr::write_csv(codigo_elemento_despesa_df, here::here("data/codigo_elemento_despesa.csv"))
 readr::write_csv(codigo_subelemento_df, here::here("data/codigo_subelemento.csv"))
@@ -206,5 +201,3 @@ readr::write_csv(fornecedores_df, here::here("data/fornecedores.csv"))
 readr::write_csv(participantes_transformados, here::here("data/participantes.csv"))
 readr::write_csv(contratos_mutados_transformados, here::here("data/contratos_mutados.csv"))
 readr::write_csv(propostas_transformadas, here::here("data/propostas.csv"))
-readr::write_csv(licitacoes_tramita_transformadas, here::here("data/licitacoes/licitacoes_tramita.csv"))
-readr::write_csv(contratos_tramita_transformados, here::here("data/contratos/contratos_tramita.csv"))

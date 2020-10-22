@@ -9,7 +9,8 @@
 #' licitacoes_dt <- translate_licitacoes(licitacoes_raw)
 translate_licitacoes <- function(licitacoes_raw) {
   licitacoes_raw %<>% janitor::clean_names() %>%
-    dplyr::mutate(de_obs = stringr::str_replace(de_obs, "\uFFFD", ""))
+    dplyr::mutate(de_obs = stringr::str_replace(de_obs, "\uFFFD", "")) %>%
+    dplyr::mutate(dt_homologacao = gsub("T00:00:00Z", "", dt_homologacao))
 }
 
 #' @title Traduz dado recebido para dataset
@@ -72,7 +73,9 @@ translate_codigo_funcao <- function(codigo_funcao_raw) {
 translate_contratos <- function(contratos_raw) {
   contratos_raw %<>% janitor::clean_names() %>%
     dplyr::mutate(de_obs = stringr::str_replace(de_obs, "\uFFFD", "")) %>%
-    dplyr::mutate(nu_contrato = stringr::str_replace(nu_contrato, "\uFFFD", ""))
+    dplyr::mutate(nu_contrato = stringr::str_replace(nu_contrato, "\uFFFD", "")) %>%
+    dplyr::mutate(dt_assinatura = gsub("T00:00:00Z", "", dt_assinatura)) %>%
+    dplyr::mutate(pr_vigencia = gsub("T00:00:00Z", "", pr_vigencia)) 
 }
 
 #' @title Traduz dado recebido para dataset
@@ -250,10 +253,10 @@ translate_licitacoes_tramita <- function(licitacoes_tramita_raw){
      dplyr::mutate(de_tipo_licitacao = gsub("Dispensa \\(Art. 24 - Lei 8.666/93\\)", "Dispensa por Valor", de_tipo_licitacao)) %>%
      dplyr::mutate(de_tipo_licitacao = gsub("Dispensada \\(Art. 17 - Lei 8.666/93\\)", "Dispensa por outros motivos", de_tipo_licitacao)) %>%    
      dplyr::mutate(de_tipo_licitacao = gsub("Dispensa COVID-19 \\(Art. 4º da Lei 13.979/2020\\)", "Dispensa por outros motivos", de_tipo_licitacao)) %>%
-     dplyr::mutate(dt_mes_ano = NA) %>%
-     dplyr::mutate(registro_cge = NA) %>%
-     dplyr::mutate(dt_ano = NA) %>%
-     dplyr::mutate(tp_regime_execucao = NA)    
+     dplyr::mutate(dt_mes_ano = "NA") %>%
+     dplyr::mutate(registro_cge = "NA") %>%
+     dplyr::mutate(dt_ano = as.numeric(2020)) %>%
+     dplyr::mutate(tp_regime_execucao = NA)  
 }
 
 #' @param contratos_tramita_raw Dados brutos dos contratos contidos no Tramita
@@ -276,18 +279,18 @@ translate_contratos_tramita <- function(contratos_tramita_raw){
     dplyr::mutate(de_tipo_licitacao = gsub("Dispensa \\(Art. 24 - Lei 8.666/93\\)", "Dispensa por Valor", de_tipo_licitacao)) %>%
     dplyr::mutate(de_tipo_licitacao = gsub("Dispensada \\(Art. 17 - Lei 8.666/93\\)", "Dispensa por outros motivos", de_tipo_licitacao)) %>%    
     dplyr::mutate(de_tipo_licitacao = gsub("Dispensa COVID-19 \\(Art. 4º da Lei 13.979/2020\\)", "Dispensa por outros motivos", de_tipo_licitacao)) %>%
-    dplyr::mutate(dt_ano = NA) %>%
+    dplyr::mutate(dt_ano = 2020) %>%
     dplyr::rename(dt_assinatura = data_assinatura) %>%
     dplyr::rename(nu_cpfcnpj = cpf_cnpj_licitante) %>%
     dplyr::rename(vl_total_contrato = valor_contratado) %>%
     dplyr::rename(de_obs = descricao_contrato) %>%
-    dplyr::mutate(registro_cge = NA) %>%
-    dplyr::mutate(cd_siafi = NA) %>%
+    dplyr::mutate(registro_cge = "NA") %>%
+    dplyr::mutate(cd_siafi = "NA") %>%
     dplyr::mutate(dt_recebimento = NA) %>%
-    dplyr::mutate(foto = NA) %>%
-    dplyr::mutate(dt_mes_ano = NA) %>%
-    dplyr::mutate(planilha = NA) %>%
-    dplyr::mutate(ordem_servico = NA)  %>%
+    dplyr::mutate(foto = "NA") %>%
+    dplyr::mutate(dt_mes_ano = "NA") %>%
+    dplyr::mutate(planilha = "NA") %>%
+    dplyr::mutate(ordem_servico = "NA")  %>%
     dplyr::mutate(language = 'portuguese') %>%
     dplyr::rename(de_ugestora = unidade_gestora) %>%
     dplyr::rename(no_fornecedor = licitante) 

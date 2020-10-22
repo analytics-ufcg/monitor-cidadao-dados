@@ -31,6 +31,21 @@ join_empenhos_licitacao <- function(df_empenhos, df_licitacoes) {
     dplyr::select(-c(cd_municipio))
 }
 
+#' @title Realiza o join dos empenhos com o dataframe das licitações do tramita
+#' @param empenhos_df dataframe com os empenhos
+#' @param licitacoes_df dataframe com as licitações do tramita
+#' @return Dataframe contendo informações dos empenhos com os ids das licitações
+#' @rdname join_empenhos_licitacao_tramita
+#' @examples
+#' join_empenhos_licitacao_tramita_dt <- join_empenhos_licitacao_tramita(df_empenhos, df_licitacoes_tramita)
+#'
+join_empenhos_licitacao_tramita <- function(df_empenhos, df_licitacoes_tramita) {
+  df_licitacoes_tramita %<>% dplyr::select(cd_u_gestora, dt_ano, nu_licitacao,
+                                   tp_licitacao, id_licitacao, cd_ibge)
+  df_empenhos %<>% dplyr::left_join(df_licitacoes_tramita) %>%
+    dplyr::select(id_empenho, id_licitacao, dplyr::everything())
+  }
+
 #' @title Realiza o join dos contratos com os códigos das unidades gestoras
 #' @param df_contratos dataframe com os contratos
 #' @param df_codigo_unidade_gestora dataframe com os códigos das unidades gestoras
@@ -355,6 +370,32 @@ join_licitacoes_tramita_localidades_ibge <- function(df_licitacoes_tramita, df_l
   df_licitacoes_tramita %<>% dplyr::left_join(df_localidades_ibge) %>%
     dplyr::select(id_licitacao, dplyr::everything()) %>%
     dplyr::select(-c(cd_municipio))
+}
+
+#' @title Realiza o join dos contratos do tamita com as contratos do Sagres
+#' @param df_contratos_tramita dataframe com os contratos do tramita
+#' @param df_contratos dataframe com os contratos do SAGRES
+#' @return Dataframe contendo informações do contrato do Tramita e Sagres
+#' @rdname join_contratos_tramita_contratos_sagres
+#' @examples
+#' join_contratos_tramita_contratos_sagres_dt <- join_contratos_tramita_contratos_sagres(
+#'          df_contratos_tramita, df_contratos)
+#'
+join_contratos_tramita_contratos_sagres <- function(df_contratos, df_contratos_tramita) {
+  df_contratos %<>% dplyr::bind_rows(dplyr::anti_join(df_contratos_tramita, df_contratos, by="id_licitacao")) 
+}
+
+#' @title Realiza o join das licitações do tamita com as licitações do Sagres
+#' @param df_licitacoes_tramita dataframe com as licitações do tramita
+#' @param df_licitacoes dataframe com as licitações do SAGRES
+#' @return Dataframe contendo informações das licitações do Tramita e Sagres
+#' @rdname join_licitacoes_tramita_licitacoes_sagres
+#' @examples
+#' join_licitacoes_tramita_licitacoes_sagres_dt <- join_licitacoes_tramita_licitacoes_sagres(
+#'          df_licitacoes_tramita, df_licitacoes)
+#'
+join_licitacoes_tramita_licitacoes_sagres <- function(df_licitacoes, df_licitacoes_tramita) {
+  df_licitacoes %<>% dplyr::bind_rows(dplyr::anti_join(df_licitacoes_tramita, df_licitacoes, by="id_licitacao")) 
 }
 
 
