@@ -2,11 +2,11 @@ DROP TABLE IF EXISTS contrato_mutado;
 
 CREATE TABLE IF NOT EXISTS "contrato_mutado" (
     "id_contrato" VARCHAR(50),
-    "nu_contrato" VARCHAR(9),
+    "nu_contrato" VARCHAR(20),
     "jurisdicionado" VARCHAR(200),
     "cod_jurisdicionado" INTEGER,
     "cd_u_gestora" INTEGER,
-    "modalidade_licitacao" varchar(40),
+    "modalidade_licitacao" varchar(500),
     "nu_licitacao" VARCHAR(50),
     "nu_cpfcnpj" VARCHAR(14),
     "tipo_alteracao" VARCHAR(30),

@@ -5,11 +5,7 @@ CREATE TABLE IF NOT EXISTS "contrato" (
     "id_licitacao" VARCHAR(50),
     "cd_u_gestora" INTEGER,   
     "dt_ano" SMALLINT,
-<<<<<<< HEAD
-    "nu_contrato" VARCHAR(20),
-=======
     "nu_contrato" VARCHAR(40),
->>>>>>> f161bdd1a6af43a586b2fcb330f72649f77ae01d
     "dt_assinatura" DATE,
     "pr_vigencia" DATE,
     "nu_cpfcnpj" VARCHAR(14),
