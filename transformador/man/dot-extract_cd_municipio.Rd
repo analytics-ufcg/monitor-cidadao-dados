@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{.extract_cd_municipio}
 \alias{.extract_cd_municipio}
-\title{Extrai o código do município do código da unidade gestora. 
+\title{Extrai o código do município do código da unidade gestora.
 Essa estração é feita através da coleta dos últimos 3 digitos da unidade gestora.}
 \usage{
 .extract_cd_municipio(df, cd_u_gestora)
@@ -16,6 +16,6 @@ Essa estração é feita através da coleta dos últimos 3 digitos da unidade ge
 Dataframe com o código do município
 }
 \description{
-Extrai o código do município do código da unidade gestora. 
+Extrai o código do município do código da unidade gestora.
 Essa estração é feita através da coleta dos últimos 3 digitos da unidade gestora.
 }

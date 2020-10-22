@@ -5,14 +5,18 @@ CREATE TABLE IF NOT EXISTS "contrato" (
     "id_licitacao" VARCHAR(50),
     "cd_u_gestora" INTEGER,   
     "dt_ano" SMALLINT,
+<<<<<<< HEAD
     "nu_contrato" VARCHAR(20),
+=======
+    "nu_contrato" VARCHAR(40),
+>>>>>>> f161bdd1a6af43a586b2fcb330f72649f77ae01d
     "dt_assinatura" DATE,
     "pr_vigencia" DATE,
     "nu_cpfcnpj" VARCHAR(14),
-    "nu_licitacao" VARCHAR(10),
-    "tp_licitacao" SMALLINT,
+    "nu_licitacao" VARCHAR(20),
+    "tp_licitacao" VARCHAR(20),
     "vl_total_contrato" DECIMAL,
-    "de_obs" VARCHAR(5000),
+    "de_obs" VARCHAR,
     "dt_mes_ano" VARCHAR(6),
     "registro_cge" varchar(40),
     "cd_siafi" varchar(40),
@@ -28,7 +32,6 @@ CREATE TABLE IF NOT EXISTS "contrato" (
     "mesorregiao_geografica" VARCHAR(2),
     "microrregiao_geografica" VARCHAR(2),
     PRIMARY KEY("id_contrato"),
-    CONSTRAINT contrato_key UNIQUE (cd_u_gestora, dt_ano, nu_licitacao, tp_licitacao, nu_contrato),
     FOREIGN KEY("cd_ibge") REFERENCES localidade_ibge("cd_ibge") ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY("id_licitacao") REFERENCES licitacao("id_licitacao") ON DELETE CASCADE ON UPDATE CASCADE
 
