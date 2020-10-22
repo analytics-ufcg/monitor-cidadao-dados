@@ -108,7 +108,10 @@ for(ano in anos_fetch){
 
   readr::write_csv(contratos_rs_formatados, here::here(sprintf("./data/rs/contratos/contratos_%s.csv", ano)))
   readr::write_csv(licitacoes_rs_formatadas, here::here(sprintf("./data/rs/licitacoes/licitacoes_%s.csv", ano)))
+
+
 }
+
 
 
 
