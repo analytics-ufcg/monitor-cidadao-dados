@@ -105,7 +105,7 @@ contratos_tramita_transformados <- contratos_tramita_df %>%
    dplyr::distinct(id_contrato, .keep_all=TRUE) %>%
    dplyr::left_join(descricoes_licitacoes) %>%
    dplyr::mutate(de_obs = dplyr::if_else(is.na(de_obs),  obs, de_obs)) %>%
-   dplyr::select(-c(obs)) 
+   dplyr::select(-obs) 
 
 
 contratos_transformados <- contratos_df %>% mcTransformador::process_contrato() %>%

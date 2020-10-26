@@ -465,7 +465,7 @@ join_licitacoes_tramita_localidades_ibge <- function(df_licitacoes_tramita, df_l
 #'          df_contratos_tramita, df_contratos)
 #'
 join_contratos_tramita_contratos_sagres <- function(df_contratos, df_contratos_tramita) {
-  df_contratos %<>% dplyr::bind_rows(dplyr::anti_join(df_contratos_tramita, df_contratos, by="id_licitacao")) 
+  df_contratos %<>% dplyr::bind_rows(dplyr::anti_join(df_contratos_tramita, df_contratos, by="id_contrato")) 
 }
 
 #' @title Realiza o join das licitações do tamita com as licitações do Sagres
