@@ -38,7 +38,7 @@ translate_licitacoes_tce_rs <- function(licitacoes_tce_rs_raw){
   licitacoes_tce_rs_raw %<>% janitor::clean_names() %>%
     dplyr::rename(cd_u_gestora = cd_orgao) %>%
     dplyr::rename(dt_ano = ano_licitacao) %>%
-    dplyr::rename(nu_licitacao = nr_licitacao) %>% #tp_licitacao, dt_homologacao,vl_licitacao ok
+    dplyr::rename(nu_licitacao = nr_licitacao) %>%
     dplyr::rename(de_obs = ds_objeto) %>%
     dplyr::rename(de_ugestora = nm_orgao)
 }
@@ -55,6 +55,27 @@ translate_pessoas_tce_rs <- function(pessoas_tce_rs_raw){
     dplyr::rename(no_fornecedor = nm_pessoa)
 }
 
+#' @param empenho_licitacao_tce_rs_raw Dados brutos de empenhos, liquidações e pagamentos
+#' @return Dataframe contendo informações sobre empenhos, liquidações e pagamentos da base do TCE-RS
+#' @rdname translate_empenho_tce_rs
+#' @examples
+#' empenho_tce_rs_dt <- translate_empenho_tce_rs(empenho_licitacao_tce_rs_raw)
+translate_empenho_tce_rs  <- function(empenho_licitacao_tce_rs_raw){
+  empenho_licitacao_tce_rs_raw %<>% janitor::clean_names() %>%
+    dplyr::rename(cd_u_gestora = cd_orgao) %>%
+    dplyr::rename(nu_cpfcnpj = cnpj_cpf) %>%
+    dplyr::rename(no_fornecedor = nm_credor) %>%
+    dplyr::rename(dt_ano = ano_contrato) %>%
+    dplyr::rename(de_historico = historico) %>%
+    dplyr::rename(nu_empenho = nr_empenho) %>%
+    dplyr::rename(nu_parcela = nr_pagamento) %>%
+    dplyr::rename(dt_pagamento = dt_operacao) %>%
+    dplyr::rename(nu_licitacao = nr_licitacao) %>%
+    dplyr::rename(nu_contrato = nr_contrato) %>%
+    dplyr::rename(cd_tipo_modalidade = mod_licitacao) %>%
+    dplyr::rename(tp_instrumento = tp_instrumento_contratual)
+
+}
 
 
 

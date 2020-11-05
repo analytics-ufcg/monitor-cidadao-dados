@@ -15,11 +15,11 @@ CREATE TABLE IF NOT EXISTS "empenho" (
     "cd_cat_economica" VARCHAR(1),
     "cd_nat_despesa" VARCHAR(1),
     "cd_modalidade" VARCHAR(2),
-    "cd_elemento" VARCHAR(2),
+    "cd_elemento" VARCHAR(20),
     "cd_sub_elemento" VARCHAR(3),
     "tp_licitacao" SMALLINT,
-    "nu_licitacao" VARCHAR(10),
-    "nu_empenho" VARCHAR(7),
+    "nu_licitacao" VARCHAR(50),
+    "nu_empenho" VARCHAR(50),
     "tp_empenho" SMALLINT,
     "dt_empenho" DATE,
     "vl_empenho" DECIMAL,
@@ -38,7 +38,6 @@ CREATE TABLE IF NOT EXISTS "empenho" (
     "cd_sub_elemento_2" VARCHAR(3),
     "cd_ibge" VARCHAR(7),
     PRIMARY KEY("id_empenho"),
-    CONSTRAINT empenho_key UNIQUE (nu_empenho, cd_unid_orcamentaria, dt_ano, cd_u_gestora),
     FOREIGN KEY("cd_ibge") REFERENCES localidade_ibge("cd_ibge") ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY("id_licitacao") REFERENCES licitacao("id_licitacao") ON DELETE CASCADE ON UPDATE CASCADE
 
