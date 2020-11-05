@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS "empenho" (
     "cd_modalidade" VARCHAR(2),
     "cd_elemento" VARCHAR(2),
     "cd_sub_elemento" VARCHAR(3),
-    "tp_licitacao" SMALLINT,
+    "tp_licitacao" VARCHAR(20),
     "nu_licitacao" VARCHAR(10),
     "nu_empenho" VARCHAR(7),
     "tp_empenho" SMALLINT,
