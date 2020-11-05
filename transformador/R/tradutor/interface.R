@@ -270,10 +270,20 @@ get_licitacoes_tce_rs <- function(ano){
 #' @return Dataframe contendo informações sobre os fornecedores
 #' @rdname get_pessoas_tce_rs
 #' @examples
-#' essoas_tce_rs_dt <- get_pessoas_tce_rs()
+#' pessoas_tce_rs_dt <- get_pessoas_tce_rs()
 get_pessoas_tce_rs <- function(ano){
   pessoas_tce_rs_dt  <- read_pessoas_tce_rs(ano) %>%
     translate_pessoas_tce_rs()
+}
+
+#' @title Obtem dados os dados de empenhos, liquidações e pagamentos do TCE-RS
+#' @return Dataframe contendo informações sobre empenhos, liquidações e pagamentos
+#' @rdname get_empenho_tce_rs
+#' @examples
+#' get_empenho_tce_rs <- get_empenho_tce_rs(2020, 2020.00001.csv)
+get_empenho_tce_rs <- function(ano, file_empenho){
+  get_empenho_tce_rs <- read_empenho_tce_rs(ano, file_empenho) %>%
+    translate_empenho_tce_rs()
 }
 
 

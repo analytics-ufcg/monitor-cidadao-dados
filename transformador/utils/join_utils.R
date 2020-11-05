@@ -344,4 +344,39 @@ join_pagamentos_empenhos <- function(df_pagamentos, df_empenhos) {
     dplyr::select(id_pagamento, id_empenho, id_licitacao, id_contrato, dplyr::everything())
 }
 
+#' @title Realiza o join dos empenhos e pagamentos do RS com o df de contratos
+#' @param df_empenhos_pagamentos_rs dataframe com os empenhos e pagamentos
+#' @param df_contratos_rs dataframe com os contratos
+#' @return Dataframe contendo informações dos empenhos e pagamentos com o id do contrato
+#' @rdname join_empenhos_rs_contratos
+#' @examples
+#' join_empenhos_pagamentos_rs_contratos_dt <- join_empenhos_pagamentos_rs_contratos(df_empenhos_pagamentos_rs, df_contratos_rs)
+#'
+join_empenhos_pagamentos_rs_contratos  <- function(df_empenhos_pagamentos_rs, df_contratos_rs) {
+  df_contratos_rs %<>% dplyr::select(cd_tipo_modalidade, tp_instrumento, ano_licitacao,
+                                     dt_ano, nu_contrato, nu_licitacao, cd_u_gestora,
+                                     id_licitacao, id_contrato)  %>%
+                      dplyr::mutate(dt_ano = as.character(dt_ano))
+
+  df_empenhos_pagamentos_rs %<>% dplyr::left_join(df_contratos_rs , by=c("tp_instrumento", "cd_tipo_modalidade", "ano_licitacao",
+                                                                        "dt_ano", "nu_contrato", "nu_licitacao", "cd_u_gestora")) %>%
+    dplyr::select(id_empenho,id_licitacao, id_licitacao, id_contrato, dplyr::everything()) %>%
+    dplyr::filter(!is.na(id_contrato))
+}
+
+
+
+  # df_empenhos_pagamentos_rs %<>% dplyr::left_join(contratos_df %>%
+  #                      dplyr::mutate(nr_licitacao = as.character(nr_licitacao),
+  #                                    nr_contrato = as.character(nr_contrato)) %>%
+  #                      dplyr::select(id_contrato, id_orgao, ano_licitacao, nr_licitacao, cd_tipo_modalidade,
+  #                                    nr_contrato, ano_contrato, tp_instrumento_contrato),
+  #                    by = c("id_orgao", "ano_licitacao", "nr_licitacao", "cd_tipo_modalidade",
+  #                           "nr_contrato", "ano_contrato", "tp_instrumento_contrato"))
+
+
+
+
+
+
 

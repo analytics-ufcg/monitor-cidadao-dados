@@ -108,7 +108,14 @@ for(ano_exec in anos_exec){
   decompress_file(path_empenhos, empenhos_zip)
   unlink(empenhos_zip)
   
+  message(sprintf("   Separando empenhos do ano %s em arquivos menores.",ano_exec))
+  csv_empenhos_full <- sprintf("data/rs/empenhos/%s/%s.csv", ano_exec, ano_exec) 
+  cmd_split <- paste("awk -v l=500000 '(NR==1){header=$0;next} (NR%l==2) { close(file); file=sprintf(\"%s.%0.5d.csv\",FILENAME,++c); sub(/csv[.]/,\"\",file); print header > file; } {print > file}'", csv_empenhos_full)
+  system(cmd_split)
+  system(paste("rm", csv_empenhos_full))
 }
+
+
 
 # realiza o fetch dos arquivos que não são anuais
 # fetch órgãos

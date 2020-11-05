@@ -74,7 +74,67 @@ format_contrato_tce_rs <- function(contratos_transformados_rs_df) {
     dplyr::select(colunas_contratos)
 }
 
+#' @title Processa dataframe dos empenhos
+#' @description Manipula a tabela para se adequar aos outros estados
+#' @param empenhos_pagamentos_transformados_rs_df Dataframe contendo informações de empenhos e pagamentos do RS
+#' @return Dataframe contendo informações dos empenhos
+format_empenhos_tce_rs <- function(empenhos_pagamentos_transformados_rs_df) {
+  colunas_empenhos <- c( "id_empenho", "id_licitacao", "id_contrato","cd_u_gestora","dt_ano","cd_unid_orcamentaria","cd_funcao","cd_subfuncao",
+                         "cd_programa","cd_acao","cd_classificacao", "cd_cat_economica", "cd_nat_despesa", "cd_modalidade","cd_elemento",
+                         "cd_sub_elemento","tp_licitacao","nu_licitacao", "nu_empenho", "tp_empenho","dt_empenho","vl_empenho","cd_credor",
+                         "no_credor","tp_credor","de_historico1","de_historico2","de_historico","tp_meta","nu_obra", "dt_mes_ano",
+                         "dt_mes_ano_referencia","tp_fonte_recursos","nu_cpf", "cd_sub_elemento_2","cd_ibge")
 
+  empenhos_rs_formatados <-fncols(empenhos_pagamentos_transformados_rs_df, colunas_empenhos) %>%
+    dplyr::select(colunas_empenhos)  %>%
+    dplyr::distinct(id_empenho, .keep_all = TRUE)
+}
+
+#' @title Processa dataframe de pagamentos
+#' @description Manipula a tabela para se adequar aos outros estados
+#' @param empenhos_pagamentos_transformados_rs_df Dataframe contendo informações de empenhos e pagamentos do RS
+#' @return Dataframe contendo informações dos pagamentos
+format_pagamentos_tce_rs <- function(empenhos_pagamentos_transformados_rs_df) {
+  colunas_pagamentos <- c("id_pagamento","id_empenho","id_licitacao","id_contrato",
+                          "cd_u_gestora","dt_ano","cd_unid_orcamentaria","nu_empenho",
+                          "nu_parcela","tp_lancamento","vl_pagamento","dt_pagamento",
+                          "cd_conta","nu_cheque_pag","nu_deb_aut","cd_banco_rec",
+                          "cd_agencia_rec","nu_conta_rec","tp_fonte_recursos","dt_mes_ano",
+                          "cd_banco","cd_agencia","tp_conta_bancaria")
+
+  pagamentos_rs_formatados <-fncols(empenhos_pagamentos_transformados_rs_df, colunas_pagamentos) %>%
+    dplyr::select(colunas_pagamentos) %>%
+    dplyr::filter(!is.na(vl_pagamento))
+
+}
+
+#' @title Processa dataframe de empenhos e pagamentos do RS
+#' @description Manipula a tabela para a adição de identificadores e para adequação
+#'              de colunas.
+#' @param empenhos_pagamento_ce_rs Dataframe contendo informações de empenhos e pagamentos do RS
+#' @return Dataframe contendo informações dos empenhos e pagamentos
+process_empenhos_pagamento_tce_rs <- function(empenhos_pagamento_tce_rs, file_empenho) {
+  empenhos_pagamento_tce_rs %<>% generate_empenhos_pagamento_tce_rs_id(file_empenho)
+}
+
+#' @title Gera um identificador único para empenhos e licitações do RS
+#' @param empenhos_pagamento_tce_rs Dataframe contendo informações sobre empenhos e licitações
+#' @return Dataframe contendo informações sobre empenhos e licitações do RS e seus ids
+#' @rdname generate_empenhos_pagamento_tce_rs_id
+#' @examples
+#' empenhos_pagamento_tce_rs <- generate_empenhos_pagamento_tce_rs_id(empenhos_pagamento_tce_rs)
+generate_empenhos_pagamento_tce_rs_id <- function(empenhos_pagamento_tce_rs, file_empenho) {
+  empenhos_pagamento_tce_rs$index <- seq.int(nrow(empenhos_pagamento_tce_rs))
+  empenhos_pagamento_tce_rs$file <- file_empenho
+
+  chave_empenhos <- c("ano_recebimento", "mes_recebimento", "cd_u_gestora", "cd_orgao_orcamentario", "nome_orgao_orcamentario",
+                      "cd_unidade_orcamentaria", "nome_unidade_orcamentaria", "tp_unidade",
+                      "dt_empenho", "ano_empenho", "ano_operacao", "nu_empenho", "cd_credor", "nu_cpfcnpj",
+                      "ano_licitacao", "nu_licitacao", "cd_tipo_modalidade", "file")
+
+  empenhos_pagamento_tce_rs %<>% .generate_hash_id(chave_empenhos, "id_empenho")
+  empenhos_pagamento_tce_rs %<>% .generate_hash_id(c("index", "file"), "id_pagamento")
+}
 
 
 

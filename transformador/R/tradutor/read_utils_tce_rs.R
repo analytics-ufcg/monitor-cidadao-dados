@@ -87,6 +87,18 @@ read_pessoas_tce_rs <- function(ano) {
                                           ))
 }
 
+#' @title Lê dataframe contendo informações de empenhos, liquidações e pagamentos da base de dados do TCE-RS
+#' @return Dataframe contendo informações sobre empenhos, liquidações e pagamentos
+#' @rdname read_empenho_tce_rs
+#' @examples
+#' read_empenho_tce_rs_dt <- read_empenho_tce_rs(ano, file)
+read_empenho_tce_rs<- function(ano, file_empenho){
+  empenho_tce_rs_df <- readr::read_csv(here::here(sprintf("../fetcher/data/rs/empenhos/%s/%s", ano, file_empenho)),
+                                       col_types = list(
+                                         .default = readr::col_character()
+                                       ))
+
+}
 
 
 
