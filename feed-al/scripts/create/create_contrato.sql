@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS "contrato" (
     "ordem_servico" VARCHAR(150),
     "language" VARCHAR(10),
     "de_ugestora" VARCHAR(100),
-    "no_fornecedor" VARCHAR(100),
+    "no_fornecedor" VARCHAR(500),
     "cd_ibge" VARCHAR(7),
     "uf" VARCHAR(2),
     "mesorregiao_geografica" VARCHAR(2),

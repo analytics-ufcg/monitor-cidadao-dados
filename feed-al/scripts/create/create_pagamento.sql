@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS "pagamento" (
   "cd_banco" VARCHAR(3),
   "cd_agencia" VARCHAR(6),
   "tp_conta_bancaria" VARCHAR(1),
+  "cd_credor" VARCHAR(14),
   PRIMARY KEY("id_pagamento"),
   CONSTRAINT pagamento_key UNIQUE (cd_u_gestora, dt_ano, cd_unid_orcamentaria,
      nu_empenho, nu_parcela, tp_lancamento),

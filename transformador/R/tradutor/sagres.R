@@ -9,7 +9,8 @@
 #' licitacoes_dt <- translate_licitacoes(licitacoes_raw)
 translate_licitacoes <- function(licitacoes_raw) {
   licitacoes_raw %<>% janitor::clean_names() %>%
-    dplyr::mutate(de_obs = stringr::str_replace(de_obs, "\uFFFD", ""))
+    dplyr::mutate(de_obs = stringr::str_replace(de_obs, "\uFFFD", "")) %>%
+    dplyr::mutate(dt_homologacao = gsub("T00:00:00Z", "", dt_homologacao))
 }
 
 #' @title Traduz dado recebido para dataset
@@ -72,7 +73,9 @@ translate_codigo_funcao <- function(codigo_funcao_raw) {
 translate_contratos <- function(contratos_raw) {
   contratos_raw %<>% janitor::clean_names() %>%
     dplyr::mutate(de_obs = stringr::str_replace(de_obs, "\uFFFD", "")) %>%
-    dplyr::mutate(nu_contrato = stringr::str_replace(nu_contrato, "\uFFFD", ""))
+    dplyr::mutate(nu_contrato = stringr::str_replace(nu_contrato, "\uFFFD", "")) %>%
+    dplyr::mutate(dt_assinatura = gsub("T00:00:00Z", "", dt_assinatura)) %>%
+    dplyr::mutate(pr_vigencia = gsub("T00:00:00Z", "", pr_vigencia)) 
 }
 
 #' @title Traduz dado recebido para dataset
@@ -214,7 +217,7 @@ translate_estorno_pagamento <- function(estorno_pagamento_raw) {
 }
 
 
-#' @param propostas_raw Dados brutos dos distritos do IBGE
+#' @param localidades_ibge_raw Dados brutos dos distritos do IBGE
 #' @return Dataframe contendo informações sobre os distritos
 #' @rdname translate_distritos_ibge
 #' @examples
@@ -226,3 +229,74 @@ translate_codigo_localidades_ibge <- function(localidades_ibge_raw){
                                 municipio, codigo_municipio_completo,	nome_municipio),
                                function(x){gsub("[^[:alnum:][:blank:]?&/\\-]", "", x)})
 }
+
+#' @param licitacoes_tramita_raw Dados brutos das licitações contidas no Tramita
+#' @return Dataframe contendo informações sobre as licitações contidas no Tramita
+#' @rdname translate_licitacoes_tramita
+#' @examples
+#' licitacoes_tramita_df <- translate_licitacoes_tramita(licitacoes_tramita_raw)
+translate_licitacoes_tramita <- function(licitacoes_tramita_raw){
+    licitacoes_tramita_raw %<>% janitor::clean_names() %>%
+     dplyr::filter(esfera == "Municipal") %>%
+     dplyr::rename(cd_u_gestora = cod_unidade_gestora) %>%
+     dplyr::rename(nu_licitacao = numero_licitacao) %>%
+     dplyr::rename(vl_licitacao = valor_homologacao) %>% # Foi utilizado o valor homologação porque o valor estimado tinha muitas observações com NA
+     dplyr::rename(dt_homologacao = data_homologacao) %>%
+     dplyr::mutate(nu_licitacao = gsub("/", "", nu_licitacao)) %>%
+     dplyr::rename(de_tipo_licitacao = modalidade_licitacao) %>%
+     dplyr::rename(de_tipo_objeto = tipo_objeto) %>%
+     dplyr::rename(de_obs = objeto) %>%
+     dplyr::rename(de_ugestora = unidade_gestora) %>%
+     dplyr::mutate(de_tipo_licitacao = gsub("Adesão a Ata de Registro de Preços", "Adesão a Registro de Preço", de_tipo_licitacao)) %>%
+     dplyr::mutate(de_tipo_licitacao = gsub("Inexigibilidade", "Inexigível", de_tipo_licitacao)) %>%
+     dplyr::mutate(de_tipo_licitacao = gsub("Tomada de Preço", "Tomada de Preços", de_tipo_licitacao)) %>%
+     dplyr::mutate(de_tipo_licitacao = gsub("Dispensa \\(Art. 24 - Lei 8.666/93\\)", "Dispensa por Valor", de_tipo_licitacao)) %>%
+     dplyr::mutate(de_tipo_licitacao = gsub("Dispensada \\(Art. 17 - Lei 8.666/93\\)", "Dispensa por outros motivos", de_tipo_licitacao)) %>%    
+     dplyr::mutate(de_tipo_licitacao = gsub("Dispensa COVID-19 \\(Art. 4º da Lei 13.979/2020\\)", "Dispensa por outros motivos", de_tipo_licitacao)) %>%
+     dplyr::mutate(dt_mes_ano = "NA") %>%
+     dplyr::mutate(registro_cge = "NA") %>%
+     dplyr::mutate(dt_ano = as.numeric(2020)) %>%
+     dplyr::mutate(tp_regime_execucao = NA)  
+}
+
+#' @param contratos_tramita_raw Dados brutos dos contratos contidos no Tramita
+#' @return Dataframe contendo informações sobre os contratos contidos no Tramita
+#' @rdname translate_contratos_tramita
+#' @examples
+#' contratos_tramita_df <- translate_contratos_tramita(contratos_tramita_raw)
+translate_contratos_tramita <- function(contratos_tramita_raw){
+    contratos_tramita_raw %<>% janitor::clean_names() %>%
+    dplyr::filter(esfera == "Municipal") %>%
+    dplyr::rename(cd_u_gestora = cod_unidade_gestora_contrato) %>%
+    dplyr::rename(pr_vigencia = data_finalizacao) %>%
+    dplyr::rename(nu_licitacao = numero_licitacao) %>%
+    dplyr::rename(nu_contrato = numero_contrato) %>%
+    dplyr::mutate(nu_licitacao = gsub("/", "", nu_licitacao)) %>%
+    dplyr::rename(de_tipo_licitacao = modalidade_licitacao)  %>%
+    dplyr::mutate(de_tipo_licitacao = gsub("Adesão a Ata de Registro de Preços", "Adesão a Registro de Preço", de_tipo_licitacao)) %>%
+    dplyr::mutate(de_tipo_licitacao = gsub("Inexigibilidade", "Inexigível", de_tipo_licitacao)) %>%
+    dplyr::mutate(de_tipo_licitacao = gsub("Tomada de Preço", "Tomada de Preços", de_tipo_licitacao)) %>%
+    dplyr::mutate(de_tipo_licitacao = gsub("Dispensa \\(Art. 24 - Lei 8.666/93\\)", "Dispensa por Valor", de_tipo_licitacao)) %>%
+    dplyr::mutate(de_tipo_licitacao = gsub("Dispensada \\(Art. 17 - Lei 8.666/93\\)", "Dispensa por outros motivos", de_tipo_licitacao)) %>%    
+    dplyr::mutate(de_tipo_licitacao = gsub("Dispensa COVID-19 \\(Art. 4º da Lei 13.979/2020\\)", "Dispensa por outros motivos", de_tipo_licitacao)) %>%
+    dplyr::mutate(dt_ano = 2020) %>%
+    dplyr::rename(dt_assinatura = data_assinatura) %>%
+    dplyr::rename(nu_cpfcnpj = cpf_cnpj_licitante) %>%
+    dplyr::rename(vl_total_contrato = valor_contratado) %>%
+    dplyr::rename(de_obs = descricao_contrato) %>%
+    dplyr::mutate(registro_cge = "NA") %>%
+    dplyr::mutate(cd_siafi = "NA") %>%
+    dplyr::mutate(dt_recebimento = NA) %>%
+    dplyr::mutate(foto = "NA") %>%
+    dplyr::mutate(dt_mes_ano = "NA") %>%
+    dplyr::mutate(planilha = "NA") %>%
+    dplyr::mutate(ordem_servico = "NA")  %>%
+    dplyr::mutate(language = 'portuguese') %>%
+    dplyr::rename(de_ugestora = unidade_gestora) %>%
+    dplyr::rename(no_fornecedor = licitante) 
+}
+
+
+
+
+

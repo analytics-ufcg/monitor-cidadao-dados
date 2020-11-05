@@ -136,3 +136,48 @@ COLNAMES_CODIGO_LOCALIDADES <- c("UF" ="integer",
                                     "Código de Distrito Completo" = "integer",
                                     "Nome_Distrito" = "character"
                                     )
+
+COLNAMES_CONTRATOS_2020 <- c("poder" = "character", "ente" = "character",
+                                "cod_unidade_gestora_contrato" = "integer",
+                                "unidade_gestora" = "character",
+                                "cod_modalidade_licitacao" = "integer",
+                                "modalidade_licitacao" = "character",
+                                "numero_licitacao" = "character", 
+                                "numero_regcge" = "character",
+                                "esfera" = "character",
+                                "cpf_cnpj_licitante" = "character",
+                                "licitante" = "character",
+                                "numero_contrato" = "character",
+                                "numero_protocolo_contrato" = "character",
+                                "tipo_protocolo_contrato" = "character",
+                                "numero_protocolo_licitacao" = "character",
+                                "tipo_protocolo_licitacao" = "character",
+                                "data_assinatura" = "character", 
+                                "data_publicacao" = "character",
+                                "data_finalizacao" = "character",
+                                "valor_contratado" = "numeric",
+                                "valor_proposta" = "numeric",	
+                                "descricao_contrato" = "character",
+                                "informacao_complementar" = "character"
+                                )
+
+
+COLNAMES_LICITACOES_2020 <- c("cod_unidade_gestora" = "integer",
+                        	    "ente"= "character",
+                        		"unidade_gestora" = "character",
+                        		"esfera" = "character",
+                        		"numero_licitacao" = "character",
+                        		"data_homologacao" = "character",
+                        		"valor_homologacao" = "numeric",
+                        		"valor_estimado" = "numeric",
+                        		"objeto" = "character",
+                        		"tipo_objeto" = "character",
+                        		"cod_modalidade_licitacao" = "integer",
+                        		"modalidade_licitacao" = "character",
+                        		"situacao" = "character",
+                        		"valor_proposta" = "numeric",
+                        		"cpf_cnpj_licitante" = "character",
+                        		"nome_licitante" = "character",
+                        		"numero_protocolo" = "character",
+                        		"tipo_protocolo" = "character"
+                                )

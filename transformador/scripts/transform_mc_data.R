@@ -51,6 +51,7 @@ aditivos_df <- get_aditivos()
 codigo_unidade_gestora_df <- get_codigo_unidade_gestora()
 codigo_funcao_df <- get_codigo_funcao()
 contratos_df <- get_contratos()
+contratos_tramita_df <- get_contratos_tramita()
 codigo_subfuncao_df <- get_codigo_subfuncao()
 codigo_elemento_despesa_df <- get_codigo_elemento_despesa()
 codigo_subelemento_df <- get_codigo_subelemento()
@@ -60,6 +61,7 @@ codigo_localidades_ibge_df <- get_codigo_localidades_ibge()
 estorno_pagamento_df <- get_estorno_pagamento()
 fornecedores_df <- get_fornecedores()
 licitacoes_df <- get_licitacoes()
+licitacoes_tramita_df <- get_licitacoes_tramita()
 municipios_df <- get_codigo_municipio()
 participantes_df <- get_participantes()
 propostas_df <- get_propostas()
@@ -72,13 +74,39 @@ message("")
 # TRANSFORMA AS TABELAS
 municipios_sagres_df <- municipios_df %>% mcTransformador::process_municipio()
 
+licitacoes_tramita_transformadas <- licitacoes_tramita_df %>% 
+   join_licitacoes_tramita_tipo_modalidade_licitacao(tipo_modalidade_licitacao_df) %>%
+   join_licitacoes_tramita_tipo_objeto_licitacao(tipo_objeto_licitacao_df) %>%
+   dplyr::group_by(cd_u_gestora, nu_licitacao, dt_homologacao, vl_licitacao, de_obs, de_ugestora, de_tipo_licitacao, tp_licitacao, tp_objeto, dt_mes_ano, registro_cge, dt_ano, tp_regime_execucao) %>% 
+   dplyr::summarise(nu_propostas = dplyr::n()) %>%
+   mcTransformador::process_licitacao_tramita() %>%
+   join_licitacoes_tramita_municipios_sagres(municipios_sagres_df) %>%
+   join_licitacoes_tramita_localidades_ibge(codigo_localidades_ibge_transformados) %>%
+   dplyr::select(id_licitacao, cd_u_gestora, dt_ano, nu_licitacao, tp_licitacao, dt_homologacao, nu_propostas, vl_licitacao, tp_objeto, de_obs, dt_mes_ano, registro_cge, tp_regime_execucao, de_ugestora, de_tipo_licitacao,	cd_ibge, uf, mesorregiao_geografica, microrregiao_geografica) %>%
+   dplyr::distinct(id_licitacao, .keep_all=TRUE)
+
 licitacoes_transformadas <- licitacoes_df %>% mcTransformador::process_licitacao() %>%
   join_licitacoes_codigo_unidade_gestora(codigo_unidade_gestora_df) %>%
   join_licitacoes_tipo_modalidade_licitacao(tipo_modalidade_licitacao_df) %>%
   join_licitacoes_municipios_sagres(municipios_sagres_df) %>%
-  join_licitacoes_localidades_ibge(codigo_localidades_ibge_transformados)
+  join_licitacoes_localidades_ibge(codigo_localidades_ibge_transformados) %>%
+  join_licitacoes_tramita_licitacoes_sagres(licitacoes_tramita_transformadas)
+
 
 descricoes_licitacoes <- licitacoes_transformadas %>% dplyr::select(id_licitacao, obs = de_obs)
+
+contratos_tramita_transformados <- contratos_tramita_df %>%
+   join_contratos_tramita_tipo_modalidade_licitacao(tipo_modalidade_licitacao_df) %>% 
+   mcTransformador::process_contrato_tramita() %>%
+   join_contratos_tramita_licitacoes_tramita(licitacoes_tramita_transformadas) %>%
+   join_contratos_tramita_municipios_sagres(municipios_sagres_df) %>%
+   join_contratos_tramita_localidades_ibge(codigo_localidades_ibge_transformados) %>%
+   dplyr::select(id_contrato, id_licitacao, cd_u_gestora, dt_ano, nu_contrato, dt_assinatura, pr_vigencia, nu_cpfcnpj, nu_licitacao, tp_licitacao, vl_total_contrato, de_obs, dt_mes_ano, registro_cge, cd_siafi, dt_recebimento, foto, planilha, ordem_servico, language, de_ugestora, no_fornecedor, cd_ibge,	uf,	mesorregiao_geografica,	microrregiao_geografica) %>%
+   dplyr::distinct(id_contrato, .keep_all=TRUE) %>%
+   dplyr::left_join(descricoes_licitacoes) %>%
+   dplyr::mutate(de_obs = dplyr::if_else(is.na(de_obs),  obs, de_obs)) %>%
+   dplyr::select(-obs) 
+
 
 contratos_transformados <- contratos_df %>% mcTransformador::process_contrato() %>%
   join_contratos_licitacao(licitacoes_transformadas) %>%
@@ -88,7 +116,8 @@ contratos_transformados <- contratos_df %>% mcTransformador::process_contrato() 
   join_contratos_localidades_ibge(codigo_localidades_ibge_transformados) %>%
   dplyr::left_join(descricoes_licitacoes) %>%
   dplyr::mutate(de_obs = dplyr::if_else(is.na(de_obs),  obs, de_obs)) %>%
-  dplyr::select(-obs)
+  dplyr::select(-obs) %>%
+  join_contratos_tramita_contratos_sagres(contratos_tramita_transformados)
 
 participantes_transformados <- participantes_df %>% mcTransformador::process_participante() %>%
   join_participantes_licitacao(licitacoes_transformadas) %>%

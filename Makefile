@@ -53,11 +53,12 @@ enter-fetcher-container:
 .PHONY: enter-fetcher-container
 fetch-data-tce-rs:
 	docker exec -it fetcher sh -c "Rscript scripts/fetch_tce_rs_opendata.R --ano $(ano)"
-.PHONY: fetch-data
+.PHONY: fetch-data-tce-rs
 fetch-data-sagres:
+	docker exec -it fetcher sh -c "Rscript scripts/fetch_tramita_pb_2020_data.R"
 	docker exec -it fetcher sh -c "Rscript scripts/fetch_ibge.R"
 	docker exec -it fetcher sh -c "Rscript scripts/fetch_sagres_data.R"
-.PHONY: fetch-data
+.PHONY: fetch-data-sagres
 enter-transformer-container:
 	docker exec -it transformador /bin/bash
 .PHONY: enter-transformer-container
