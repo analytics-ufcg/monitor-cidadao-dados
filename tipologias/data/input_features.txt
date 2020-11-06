@@ -21,3 +21,9 @@ razao_contrato_por_vl_recebido
 pr_vigencia
 cd_u_gestora
 vl_total_contrato
+n_municipios
+n_ugestora
+total_ganho
+media_municipio
+media_ugestora
+media_ganho

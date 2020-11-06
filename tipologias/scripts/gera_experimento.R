@@ -162,14 +162,18 @@ tipologias_cgerais <- features %>%
 tipologias_cgerais$status_tramita <- as.factor(tipologias_cgerais$status_tramita)
 tipologias_cgerais$tp_licitacao <- as.factor(tipologias_cgerais$tp_licitacao)
 
+
 message("   Recuperando features de contratos vigentes...")
 message("")
+
 tipologias_vigentes <- tipologias_cgerais %>% 
   dplyr::filter_all(dplyr::all_vars(!is.na(.))) %>% 
   dplyr::filter(vigente == "TRUE") %>% dplyr::select(-vigente)
 
+
 message("   Recuperando features de contratos finalizados...")
 message("")
+
 tipologias_cgerais <- tipologias_cgerais %>% 
   dplyr::filter_all(dplyr::all_vars(!is.na(.))) %>% 
   dplyr::filter(vigente == "FALSE") %>% dplyr::select(-vigente)
@@ -248,7 +252,7 @@ rl_receita <- recipes::recipe(status_tramita ~ ., data = treino_fil) %>%
   recipes::step_dummy(recipes::all_nominal(), -recipes::all_outcomes()) %>% 
   recipes::prep()
 
-teste_feature <- teste %>% dplyr::select(-id_contrato) %>% 
+teste_feature <- teste_fil %>% dplyr::select(-id_contrato) %>% 
   sapply(as.numeric) %>%
   as.data.frame() %>% 
   dplyr::mutate(tp_licitacao = as.character(tp_licitacao),

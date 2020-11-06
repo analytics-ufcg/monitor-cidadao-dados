@@ -117,21 +117,64 @@ gera_tipologia_contrato <- function(tipologias_df, contratos_df, contratos_raw) 
   return(contratos_features)
 }
 
+gera_tipologia_fornecimento <- function(empenhos_data) {
+  ## Separa nome dos Credores
+  cnpjs_nome <- empenhos_data %>% 
+    dplyr::group_by(cd_credor) %>% 
+    dplyr::summarise(no_credor = dplyr::first(no_credor))
+  
+  ## Calcula o total ganho por Credor, Data, Unidade Gestora e Ano
+  empenhos_group <- empenhos_data %>% 
+    group_by(cd_credor, data, cd_u_gestora, dt_ano) %>% 
+    summarise(total_ganho = sum(total_pago - replace_na(total_estornado, 0))) %>% 
+    ungroup()
+  
+  ## Calcula a Feature do número de municípios agrupando por Credor e Ano
+  empenhos_por_fornecedor_ano <- empenhos_group %>% 
+    dplyr::mutate(cd_u_gestora_copy = cd_u_gestora) %>% 
+    tidyr::separate(cd_u_gestora_copy, c('cd_u_gestora_prefix', 'cd_municipio'), -3) %>%
+    dplyr::group_by(cd_credor, data, dt_ano) %>% 
+    dplyr::summarise(n_municipios = dplyr::n_distinct(cd_municipio),
+              n_ugestora = dplyr::n_distinct(cd_u_gestora),
+              total_ganho = sum(total_ganho)) %>% 
+    dplyr::ungroup() %>% 
+    dplyr::select(cd_credor, data, dt_ano, n_municipios, n_ugestora, total_ganho)
+  
+  # empenhos_features <- empenhos_por_fornecedor_ano %>% 
+  #   dplyr::group_by(cd_credor, data) %>% 
+  #   dplyr::summarise(media_municipio = mean(n_municipios), # ordem das operações importa. Média calculada apenas para o anos com observações (fornecimento da empresa).
+  #             n_municipios = sum(n_municipios),
+  #             media_ugestora = mean(n_ugestora),
+  #             n_ugestora = sum(n_ugestora),
+  #             media_ganho = mean(total_ganho),
+  #             total_ganho = sum(total_ganho)) %>% 
+  #   dplyr::ungroup()
+  # 
+  empenhos_features_nome <- empenhos_por_fornecedor_ano %>% 
+    dplyr::left_join(cnpjs_nome, by = "cd_credor") %>% 
+    dplyr::select(cd_credor, no_credor, dplyr::everything())
+  
+  return(empenhos_features_nome)
+}
+
+
 #' @description Cruza as tipologias dos Dataframes de licitações e de propostas à tabela de contratos
 #' @param contratos_df Dataframe contendo informações processadas sobre os contratos
 #' @param tipologias_licitacao_df Dataframe contendo informações sobre as tipologias das licitações
 #' @param tipologias_proposta_df Dataframe contendo informações sobre as tipologias das propostas
+#' @param tipologias_fornecimento_df Dataframe contendo informações sobre as tipologias de fornecimento
 #' @return Dataframe contendo as tipologias das licitações e das propostas, associadas aos contratos
 #' @rdname merge_tipologias
 #' @examples
 #' tipologias_merge <- merge_tipologias(contratos_processados_df, tipologias_licitacao_df, tipologias_proposta_df) 
-merge_tipologias <- function(contratos_df, tipologias_licitacao_df, tipologias_proposta_df) {
+merge_tipologias <- function(contratos_df, tipologias_licitacao_df, tipologias_proposta_df, tipologias_fornecimento_df) {
   
   contratos_total_ganho <- contratos_df %>% #ISSO ESTA ERRADO, USAR PAGAMENTOS PARA FAZER ESSE CALCULO DO TOTAL GANHO
     dplyr::group_by(nu_cpfcnpj) %>% 
     dplyr::summarise(total_ganho = sum(vl_total_contrato))
   
   tipologias_merge <- contratos_df %>% 
+    dplyr::left_join(tipologias_fornecimento_df, by = c("nu_cpfcnpj" = "cd_credor", "data_inicio" = "data")) %>% 
     dplyr::left_join(tipologias_licitacao_df, by = c("nu_cpfcnpj" = "nu_cpfcnpj", "data_inicio" = "data_inicio")) %>% 
     dplyr::left_join(tipologias_proposta_df, by = c("nu_cpfcnpj" = "nu_cpfcnpj", "data_inicio" = "data_inicio")) %>% 
     dplyr::left_join(contratos_total_ganho) 

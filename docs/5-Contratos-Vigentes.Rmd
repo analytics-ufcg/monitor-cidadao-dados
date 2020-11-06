@@ -171,7 +171,7 @@ contratos_vigentes_f <- contratos_vigentes %>%
 
 Primeiramente, foram filtrados os contratos que possuem associação com alguma licitação realizada. Dessa maneira, garantimos que os contratos desta análise passaram pela primeira fase do Processo de Despesa Pública.
 
-O valor total do contrato e sua data de encerramento são dados disponíveis no SAGRES. Para que estejamos todos na mesma página, vamos definir um *contrato vigente* como um contrato ainda em seu prazo de validade. Dada a versão do SAGRES utilizada aqui, nesta análise iremos considerar como um contrato vigente como **o contrato cuja data de expiração é supeior a 01 de janeiro de 2019**.
+O valor total do contrato e sua data de encerramento são dados disponíveis no SAGRES. Para que estejamos todos na mesma página, vamos definir um *contrato vigente* como um contrato ainda em seu prazo de validade. Dada a versão do SAGRES utilizada aqui, nesta análise iremos considerar como um contrato vigente como **o contrato cuja data de expiração é superior a 01 de janeiro de 2019**.
 
 <br>
 
