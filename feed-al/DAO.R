@@ -31,10 +31,10 @@ get_args <- function() {
 
 #' @title Cria as tabelas do Banco de dados
 create <- function() {
+  system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_localidade_ibge.sql"))
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_municipio.sql"))
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_licitacao.sql"))
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_contrato.sql"))
-  system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_previsao.sql"))
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_empenho.sql"))
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_participante.sql"))
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/create/create_pagamento.sql"))
@@ -47,6 +47,12 @@ create <- function() {
 import <- function() {
   system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/import/import_data.sql"))
 }
+
+#' @title Importa dados do TCE-RS para as tabelas do banco de dados
+import_tce_rs <- function() {
+  system(paste0("psql -h ", host, " -U ", user, " -d ", db, " -f ", " /feed-al/scripts/import/import_data_tce_rs.sql"))
+}
+
 
 #' @title "Dropa as tabelas do Banco de Dados"
 clean <- function() {
@@ -75,7 +81,9 @@ if (funct == "create") {
   create()
 } else if (funct == "import") {
   import()
-} else if ( funct == "shell") {
+}  else if (funct == "import-tce-rs") {
+  import_tce_rs()
+}else if ( funct == "shell") {
   shell()
 } else if ( funct == "clean"){
   clean()

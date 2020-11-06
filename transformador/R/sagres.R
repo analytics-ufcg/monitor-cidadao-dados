@@ -28,6 +28,19 @@ generate_contrato_id <- function(contratos_df) {
     dplyr::select(id_contrato, dplyr::everything())
 }
 
+#' @title Gera um identificador único para cada contrato de 2020
+#' @param contratos_df Dataframe contendo informações sobre os contratos de 2020
+#' @return Dataframe contendo informações sobre os contratos de 2020 e seus ids
+#' @rdname generate_contrato_tramita_id
+#' @examples
+#' contratos_dt <- generate_contrato_tramita_id(contrato_df)
+generate_contrato_tramita_id <- function(contratos_df) {
+  contratos_df %<>% .generate_hash_id(c("cd_u_gestora", "nu_licitacao",
+                                        "tp_licitacao", "nu_contrato"),
+                                       "id_contrato") %>%
+    dplyr::select(id_contrato, dplyr::everything())
+}
+
 #' @title Gera um identificador único para cada participante
 #' @param participantes_df Dataframe contendo informações sobre os participantes
 #' @return Dataframe contendo informações sobre os participantes e seus ids
@@ -141,8 +154,21 @@ process_participante <- function(participantes_df) {
 #' @param municipios_df Dataframe contendo informações dos municipios
 #' @return Dataframe contendo informações dos municipios processados
 process_municipio <- function(municipios_df) {
-  municipios_df %<>% dplyr::select(cd_municipio, dplyr::everything())
+  municipios_df %<>% dplyr::select(cd_municipio, cd_ibge) %>%
+    dplyr::mutate(cd_ibge = substr( cd_ibge , start = 1 , stop = 7 ))
 }
+
+#' @title Processa dataframe de codigos das localidades do IBGE
+#' @description Manipula tabela pra forma que será utilizada no banco
+#' @param process_codigo_localidades_df Dataframe contendo informações
+#' dos codigos das localidades do IBGE
+#' @return Dataframe contendo informações dos codigos das localidades do IBGE
+process_codigo_localidades_ibge <- function(codigo_localidades_ibge_df) {
+  codigo_localidades_ibge_df %<>% dplyr::rename(cd_ibge = codigo_municipio_completo) %>%
+    dplyr::mutate_all(as.character) %>%
+    dplyr::select(cd_ibge, dplyr::everything())
+}
+
 
 #' @title Processa dataframe de propostas
 #' @description Manipula tabela pra forma que será utilizada no banco
@@ -163,7 +189,7 @@ process_pagamento <- function(pagamentos_df) {
 #' @title Processa dataframe de contratos mutados
 #' @description Manipula tabela pra forma que será utilizada no banco
 #' @param contratos_mutados_df Dataframe contendo informações dos contratos mutados
-#' @return Dataframe contendo informações dos contratos mutados  processados
+#' @return Dataframe contendo informações dos contratos mutados processados
 process_contrato_mutado <- function(contratos_mutados_df) {
   contratos_mutados_df %<>% dplyr::select(nu_contrato, dplyr::everything())
 }
@@ -174,4 +200,36 @@ process_contrato_mutado <- function(contratos_mutados_df) {
 #' @return Dataframe contendo informações dos estornos de pagamentos processados
 process_estorno_pagamento <- function(estorno_pagamento_df) {
   estorno_pagamento_df %<>% generate_estorno_pagamento_id()
+}
+
+#' @title Processa dataframe de contratos de 2020
+#' @description Manipula tabela pra forma que será utilizada no banco
+#' @param contratos_df Dataframe contendo informações dos contratos de 2020
+#' @return Dataframe contendo informações dos contratos processados de 2020
+process_contrato_tramita <- function(contratos_tramita_df) {
+  contratos_tramita_df %<>% .extract_cd_municipio("cd_u_gestora") %>%
+    dplyr::filter(cd_municipio != "612") %>%  #registro preenchido errado
+    generate_contrato_tramita_id()
+}
+
+#' @title Gera um identificador único para cada licitação do tramita
+#' @param licitacoes_tramita_df Dataframe contendo informações sobre as licitações
+#' @return Dataframe contendo informações sobre as licitações contidas no Tramita e seus ids
+#' @rdname generate_licitacao_tramita_id
+#' @examples
+#' licitacoes_tramita_dt <- generate_licitacao_tramita_id(licitacoes_tramita_df)
+generate_licitacao_tramita_id <- function(licitacoes_tramita_df) {
+  licitacoes_tramita_df %<>% .generate_hash_id(c("cd_u_gestora",
+                                        "nu_licitacao", "tp_licitacao"),
+                                      "id_licitacao") %>%
+    dplyr::select(id_licitacao, dplyr::everything())
+}
+
+#' @title Processa dataframe das licitações contidas no tramita
+#' @description Manipula tabela pra forma que será utilizada no banco
+#' @param licitacoes_df Dataframe contendo informações das licitações
+#' @return Dataframe contendo informações das licitações do tramita processados
+process_licitacao_tramita <- function(licitacoes_tramita_df) {
+  licitacoes_tramita_df %<>% .extract_cd_municipio("cd_u_gestora") %>%
+    generate_licitacao_tramita_id()
 }

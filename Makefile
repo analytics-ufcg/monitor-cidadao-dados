@@ -9,14 +9,18 @@ help:
 	@echo "\tup \t\t\t\tCria e inicia os containers."
 	@echo "\tstop \t\t\t\tPara todos os serviços."
 	@echo "\tclean-volumes \t\t\tPara e remove todos os volumes."
+	@echo ""
+	@echo "\tfetch-data-sagres \t\t\tObtem dados do SAGRES-PB"
+	@echo "\tfetch-data-tce-rs \t\t\tObtem dados do TCE-RS"
+	@echo "\ttransform-data-sagres \t\t\tTraduz e transforma os dados colhidos do SAGRES"
+	@echo "\ttransform-data-tce-rs \t\t\tTraduz e transforma os dados colhidos do TCE-RS"
 	@echo "\tenter-fetcher-container \ttAbre cli do container fetcher"
-	@echo "\tfetch-data \t\t\tObtem dados"
 	@echo "\tenter-transformer-container \tAbre cli do container transformador"
-	@echo "\ttransform-data\t\t\tTraduz e transforma os dados colhidos"
 	@echo "\tenter-feed-al-container\t\tAbre cli do container feed-al"
 	@echo ""
 	@echo "\tfeed-al-create\t\t\tCria as tabelas do Banco de Dados Analytics"
 	@echo "\tfeed-al-import\t\t\tImporta dados para as tabelas do Banco de Dados Analytics"
+	@echo "\tfeed-al-import-tce-rs\t\t\tImporta dados do TCE-RS para as tabelas do Banco de Dados Analytics"
 	@echo "\tfeed-al-clean\t\t\tDropa as tabelas do Banco de Dados Analytics"
 	@echo "\tfeed-al-shell\t\t\tAcessa terminal do Banco de Dados Analytics"
 	@echo ""
@@ -47,15 +51,23 @@ clean-volumes:
 enter-fetcher-container:
 	docker exec -it fetcher /bin/bash
 .PHONY: enter-fetcher-container
-fetch-data:
+fetch-data-tce-rs:
+	docker exec -it fetcher sh -c "Rscript scripts/fetch_tce_rs_opendata.R --ano $(ano)"
+.PHONY: fetch-data-tce-rs
+fetch-data-sagres:
+	docker exec -it fetcher sh -c "Rscript scripts/fetch_tramita_pb_2020_data.R"
+	docker exec -it fetcher sh -c "Rscript scripts/fetch_ibge.R"
 	docker exec -it fetcher sh -c "Rscript scripts/fetch_sagres_data.R"
-.PHONY: fetch-data
+.PHONY: fetch-data-sagres
 enter-transformer-container:
 	docker exec -it transformador /bin/bash
 .PHONY: enter-transformer-container
-transform-data:
+transform-data-sagres:
 	docker exec -it transformador sh -c "Rscript scripts/transform_mc_data.R"
-.PHONY: transform-data
+.PHONY: transform-data-sagres
+transform-data-tce-rs:
+	docker exec -it transformador sh -c "Rscript scripts/transform_mc_data_tce_rs.R"
+.PHONY: transform-data-tce-rs
 enter-feed-al-container:
 	sudo docker exec -it feed-al sh
 .PHONY: enter-feed-al-container
@@ -65,6 +77,9 @@ feed-al-create:
 feed-al-import:
 	docker exec -it feed-al sh -c "Rscript feed-al/DAO.R -f import"
 .PHONY: feed-al-import
+feed-al-import-tce-rs:
+	docker exec -it feed-al sh -c "Rscript feed-al/DAO.R -f import-tce-rs"
+.PHONY: feed-al-import-tce-rs
 feed-al-clean:
 	docker exec -it feed-al sh -c "Rscript feed-al/DAO.R -f clean"
 .PHONY: feed-al-clean
