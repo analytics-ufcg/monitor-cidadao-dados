@@ -3,6 +3,13 @@ library(magrittr)
 source(here::here("R/tradutor/sagres.R"))
 source(here::here("R/tradutor/read_utils.R"))
 
+source(here::here("R/tradutor/tce_rs_opendata.R"))
+source(here::here("R/tradutor/read_utils_tce_rs.R"))
+
+#-----------------------------------------------------------------------------#
+#-------------------------          SAGRES          --------------------------#
+#-----------------------------------------------------------------------------#
+
 #' @title Obtem dados das licitações
 #' @return Dataframe contendo informações sobre as licitações
 #' @rdname get_licitacoes
@@ -203,3 +210,90 @@ get_contratos_mutados <-function(){
   contratos_mutados_dt <- read_contratos_mutados() %>%
     translate_contratos_mutados()
 }
+
+#' @title Obtem dados das localidades de acordo com o IBGE
+#' @return Dataframe contendo informações sobre as localidades de acordo com o IBGE
+#' @rdname get_codigo_localidades_ibge
+#' @examples
+#' codigo_localidades_ibge_dt <- get_codigo_localidades_ibge()
+get_codigo_localidades_ibge <- function(){
+  codigo_localidades_ibge_dt  <- read_codigo_localidades_ibge() %>%
+    translate_codigo_localidades_ibge()
+}
+
+
+#' @title Obtem dados das licitações contidas no tramita
+#' @return Dataframe contendo informações sobre as licitações contidas no tramita
+#' @rdname get_licitacoes_tramita
+#' @examples
+#' licitacoes_tramita_df <- get_licitacoes_tramita()
+get_licitacoes_tramita <- function(){
+  licitacoes_tramita_df <- read_licitacoes_tramita() %>%
+  translate_licitacoes_tramita()
+}
+
+#' @title Obtem dados dos contratos contidos no tramita
+#' @return Dataframe contendo informações sobre os contratos contidos no tramita
+#' @rdname get_contratos_tramita
+#' @examples
+#' contratos_tramita_df <- get_contratos_tramita()
+get_contratos_tramita <- function(){
+  contratos_tramita_df <- read_contratos_tramita() %>%
+  translate_contratos_tramita()
+}
+#-----------------------------------------------------------------------------#
+#-------------------------          TCE-RS          --------------------------#
+#-----------------------------------------------------------------------------#
+
+#' @title Obtem dados dos contrato do TCE-RS
+#' @return Dataframe contendo informações sobre os contratos
+#' @rdname get_contratos_tce_rs
+#' @examples
+#' contratos_tce_rs_dt <- get_contratos_tce_rs(ano)
+get_contratos_tce_rs <- function(ano){
+  contratos_tce_rs_dt  <- read_contratos_tce_rs(ano) %>%
+  translate_contratos_tce_rs()
+}
+
+#' @title Obtem dados dos ógãos do TCE-RS
+#' @return Dataframe contendo informações sobre os órgãos
+#' @rdname get_orgaos_tce_rs
+#' @examples
+#' orgaos_tce_rs_dt <- get_orgaos_tce_rs()
+get_orgaos_tce_rs <- function(){
+  orgaos_tce_rs_dt  <- read_orgaos_tce_rs() %>%
+    translate_orgaos_tce_rs()
+}
+
+#' @title Obtem dados das modalidades das licitação do TCE-RS
+#' @return Dataframe contendo informações sobre as modalidades de licitação existentes
+#' @rdname get_modalidade_licitacao_tce_rs
+#' @examples
+#' modalidade_licitacao_tce_rs_dt <- get_modalidade_licitacao_tce_rs()
+get_modalidade_licitacao_tce_rs <- function(){
+  modalidade_licitacao_tce_rs_dt  <- read_modalidade_licitacoes_tce_rs()
+}
+
+
+
+#' @title Obtem dados das licitações do TCE-RS
+#' @return Dataframe contendo informações sobre as licitações
+#' @rdname get_licitacoes_tce_rs
+#' @examples
+#' licitacoes_tce_rs_dt <- get_licitacoes_tce_rs()
+get_licitacoes_tce_rs <- function(ano){
+  licitacoes_tce_rs_dt  <- read_licitacoes_tce_rs(ano) %>%
+    translate_licitacoes_tce_rs()
+}
+
+#' @title Obtem dados os dados dos fornecedores do TCE-RS
+#' @return Dataframe contendo informações sobre os fornecedores
+#' @rdname get_pessoas_tce_rs
+#' @examples
+#' essoas_tce_rs_dt <- get_pessoas_tce_rs()
+get_pessoas_tce_rs <- function(ano){
+  pessoas_tce_rs_dt  <- read_pessoas_tce_rs(ano) %>%
+    translate_pessoas_tce_rs()
+}
+
+

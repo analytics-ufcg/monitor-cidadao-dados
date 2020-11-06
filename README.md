@@ -31,15 +31,35 @@ Adicione os seguintes arquivos com variáveis de ambiente e credenciais:
 
 
 ## Como usar?
-Nesta camada o make é utilizado como facilitador para execução. Abaixo estão descritos os passos necessários para importar os dados para o banco de dados Analytics (também chamado de AL_DB):
+Nesta camada o make é utilizado como facilitador para execução. Abaixo estão descritos os passos necessários para importar os dados para o banco de dados Analytics (também chamado de AL_DB) e Monitor Cidadão (também chamado de MC_DB):
+
+<b> Passos comuns a ambos os bancos:</b>
 
  1. Faça o build das imagens necessárias com `sudo make build`;
  2. Crie e inicie os containers do docker com `sudo make up`;
- 3. Obtenha os dados através do `sudo make fetch-data`. Nesta etapa você também pode testar a integridade dos dados obtidos utilizando os testes unitários de cada tabela com `sudo docker exec -it fetcher sh -c "Rscript tests/<nome-da-tabela>.R"`;
- 4. Traduza e transforme os dados colhidos `sudo make transform-data`;
+ 3. Obtenha os dados através do `sudo make fetch-data-sagres` e `sudo make fetch-data-tce-rs ano=<2016,2017, 2018 , 2019, 2020 ou todos>`. Nesta etapa você também pode testar a integridade dos dados obtidos utilizando os testes unitários de cada tabela com `sudo docker exec -it fetcher sh -c "Rscript tests/<nome-da-tabela>.R"`;
+ 4. Traduza e transforme os dados colhidos `sudo make transform-data` e `sudo make transform-data-tce-rs`;
+
+<b> Para o AL_DB: </b>
+
  5. Crie as tabelas no banco AL_DB com `sudo make feed-al-create`;
- 6. Agora importe os dados para as tabelas do banco com `sudo make feed-al-import`;
+ 6. Agora importe os dados para as tabelas do banco com `sudo make feed-al-import` e `sudo make feed-al-import-tce-rs`;
  7. Você pode verificar se a(s) tabela(s) estão no banco com `sudo make feed-al-shell` e `\dt`.
+
+<b> Geração das previsões: </b>
+
+ 8. Gere as features da previsão com `sudo make gera-feature vigencia=<encerrados, vigentes e todos> data_range_inicio=<2012-01-01> data_range_fim=<2018-01-01>`;
+ 9. Gere o feature set da previsão com `sudo make gera-feature-set tipo_construcao_features=<recentes>`;
+ 10. Gere o experimento com as informações do risco com `sudo make gera-experimento tipo_contrucao_feature_set=<recentes>`.
+
+<b> Para o MC_DB: </b>
+
+ 11. Crie as tabelas no banco MC_DB com `sudo make feed-mc-create`;
+ 12. Importe os dados das features para as tabelas do banco com `sudo make feed-mc-import-feature`;
+ 13. Importe os dados do features set para as tabelas do banco com `sudo make feed-mc-import-feature-set`;
+ 14. Agora importe os dados do experimento para as tabelas do banco com `sudo make feed-mc-import-experimento`;
+ 15. Você pode verificar se a(s) tabela(s) estão no banco com `sudo make feed-mc-shell` e `\dt`.
+
 
 Caso você queira executar os comandos docker diretamente, confira o código correspondente a seu comando no arquivo  `Makefile`. Abaixo estão todos os comandos disponíveis para serem executados com `sudo make <Comando>`:
 Comando | Descrição
@@ -51,14 +71,26 @@ stop | Para todos os serviços.
 clean-volumes | Para e remove todos os volumes.
 enter-fetcher-container  | Abre cli do container fetcher
 fetch-data | Obtem dados
+fetch-data-tce-rs | Obtem dados do TCE-RS
 enter-transformer-container | Abre cli do container transformador
 transform-data | Traduz e transforma os dados colhidos
+transform-data-tce-rs | Traduz e transforma os dados do TCE-RS
 enter-feed-al-container | Abre cli do container feed-al
 feed-al-create | Cria as tabelas do Banco de Dados Analytics
 feed-al-import | Importa dados para as tabelas do Banco de Dados Analytics
+feed-al-import-tce-rs | Importa dados do RS para as tabelas do Banco de Dados Analytics
 feed-al-clean | Dropa as tabelas do Banco de Dados Analytics
 feed-al-shell | Acessa terminal do Banco de Dados Analytics
-
+gera-feature | Gera features
+gera-feature-set | Gera conjunto de features
+gera-experimento | Gera previsão de risco
+enter-feed-mc-container | Abre cli do container feed-mc
+feed-mc-create | Cria as tabelas do Banco de Dados Monitor Cidadão
+feed-mc-import-feature | Importa features para o Banco de dados Monitor Cidadão
+feed-mc-import-feature-set | Importa features set para o Banco de dados Monitor Cidadão
+feed-mc-import-experimento | Importa experimento para o Banco de dados Monitor Cidadão
+feed-mc-clean | Dropa as tabelas do Banco de Dados Monitor Cidadão
+feed-mc-shell | Acessa terminal do Banco de Dados Monitor Cidadão
 
 ## License
 

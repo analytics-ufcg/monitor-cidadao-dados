@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS "proposta" (
     "cd_u_gestora" INTEGER,
     "dt_ano" SMALLINT,
     "nu_licitacao" VARCHAR(9),
-    "tp_licitacao" SMALLINT,
+    "tp_licitacao" VARCHAR(10),
     "cd_item" VARCHAR(5),
     "cd_sub_grupo_item" VARCHAR(9),
     "nu_cpfcnpj" VARCHAR(14),

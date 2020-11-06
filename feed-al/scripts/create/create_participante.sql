@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS "participante" (
     "cd_u_gestora" INTEGER,   
     "dt_ano" SMALLINT,
     "nu_licitacao" VARCHAR(10),
-    "tp_licitacao" SMALLINT,
+    "tp_licitacao" VARCHAR(20),
     "nu_cpfcnpj" VARCHAR(14),
     "dt_mes_ano" VARCHAR(6),
     "no_fornecedor" VARCHAR(100),
