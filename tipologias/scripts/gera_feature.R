@@ -96,6 +96,13 @@ data_range_fim <- "2020-01-01"
 
 al_db_con <- NULL
 
+POSTGRES_HOST="10.30.0.91"
+POSTGRES_DB="al_db"
+POSTGRES_USER='postgres'
+POSTGRES_PASSWORD="secret"
+POSTGRES_PORT=7655
+
+
 tryCatch({al_db_con <- DBI::dbConnect(RPostgres::Postgres(),
                                       dbname = POSTGRES_DB, 
                                       host = POSTGRES_HOST, 
@@ -159,13 +166,13 @@ print("Buscando vencedores a partir dos contratos...")
 licitacoes_vencedoras <- contratos_processados %>% get_vencedores_by_contratos()
 
 print("Cruzando propostas com licitações...")
-propostas_licitacoes <- propostas %>% dplyr::inner_join(licitacoes)
+propostas_licitacoes <- propostas %>% dplyr::mutate(tp_licitacao = as.character(tp_licitacao)) %>% dplyr::inner_join(licitacoes)
 
 #Carrega dados dependentes
 print("Carregando participantes...")
 participantes <- carrega_participantes(al_db_con, contratos_by_cnpj$nu_cpfcnpj)
 
-credores <- c("09123654000187", "09095183000140", "01518579000141", "00360305000104", "24513574000121")
+credores <- contratos_processados$nu_cpfcnpj
 
 #Gera tipologias de fornecimento
 print("Gerando tipologias de fornecimento...")
@@ -204,8 +211,7 @@ contratos_tramita <- carrega_contratos_mutados(al_db_con)
 
 tipologias_merge <- merge_tipologias(contratos_processados, 
                                      tipologias_licitacao, 
-                                     tipologias_proposta,
-                                     tipologias_fornecimento) %>% 
+                                     tipologias_proposta) %>% 
   processa_gabarito_tramita(contratos_tramita) %>% 
   replace_nas()
 

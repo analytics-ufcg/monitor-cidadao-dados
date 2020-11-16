@@ -174,7 +174,7 @@ merge_tipologias <- function(contratos_df, tipologias_licitacao_df, tipologias_p
     dplyr::summarise(total_ganho = sum(vl_total_contrato))
   
   tipologias_merge <- contratos_df %>% 
-    dplyr::left_join(tipologias_fornecimento_df, by = c("nu_cpfcnpj" = "cd_credor", "data_inicio" = "data")) %>% 
+    #dplyr::left_join(tipologias_fornecimento_df, by = c("nu_cpfcnpj" = "cd_credor", "data_inicio" = "data")) %>% 
     dplyr::left_join(tipologias_licitacao_df, by = c("nu_cpfcnpj" = "nu_cpfcnpj", "data_inicio" = "data_inicio")) %>% 
     dplyr::left_join(tipologias_proposta_df, by = c("nu_cpfcnpj" = "nu_cpfcnpj", "data_inicio" = "data_inicio")) %>% 
     dplyr::left_join(contratos_total_ganho) 

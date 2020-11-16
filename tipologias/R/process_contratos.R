@@ -7,6 +7,7 @@
 #' contratos <- process_contratos(contratos_df)
 process_contratos <- function(contratos_df) {
   contratos_df %<>% dplyr::mutate(data_inicio = as.Date(dt_assinatura, "%Y-%m-%d")) %>% 
+    dplyr::filter(!is.na(id_licitacao)) %>% 
     dplyr::select(cd_u_gestora, nu_licitacao, nu_contrato, dt_ano, data_inicio, nu_cpfcnpj, tp_licitacao, vl_total_contrato)
 }
 
@@ -122,7 +123,7 @@ media_n_contratos_by_cnpj <- function(contratos_df){
 #' contratos_features <- merge_features_contratos(contratos_razao_df, contratos_df)
 merge_features_contratos <- function(contratos_razao_df, contratos_df){
   contratos_features <- contratos_razao_df %>% 
-    dplyr::left_join(contratos_df, by = c("nu_cpfcnpj", "data_inicio")) %>% 
+    dplyr::inner_join(contratos_df, by = c("nu_cpfcnpj", "data_inicio")) %>% 
     dplyr::mutate_at(.funs = dplyr::funs(tidyr::replace_na(., 0)), .vars = dplyr::vars(dplyr::starts_with("num_contratos"), "media_num_contratos"))
 }
   
