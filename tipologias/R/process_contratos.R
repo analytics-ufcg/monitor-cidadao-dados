@@ -8,7 +8,8 @@
 process_contratos <- function(contratos_df) {
   contratos_df %<>% dplyr::mutate(data_inicio = as.Date(dt_assinatura, "%Y-%m-%d")) %>% 
     dplyr::filter(!is.na(id_licitacao)) %>% 
-    dplyr::select(cd_u_gestora, nu_licitacao, nu_contrato, dt_ano, data_inicio, nu_cpfcnpj, tp_licitacao, vl_total_contrato)
+    dplyr::select(cd_u_gestora, nu_licitacao, nu_contrato, dt_ano, data_inicio, nu_cpfcnpj, tp_licitacao, vl_total_contrato) %>% 
+    dplyr::mutate(nu_contrato = str_pad(nu_contrato, 12, "left", "0"))
 }
 
 #' @description Conta o número de contratos por CNPJ

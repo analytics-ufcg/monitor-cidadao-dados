@@ -4,6 +4,13 @@
 #' @return Data Frame com os dados passados como parâmetro e uma nova coluna status_tramita com a classe (pertence a classe positiva (1) ou não (0))
 processa_gabarito_tramita <- function(dados, contratos_tramita) {
  
+    # Adiciona filtragem nos contratos mutados - considerando apenas as mutações de interesse a seguir
+    alteracoes_interesse = c("Impedimento", "Paralisação", "Rescisão", "Suspensão", "Sustação")
+    
+    contratos_tramita <- contratos_tramita %>%
+        dplyr::filter(tipo_alteracao %in% alteracoes_interesse) %>% 
+        dplyr::mutate(nu_contrato = str_pad(nu_contrato, 12, "left", "0"))
+        
     contratos_tramita_group <- contratos_tramita %>% 
         dplyr::group_by(cd_u_gestora, nu_contrato) %>% 
         dplyr::summarise(status_tramita = dplyr::n()) %>% 
